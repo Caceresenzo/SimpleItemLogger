@@ -1,10 +1,13 @@
 package caceresenzo.apps.itemlogger.models;
 
+import caceresenzo.frameworks.database.IDatabaseEntry;
 import caceresenzo.frameworks.database.annotations.DatabaseTable;
 import caceresenzo.frameworks.database.annotations.DatabaseTableColumn;
+import caceresenzo.frameworks.search.ISearchable;
+import caceresenzo.frameworks.search.filters.IFilter;
 
 @DatabaseTable("items")
-public class Item {
+public class Item implements IDatabaseEntry, ISearchable<Item> {
 
 	/* Database Fields */
 	public static final String COLUMN_NAME = "name";
@@ -58,6 +61,11 @@ public class Item {
 	 */
 	public void setQuantity(int quantity) {
 		this.quantity = quantity;
+	}
+
+	@Override
+	public boolean search(IFilter<Item> filters) {
+		return false;
 	}
 	
 }

@@ -2,12 +2,15 @@ package caceresenzo.apps.itemlogger.models;
 
 import java.util.Date;
 
+import caceresenzo.frameworks.database.IDatabaseEntry;
 import caceresenzo.frameworks.database.annotations.DatabaseTable;
 import caceresenzo.frameworks.database.annotations.DatabaseTableColumn;
 import caceresenzo.frameworks.database.setup.sql.SqlTableBuilder;
+import caceresenzo.frameworks.search.ISearchable;
+import caceresenzo.frameworks.search.filters.IFilter;
 
 @DatabaseTable("history_entries")
-public class HistoryEntry {
+public class HistoryEntry implements IDatabaseEntry, ISearchable<HistoryEntry> {
 	
 	/* Database Fields */
 	public static final String COLUMN_PERSON_ID = "person_id";
@@ -59,6 +62,11 @@ public class HistoryEntry {
 	/** @return History entry's return date. */
 	public Date getReturnDate() {
 		return returnDate;
+	}
+
+	@Override
+	public boolean search(IFilter<HistoryEntry> filters) {
+		return false;
 	}
 	
 }

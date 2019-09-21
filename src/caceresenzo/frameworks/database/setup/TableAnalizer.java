@@ -12,6 +12,14 @@ import caceresenzo.frameworks.database.binder.BindableTable;
 
 public class TableAnalizer {
 	
+	/* Singleton */
+	private static TableAnalizer INSTANCE;
+	
+	/* Private Constructor */
+	private TableAnalizer() {
+		
+	}
+	
 	/**
 	 * Analize a class and extract table data and rows with the Java's Reflection API.
 	 * 
@@ -23,22 +31,41 @@ public class TableAnalizer {
 	 * @throws NullPointerException
 	 *             If the class does not have a {@link DatabaseTable} annotation.
 	 */
-	public static BindableTable analize(Class<?> clazz) {
+	public BindableTable analize(Class<?> clazz) {
 		Objects.requireNonNull(clazz, "Cannot analize a null class.");
 		DatabaseTable tableAnnotation = clazz.getAnnotation(DatabaseTable.class);
 		Objects.requireNonNull(tableAnnotation, "Class does not have the DatabaseTable annotation.");
 		
-		List<BindableColumn> bindableFields = new ArrayList<>();
+		return new BindableTable(tableAnnotation, clazz, analizeColumns(clazz, false));
+	}
+	
+	public List<BindableColumn> analizeColumns(Class<?> clazz, boolean ignoreColumnId) {
+		Objects.requireNonNull(clazz, "Cannot analize a null class.");
+		
+		List<BindableColumn> bindableColumns = new ArrayList<>();
 		
 		for (Field field : clazz.getDeclaredFields()) {
 			DatabaseTableColumn annotation = field.getAnnotation(DatabaseTableColumn.class);
 			
 			if (annotation != null) {
-				bindableFields.add(new BindableColumn(annotation, field));
+				if (ignoreColumnId && annotation.value().equals(DatabaseTableColumn.COLUMN_ID)) {
+					continue;
+				}
+				
+				bindableColumns.add(new BindableColumn(annotation, field));
 			}
 		}
 		
-		return new BindableTable(tableAnnotation, clazz, bindableFields);
+		return bindableColumns;
+	}
+	
+	/** @return TableAnalizer's singleton instance. */
+	public static final TableAnalizer get() {
+		if (INSTANCE == null) {
+			INSTANCE = new TableAnalizer();
+		}
+		
+		return INSTANCE;
 	}
 	
 }

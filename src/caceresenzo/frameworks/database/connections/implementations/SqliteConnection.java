@@ -1,6 +1,6 @@
-package caceresenzo.frameworks.database.connections;
+package caceresenzo.frameworks.database.connections.implementations;
 
-import caceresenzo.frameworks.database.AbstractDatabaseConnection;
+import caceresenzo.frameworks.database.connections.AbstractDatabaseConnection;
 import caceresenzo.frameworks.database.setup.sql.SqlTableBuilder;
 import caceresenzo.frameworks.database.setup.sql.SqliteTableBuilder;
 

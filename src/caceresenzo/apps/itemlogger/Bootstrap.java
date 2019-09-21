@@ -3,7 +3,7 @@ package caceresenzo.apps.itemlogger;
 import caceresenzo.apps.itemlogger.models.HistoryEntry;
 import caceresenzo.apps.itemlogger.models.Item;
 import caceresenzo.apps.itemlogger.models.Person;
-import caceresenzo.frameworks.database.connections.SqliteConnection;
+import caceresenzo.frameworks.database.connections.implementations.SqliteConnection;
 import caceresenzo.frameworks.database.setup.TableCreator;
 
 public class Bootstrap {

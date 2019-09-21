@@ -1,4 +1,4 @@
-package caceresenzo.frameworks.database;
+package caceresenzo.frameworks.database.connections;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

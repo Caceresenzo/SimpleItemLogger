@@ -7,11 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import caceresenzo.frameworks.database.AbstractDatabaseConnection;
 import caceresenzo.frameworks.database.annotations.DatabaseTable;
 import caceresenzo.frameworks.database.annotations.DatabaseTableColumn;
 import caceresenzo.frameworks.database.binder.BindableColumn;
 import caceresenzo.frameworks.database.binder.BindableTable;
+import caceresenzo.frameworks.database.connections.AbstractDatabaseConnection;
 import caceresenzo.frameworks.database.setup.sql.SqlTableBuilder;
 
 public class TableCreator {
@@ -34,7 +34,7 @@ public class TableCreator {
 	public TableCreator with(Class<?> clazz) {
 		Objects.requireNonNull(clazz, "Cannot add a null class.");
 		
-		this.bindables.put(clazz, TableAnalizer.analize(clazz));
+		this.bindables.put(clazz, TableAnalizer.get().analize(clazz));
 		
 		return this;
 	}

@@ -1,10 +1,13 @@
 package caceresenzo.apps.itemlogger.models;
 
+import caceresenzo.frameworks.database.IDatabaseEntry;
 import caceresenzo.frameworks.database.annotations.DatabaseTable;
 import caceresenzo.frameworks.database.annotations.DatabaseTableColumn;
+import caceresenzo.frameworks.search.ISearchable;
+import caceresenzo.frameworks.search.filters.IFilter;
 
 @DatabaseTable("persons")
-public class Person {
+public class Person implements IDatabaseEntry, ISearchable<Person> {
 
 	/* Database Fields */
 	public static final String COLUMN_FIRSTNAME = "firstname";
@@ -77,6 +80,11 @@ public class Person {
 	 */
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	@Override
+	public boolean search(IFilter<Person> filters) {
+		return false;
 	}
 	
 }

@@ -16,6 +16,7 @@ public class BindableColumn {
 		this.field = field;
 	}
 	
+	/** @return Column's name. */
 	public String getColumnName() {
 		return annotation.value();
 	}
@@ -24,7 +25,7 @@ public class BindableColumn {
 	public DatabaseTableColumn getAnnotation() {
 		return annotation;
 	}
-
+	
 	/** @return Field's instance. */
 	public Field getField() {
 		return field;
