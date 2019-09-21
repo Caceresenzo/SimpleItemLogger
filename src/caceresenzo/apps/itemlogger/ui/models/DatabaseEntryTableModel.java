@@ -14,6 +14,7 @@ import caceresenzo.apps.itemlogger.ui.models.table.ActionCellPanel;
 import caceresenzo.apps.itemlogger.ui.models.table.ActionCellRenderer;
 import caceresenzo.frameworks.database.IDatabaseEntry;
 import caceresenzo.frameworks.database.binder.BindableColumn;
+import caceresenzo.frameworks.database.executor.DatabaseSynchronizer;
 import caceresenzo.frameworks.database.setup.TableAnalizer;
 
 public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractTableModel {
@@ -22,10 +23,13 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 	private final JTable table;
 	
 	/* Variables */
+	private final Class<T> modelClass;
 	private final List<T> entries;
+	private final boolean useActionColumn;
 	private Callback<T> actionCallback;
 	
 	/* Update */
+	private DatabaseSynchronizer<T> synchronizer;
 	
 	/* Table Model */
 	List<BindableColumn> columns;
@@ -33,19 +37,34 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 	private Class<?>[] columnClass;
 	
 	/* Constructor */
-	public DatabaseEntryTableModel(JTable table, Class<T> clazz, List<T> databaseEntries) {
+	public DatabaseEntryTableModel(JTable table, Class<T> modelClass, List<T> databaseEntries) {
+		this(table, modelClass, databaseEntries, true);
+	}
+	
+	/* Constructor */
+	public DatabaseEntryTableModel(JTable table, Class<T> modelClass, List<T> databaseEntries, boolean useActionColumn) {
 		this.table = table;
+		this.modelClass = modelClass;
 		this.entries = databaseEntries;
+		this.useActionColumn = useActionColumn;
 		
-		initializeColumns(clazz);
+		initializeColumns(modelClass);
 		initilizeRenderer();
 	}
 	
+	/**
+	 * Initialize the columns with the {@link TableAnalizer#analizeColumns(Class) analized} {@link BindableColumn columns}.
+	 * 
+	 * @param clazz
+	 *            Target class.
+	 */
 	private void initializeColumns(Class<T> clazz) {
-		columns = TableAnalizer.get().analizeColumns(clazz, true);
+		columns = TableAnalizer.get().analizeColumns(clazz);
 		
-		columnNames = new String[columns.size() + 1];
-		columnClass = new Class[columns.size() + 1];
+		int actionColumnSize = useActionColumn ? 1 : 0;
+		
+		columnNames = new String[columns.size() + actionColumnSize];
+		columnClass = new Class[columns.size() + actionColumnSize];
 		
 		int index = 0;
 		for (; index < columns.size(); index++) {
@@ -57,22 +76,26 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 			bindableColumn.getField().setAccessible(true);
 		}
 		
-		columnNames[index] = "ACTIONS";
-		columnClass[index] = Object.class;
+		if (useActionColumn) {
+			columnNames[index] = "ACTIONS";
+			columnClass[index] = Object.class;
+		}
 	}
 	
+	/** Initialize the render system of the action column only if the <code>useActionColumn</code> was set to <code>true</code> in the constructor. */
 	private void initilizeRenderer() {
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				int actionColumnIndex = getActionColumnIndex();
-				ActionCellPanel actionCellPanel = new ActionCellPanel(Arrays.asList(new JButton("Hello"), new JButton("Hello1"), new JButton("Hell2o")));
-				ActionCellRenderer renderer = new ActionCellRenderer(actionCellPanel.copy());
-				
-				table.getColumnModel().getColumn(actionColumnIndex).setCellRenderer(renderer);
-				table.getColumnModel().getColumn(actionColumnIndex).setCellEditor(new ActionCellEditor(actionCellPanel));
-				table.setRowHeight(renderer.getTableCellRendererComponent(table, null, true, true, 0, 0).getPreferredSize().height);
-			}
+		if (!useActionColumn) {
+			return;
+		}
+		
+		SwingUtilities.invokeLater(() -> {
+			int actionColumnIndex = getActionColumnIndex();
+			ActionCellPanel actionCellPanel = new ActionCellPanel(Arrays.asList(new JButton("Hello"), new JButton("Hello1"), new JButton("Hell2o")));
+			ActionCellRenderer renderer = new ActionCellRenderer(actionCellPanel.copy());
+			
+			table.getColumnModel().getColumn(actionColumnIndex).setCellRenderer(renderer);
+			table.getColumnModel().getColumn(actionColumnIndex).setCellEditor(new ActionCellEditor(actionCellPanel));
+			table.setRowHeight(renderer.getTableCellRendererComponent(table, null, true, true, 0, 0).getPreferredSize().height);
 		});
 	}
 	
@@ -132,31 +155,71 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 			try {
 				columns.get(columnIndex).getField().set(row, aValue);
 				
-				
+				if (synchronizer != null) {
+					synchronizer.update(row);
+				}
 			} catch (IllegalArgumentException | IllegalAccessException exception) {
 				throw new RuntimeException(exception);
 			}
 		}
 	}
 	
+	/** @return The index of the action's column. */
 	public int getActionColumnIndex() {
 		return columns.size();
 	}
 	
+	/**
+	 * Check if an index is the action column.
+	 * 
+	 * @param index
+	 *            Target index.
+	 * @return Weather or not the index correspond to the action column.
+	 */
 	public boolean isActionColumn(int index) {
 		return index == getActionColumnIndex();
 	}
 	
+	/**
+	 * Set the action callback.
+	 * 
+	 * @param actionCallback
+	 *            Callback instance.
+	 */
+	public void setActionCallback(Callback<T> actionCallback) {
+		this.actionCallback = actionCallback;
+	}
+	
+	public void setSynchronizer(DatabaseSynchronizer<T> synchronizer) {
+		this.synchronizer = synchronizer;
+	}
+	
+	/** @return Source {@link JTable}. */
 	public JTable getTable() {
 		return table;
 	}
 	
+	/** @return The entries {@link List list}. */
 	public List<T> getEntries() {
 		return entries;
 	}
 	
 	public interface Callback<T extends IDatabaseEntry> {
 		
+		/**
+		 * Called when a {@link JButton button} of the action column's action event is trigger.
+		 * 
+		 * @param table
+		 *            Source {@link JTable}.
+		 * @param model
+		 *            Source model.
+		 * @param entries
+		 *            The entries {@link List list}.
+		 * @param row
+		 *            Current row.
+		 * @param action
+		 *            {@link JButton} action command.
+		 */
 		void openActionClick(JTable table, DatabaseEntryTableModel<T> model, List<T> entries, int row, String action);
 		
 	}

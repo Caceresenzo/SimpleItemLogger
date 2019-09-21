@@ -2,8 +2,13 @@ package caceresenzo.frameworks.database.setup;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import caceresenzo.frameworks.database.annotations.DatabaseTable;
 import caceresenzo.frameworks.database.annotations.DatabaseTableColumn;
@@ -12,12 +17,18 @@ import caceresenzo.frameworks.database.binder.BindableTable;
 
 public class TableAnalizer {
 	
+	/* Logger */
+	private static Logger LOGGER = LoggerFactory.getLogger(TableAnalizer.class);
+	
 	/* Singleton */
 	private static TableAnalizer INSTANCE;
 	
+	/* Cache */
+	private final Map<Class<?>, List<BindableColumn>> bindableColumnCache;
+	
 	/* Private Constructor */
 	private TableAnalizer() {
-		
+		this.bindableColumnCache = new HashMap<>();
 	}
 	
 	/**
@@ -36,27 +47,34 @@ public class TableAnalizer {
 		DatabaseTable tableAnnotation = clazz.getAnnotation(DatabaseTable.class);
 		Objects.requireNonNull(tableAnnotation, "Class does not have the DatabaseTable annotation.");
 		
-		return new BindableTable(tableAnnotation, clazz, analizeColumns(clazz, false));
+		return new BindableTable(tableAnnotation, clazz, analizeColumns(clazz));
 	}
 	
-	public List<BindableColumn> analizeColumns(Class<?> clazz, boolean ignoreColumnId) {
+	/**
+	 * Extract field with a {@link DatabaseTableColumn} annotation.
+	 * 
+	 * @param clazz
+	 *            Target class.
+	 * @return A {@link List} of {@link BindableColumn} found in the target class.
+	 */
+	public List<BindableColumn> analizeColumns(Class<?> clazz) {
 		Objects.requireNonNull(clazz, "Cannot analize a null class.");
 		
-		List<BindableColumn> bindableColumns = new ArrayList<>();
-		
-		for (Field field : clazz.getDeclaredFields()) {
-			DatabaseTableColumn annotation = field.getAnnotation(DatabaseTableColumn.class);
+		return bindableColumnCache.computeIfAbsent(clazz, (key) -> {
+			List<BindableColumn> bindableColumns = new ArrayList<>();
 			
-			if (annotation != null) {
-				if (ignoreColumnId && annotation.value().equals(DatabaseTableColumn.COLUMN_ID)) {
-					continue;
-				}
+			for (Field field : clazz.getDeclaredFields()) {
+				DatabaseTableColumn annotation = field.getAnnotation(DatabaseTableColumn.class);
 				
-				bindableColumns.add(new BindableColumn(annotation, field));
+				if (annotation != null) {
+					LOGGER.info("Found valid field \"{}\" in class \"{}\".", field.getName(), clazz.getSimpleName());
+					
+					bindableColumns.add(new BindableColumn(annotation, field));
+				}
 			}
-		}
-		
-		return bindableColumns;
+			
+			return bindableColumns;
+		});
 	}
 	
 	/** @return TableAnalizer's singleton instance. */

@@ -1,6 +1,7 @@
 package caceresenzo.apps.itemlogger.ui;
 
 import java.awt.EventQueue;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,16 +24,26 @@ import javax.swing.border.TitledBorder;
 
 import caceresenzo.apps.itemlogger.models.Person;
 import caceresenzo.apps.itemlogger.ui.models.DatabaseEntryTableModel;
+import caceresenzo.frameworks.database.connections.implementations.SqliteConnection;
+import caceresenzo.frameworks.database.executor.DatabaseSynchronizer;
 
-public class AbstractLoggerWindow {
+public class AbstractLoggerWindow<T> {
 	
+	/* UI */
 	private JFrame frame;
-	private JTextField textField;
-	private JTable table;
+	private JPanel searchPanel;
+	private JPanel searchFilterPanel;
+	private JPanel actionContainerPanel;
+	private JPanel actionPanel;
+	private JPanel dataPanel;
+	private JScrollPane dataScrollPane;
+	private JTable dataTable;
+	private JTextField searchBarTextField;
+	private JButton searchButton;
+	private JCheckBox checkBox;
+	private JCheckBox checkBox_1;
 	
-	/**
-	 * Launch the application.
-	 */
+	/** Launch the application. */
 	public static void main(String[] args) {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -51,13 +62,11 @@ public class AbstractLoggerWindow {
 		});
 	}
 	
-	/**
-	 * Create the application.
-	 */
+	/* Constructor */
 	public AbstractLoggerWindow() {
 		initialize();
 		
-		DatabaseEntryTableModel<Person> model = new DatabaseEntryTableModel<>(table, Person.class, Arrays.asList(
+		DatabaseEntryTableModel<Person> model = new DatabaseEntryTableModel<>(dataTable, Person.class, Arrays.asList(
 				new Person(0, "Hello", "World", "helloworld@gmail.com"),
 				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
 				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
@@ -109,9 +118,19 @@ public class AbstractLoggerWindow {
 				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
 				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
 				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello2", "World2", "helloworld2@gmail.com")));
+				new Person(0, "Hello2", "World2", "helloworld2@gmail.com")), false);
 		
-		table.setModel(model);
+		dataTable.setModel(model);
+		
+		SqliteConnection sqliteConnection = new SqliteConnection("hello.db");
+		try {
+			sqliteConnection.connect();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		model.setSynchronizer(new DatabaseSynchronizer<>(sqliteConnection, Person.class));
 	}
 	
 	/**
@@ -124,114 +143,114 @@ public class AbstractLoggerWindow {
 		frame.setLocationRelativeTo(null);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		JPanel panel = new JPanel();
-		panel.setBorder(new TitledBorder(null, "Search", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		searchPanel = new JPanel();
+		searchPanel.setBorder(new TitledBorder(null, "Search", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
-		JPanel panel_2 = new JPanel();
-		panel_2.setBorder(new TitledBorder(null, "Actions", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		actionContainerPanel = new JPanel();
+		actionContainerPanel.setBorder(new TitledBorder(null, "Actions", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
-		JPanel panel_4 = new JPanel();
-		panel_4.setBorder(new TitledBorder(null, "Data", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		dataPanel = new JPanel();
+		dataPanel.setBorder(new TitledBorder(null, "Data", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
 		groupLayout.setHorizontalGroup(
 				groupLayout.createParallelGroup(Alignment.TRAILING)
 						.addGroup(groupLayout.createSequentialGroup()
 								.addContainerGap()
 								.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-										.addComponent(panel_4, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 664, Short.MAX_VALUE)
-										.addComponent(panel_2, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 664, Short.MAX_VALUE)
-										.addComponent(panel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 664, Short.MAX_VALUE))
+										.addComponent(dataPanel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 664, Short.MAX_VALUE)
+										.addComponent(actionContainerPanel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 664, Short.MAX_VALUE)
+										.addComponent(searchPanel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 664, Short.MAX_VALUE))
 								.addContainerGap()));
 		groupLayout.setVerticalGroup(
 				groupLayout.createParallelGroup(Alignment.LEADING)
 						.addGroup(groupLayout.createSequentialGroup()
 								.addContainerGap()
-								.addComponent(panel, GroupLayout.PREFERRED_SIZE, 128, GroupLayout.PREFERRED_SIZE)
+								.addComponent(searchPanel, GroupLayout.PREFERRED_SIZE, 128, GroupLayout.PREFERRED_SIZE)
 								.addPreferredGap(ComponentPlacement.RELATED)
-								.addComponent(panel_2, GroupLayout.PREFERRED_SIZE, 79, GroupLayout.PREFERRED_SIZE)
+								.addComponent(actionContainerPanel, GroupLayout.PREFERRED_SIZE, 79, GroupLayout.PREFERRED_SIZE)
 								.addPreferredGap(ComponentPlacement.RELATED)
-								.addComponent(panel_4, GroupLayout.DEFAULT_SIZE, 220, Short.MAX_VALUE)
+								.addComponent(dataPanel, GroupLayout.DEFAULT_SIZE, 220, Short.MAX_VALUE)
 								.addContainerGap()));
 		
-		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		scrollPane.setBorder(null);
-		GroupLayout gl_panel_4 = new GroupLayout(panel_4);
-		gl_panel_4.setHorizontalGroup(
-				gl_panel_4.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panel_4.createSequentialGroup()
+		dataScrollPane = new JScrollPane();
+		dataScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		dataScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		dataScrollPane.setBorder(null);
+		GroupLayout gl_dataPanel = new GroupLayout(dataPanel);
+		gl_dataPanel.setHorizontalGroup(
+				gl_dataPanel.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_dataPanel.createSequentialGroup()
 								.addContainerGap()
-								.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 644, Short.MAX_VALUE)
+								.addComponent(dataScrollPane, GroupLayout.DEFAULT_SIZE, 644, Short.MAX_VALUE)
 								.addContainerGap()));
-		gl_panel_4.setVerticalGroup(
-				gl_panel_4.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panel_4.createSequentialGroup()
+		gl_dataPanel.setVerticalGroup(
+				gl_dataPanel.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_dataPanel.createSequentialGroup()
 								.addContainerGap()
-								.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 198, Short.MAX_VALUE)
+								.addComponent(dataScrollPane, GroupLayout.DEFAULT_SIZE, 198, Short.MAX_VALUE)
 								.addContainerGap()));
 		
-		table = new JTable();
-		table.setFillsViewportHeight(true);
-		scrollPane.setViewportView(table);
-		panel_4.setLayout(gl_panel_4);
+		dataTable = new JTable();
+		dataTable.setFillsViewportHeight(true);
+		dataScrollPane.setViewportView(dataTable);
+		dataPanel.setLayout(gl_dataPanel);
 		
-		JPanel panel_3 = new JPanel();
-		panel_3.setBorder(null);
-		GroupLayout gl_panel_2 = new GroupLayout(panel_2);
-		gl_panel_2.setHorizontalGroup(
-				gl_panel_2.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panel_2.createSequentialGroup()
+		actionPanel = new JPanel();
+		actionPanel.setBorder(null);
+		GroupLayout gl_actionContainerPanel = new GroupLayout(actionContainerPanel);
+		gl_actionContainerPanel.setHorizontalGroup(
+				gl_actionContainerPanel.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_actionContainerPanel.createSequentialGroup()
 								.addContainerGap()
-								.addComponent(panel_3, GroupLayout.DEFAULT_SIZE, 632, Short.MAX_VALUE)
+								.addComponent(actionPanel, GroupLayout.DEFAULT_SIZE, 632, Short.MAX_VALUE)
 								.addContainerGap()));
-		gl_panel_2.setVerticalGroup(
-				gl_panel_2.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panel_2.createSequentialGroup()
+		gl_actionContainerPanel.setVerticalGroup(
+				gl_actionContainerPanel.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_actionContainerPanel.createSequentialGroup()
 								.addContainerGap()
-								.addComponent(panel_3, GroupLayout.PREFERRED_SIZE, 34, GroupLayout.PREFERRED_SIZE)
+								.addComponent(actionPanel, GroupLayout.PREFERRED_SIZE, 34, GroupLayout.PREFERRED_SIZE)
 								.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
-		panel_3.setLayout(new BoxLayout(panel_3, BoxLayout.X_AXIS));
-		panel_2.setLayout(gl_panel_2);
+		actionPanel.setLayout(new BoxLayout(actionPanel, BoxLayout.X_AXIS));
+		actionContainerPanel.setLayout(gl_actionContainerPanel);
 		
-		getActionButtons().forEach((button) -> panel_3.add(button));
+		getActionButtons().forEach((button) -> actionPanel.add(button));
 		
-		textField = new JTextField();
+		searchBarTextField = new JTextField();
 		
-		JButton button = new JButton("New button");
+		searchButton = new JButton("New button");
 		
-		JPanel panel_1 = new JPanel();
-		panel_1.setBorder(new TitledBorder(null, "Filters", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		GroupLayout gl_panel = new GroupLayout(panel);
-		gl_panel.setHorizontalGroup(
-				gl_panel.createParallelGroup(Alignment.LEADING)
-						.addGroup(Alignment.TRAILING, gl_panel.createSequentialGroup()
+		searchFilterPanel = new JPanel();
+		searchFilterPanel.setBorder(new TitledBorder(null, "Filters", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		GroupLayout gl_searchPanel = new GroupLayout(searchPanel);
+		gl_searchPanel.setHorizontalGroup(
+				gl_searchPanel.createParallelGroup(Alignment.LEADING)
+						.addGroup(Alignment.TRAILING, gl_searchPanel.createSequentialGroup()
 								.addContainerGap()
-								.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
-										.addComponent(panel_1, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 632, Short.MAX_VALUE)
-										.addGroup(gl_panel.createSequentialGroup()
-												.addComponent(textField, GroupLayout.DEFAULT_SIZE, 525, Short.MAX_VALUE)
+								.addGroup(gl_searchPanel.createParallelGroup(Alignment.TRAILING)
+										.addComponent(searchFilterPanel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 632, Short.MAX_VALUE)
+										.addGroup(gl_searchPanel.createSequentialGroup()
+												.addComponent(searchBarTextField, GroupLayout.DEFAULT_SIZE, 525, Short.MAX_VALUE)
 												.addPreferredGap(ComponentPlacement.RELATED)
-												.addComponent(button, GroupLayout.PREFERRED_SIZE, 101, GroupLayout.PREFERRED_SIZE)))
+												.addComponent(searchButton, GroupLayout.PREFERRED_SIZE, 101, GroupLayout.PREFERRED_SIZE)))
 								.addContainerGap()));
-		gl_panel.setVerticalGroup(
-				gl_panel.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panel.createSequentialGroup()
+		gl_searchPanel.setVerticalGroup(
+				gl_searchPanel.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_searchPanel.createSequentialGroup()
 								.addContainerGap()
-								.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING, false)
-										.addComponent(button, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-										.addComponent(textField, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE))
+								.addGroup(gl_searchPanel.createParallelGroup(Alignment.TRAILING, false)
+										.addComponent(searchButton, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+										.addComponent(searchBarTextField, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE))
 								.addPreferredGap(ComponentPlacement.RELATED)
-								.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 46, GroupLayout.PREFERRED_SIZE)
+								.addComponent(searchFilterPanel, GroupLayout.PREFERRED_SIZE, 46, GroupLayout.PREFERRED_SIZE)
 								.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
-		panel_1.setLayout(new BoxLayout(panel_1, BoxLayout.X_AXIS));
+		searchFilterPanel.setLayout(new BoxLayout(searchFilterPanel, BoxLayout.X_AXIS));
 		
-		JCheckBox checkBox = new JCheckBox("New check box");
-		panel_1.add(checkBox);
+		checkBox = new JCheckBox("New check box");
+		searchFilterPanel.add(checkBox);
 		
-		JCheckBox checkBox_1 = new JCheckBox("New check box");
-		panel_1.add(checkBox_1);
-		panel.setLayout(gl_panel);
+		checkBox_1 = new JCheckBox("New check box");
+		searchFilterPanel.add(checkBox_1);
+		searchPanel.setLayout(gl_searchPanel);
 		frame.getContentPane().setLayout(groupLayout);
 	}
 	
