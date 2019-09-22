@@ -42,7 +42,7 @@ public class TableAnalizer {
 	 * @throws NullPointerException
 	 *             If the class does not have a {@link DatabaseTable} annotation.
 	 */
-	public BindableTable analize(Class<?> clazz) {
+	public BindableTable analizeTable(Class<?> clazz) {
 		Objects.requireNonNull(clazz, "Cannot analize a null class.");
 		DatabaseTable tableAnnotation = clazz.getAnnotation(DatabaseTable.class);
 		Objects.requireNonNull(tableAnnotation, "Class does not have the DatabaseTable annotation.");
@@ -60,7 +60,7 @@ public class TableAnalizer {
 	public List<BindableColumn> analizeColumns(Class<?> clazz) {
 		Objects.requireNonNull(clazz, "Cannot analize a null class.");
 		
-		return bindableColumnCache.computeIfAbsent(clazz, (key) -> {
+		return new ArrayList<>(bindableColumnCache.computeIfAbsent(clazz, (key) -> {
 			List<BindableColumn> bindableColumns = new ArrayList<>();
 			
 			for (Field field : clazz.getDeclaredFields()) {
@@ -74,7 +74,7 @@ public class TableAnalizer {
 			}
 			
 			return bindableColumns;
-		});
+		}));
 	}
 	
 	/** @return TableAnalizer's singleton instance. */

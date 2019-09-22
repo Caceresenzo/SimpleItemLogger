@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 
 import caceresenzo.frameworks.database.annotations.DatabaseTableColumn;
+import caceresenzo.libs.reflection.ReflectionUtils;
 
 public class BindableColumn {
 	
@@ -15,6 +16,8 @@ public class BindableColumn {
 	public BindableColumn(DatabaseTableColumn annotation, Field field) {
 		this.annotation = annotation;
 		this.field = field;
+		
+		ReflectionUtils.silentlyRemoveFinalProtection(field);
 	}
 	
 	/** @return Column's name. */

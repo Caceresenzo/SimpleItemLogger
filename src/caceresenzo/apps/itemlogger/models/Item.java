@@ -20,6 +20,11 @@ public class Item implements IDatabaseEntry, ISearchable<Item> {
 	private String name;
 	@DatabaseTableColumn(COLUMN_QUANTITY)
 	private int quantity;
+
+	/* Constructor */
+	public Item() {
+		this(0, null, 0);
+	}
 	
 	/* Constructor */
 	public Item(final int id, String name, int quantity) {

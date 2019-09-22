@@ -14,8 +14,8 @@ import caceresenzo.apps.itemlogger.ui.models.table.ActionCellPanel;
 import caceresenzo.apps.itemlogger.ui.models.table.ActionCellRenderer;
 import caceresenzo.frameworks.database.IDatabaseEntry;
 import caceresenzo.frameworks.database.binder.BindableColumn;
-import caceresenzo.frameworks.database.executor.DatabaseSynchronizer;
 import caceresenzo.frameworks.database.setup.TableAnalizer;
+import caceresenzo.frameworks.database.synchronization.DatabaseSynchronizer;
 
 public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractTableModel {
 	
@@ -29,7 +29,7 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 	private Callback<T> actionCallback;
 	
 	/* Update */
-	private DatabaseSynchronizer<T> synchronizer;
+	private DatabaseSynchronizer synchronizer;
 	
 	/* Table Model */
 	List<BindableColumn> columns;
@@ -60,6 +60,7 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 	 */
 	private void initializeColumns(Class<T> clazz) {
 		columns = TableAnalizer.get().analizeColumns(clazz);
+		columns.remove(BindableColumn.findIdColumn(columns));
 		
 		int actionColumnSize = useActionColumn ? 1 : 0;
 		
@@ -76,7 +77,7 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 			bindableColumn.getField().setAccessible(true);
 		}
 		
-		if (useActionColumn) {
+		if (actionColumnSize != 0) {
 			columnNames[index] = "ACTIONS";
 			columnClass[index] = Object.class;
 		}
@@ -156,7 +157,7 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 				columns.get(columnIndex).getField().set(row, aValue);
 				
 				if (synchronizer != null) {
-					synchronizer.update(row);
+					synchronizer.update(modelClass, row);
 				}
 			} catch (IllegalArgumentException | IllegalAccessException exception) {
 				throw new RuntimeException(exception);
@@ -190,7 +191,7 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 		this.actionCallback = actionCallback;
 	}
 	
-	public void setSynchronizer(DatabaseSynchronizer<T> synchronizer) {
+	public void setSynchronizer(DatabaseSynchronizer synchronizer) {
 		this.synchronizer = synchronizer;
 	}
 	

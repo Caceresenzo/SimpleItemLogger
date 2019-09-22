@@ -34,7 +34,7 @@ public class TableCreator {
 	public TableCreator with(Class<?> clazz) {
 		Objects.requireNonNull(clazz, "Cannot add a null class.");
 		
-		this.bindables.put(clazz, TableAnalizer.get().analize(clazz));
+		this.bindables.put(clazz, TableAnalizer.get().analizeTable(clazz));
 		
 		return this;
 	}
@@ -60,7 +60,7 @@ public class TableCreator {
 			tableBuilder.setTableName(bindableTable.getTableName())
 					.setIfNotExists(true);
 			
-			for (BindableColumn bindableField : bindableTable.getBindableFields()) {
+			for (BindableColumn bindableField : bindableTable.getBindableColumns()) {
 				String name = bindableField.getColumnName();
 				String type = tableBuilder.findTypeFor(bindableField.getField().getType());
 				int flags = 0;

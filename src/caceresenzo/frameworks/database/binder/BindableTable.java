@@ -35,7 +35,7 @@ public class BindableTable {
 	}
 	
 	/** @return A {@link List list} of analyzed {@link BindableColumn bindable fields}. */
-	public List<BindableColumn> getBindableFields() {
+	public List<BindableColumn> getBindableColumns() {
 		return bindableFields;
 	}
 	

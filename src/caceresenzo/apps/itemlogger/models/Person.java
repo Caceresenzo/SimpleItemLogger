@@ -12,7 +12,7 @@ public class Person implements IDatabaseEntry, ISearchable<Person> {
 	/* Database Fields */
 	public static final String COLUMN_FIRSTNAME = "firstname";
 	public static final String COLUMN_LASTNAME = "lastname";
-	public static final String COLUMN_EMAIL = "email";
+	public static final String COLUMN_PHONE = "phone";
 	
 	/* Variables */
 	@DatabaseTableColumn(DatabaseTableColumn.COLUMN_ID)
@@ -21,15 +21,20 @@ public class Person implements IDatabaseEntry, ISearchable<Person> {
 	private String firstname;
 	@DatabaseTableColumn(COLUMN_LASTNAME)
 	private String lastname;
-	@DatabaseTableColumn(COLUMN_EMAIL)
-	private String email;
+	@DatabaseTableColumn(COLUMN_PHONE)
+	private String phone;
 	
 	/* Constructor */
-	public Person(int id, String firstname, String lastname, String email) {
+	public Person() {
+		this(0, null, null, null);
+	}
+	
+	/* Constructor */
+	public Person(int id, String firstname, String lastname, String phone) {
 		this.id = id;
 		this.firstname = firstname;
 		this.lastname = lastname;
-		this.email = email;
+		this.phone = phone;
 	}
 	
 	/** @return Person's database row id. */
@@ -67,19 +72,19 @@ public class Person implements IDatabaseEntry, ISearchable<Person> {
 		this.lastname = lastname;
 	}
 	
-	/** @return Person's email. */
-	public String getEmail() {
-		return email;
+	/** @return Person's phone. */
+	public String getPhone() {
+		return phone;
 	}
 	
 	/**
-	 * Change person's email.
+	 * Change person's phone.
 	 * 
-	 * @param email
-	 *            New person's email.
+	 * @param phone
+	 *            New person's phone.
 	 */
-	public void setEmail(String email) {
-		this.email = email;
+	public void setPhone(String email) {
+		this.phone = email;
 	}
 
 	@Override

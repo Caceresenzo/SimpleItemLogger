@@ -25,7 +25,7 @@ import javax.swing.border.TitledBorder;
 import caceresenzo.apps.itemlogger.models.Person;
 import caceresenzo.apps.itemlogger.ui.models.DatabaseEntryTableModel;
 import caceresenzo.frameworks.database.connections.implementations.SqliteConnection;
-import caceresenzo.frameworks.database.executor.DatabaseSynchronizer;
+import caceresenzo.frameworks.database.synchronization.DatabaseSynchronizer;
 
 public class AbstractLoggerWindow<T> {
 	
@@ -66,59 +66,7 @@ public class AbstractLoggerWindow<T> {
 	public AbstractLoggerWindow() {
 		initialize();
 		
-		DatabaseEntryTableModel<Person> model = new DatabaseEntryTableModel<>(dataTable, Person.class, Arrays.asList(
-				new Person(0, "Hello", "World", "helloworld@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello1", "World1", "helloworld1@gmail.com"),
-				new Person(0, "Hello2", "World2", "helloworld2@gmail.com")), false);
+		DatabaseEntryTableModel<Person> model = new DatabaseEntryTableModel<>(dataTable, Person.class, new ArrayList<>(), false);
 		
 		dataTable.setModel(model);
 		
@@ -130,7 +78,9 @@ public class AbstractLoggerWindow<T> {
 			e.printStackTrace();
 		}
 		
-		model.setSynchronizer(new DatabaseSynchronizer<>(sqliteConnection, Person.class));
+		DatabaseSynchronizer a = new DatabaseSynchronizer(sqliteConnection);
+		model.setSynchronizer(a);
+		model.getEntries().addAll(a.load(Person.class));
 	}
 	
 	/**

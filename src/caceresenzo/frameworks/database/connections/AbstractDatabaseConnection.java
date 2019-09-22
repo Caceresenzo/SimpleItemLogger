@@ -2,7 +2,9 @@ package caceresenzo.frameworks.database.connections;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import caceresenzo.frameworks.database.setup.sql.SqlTableBuilder;
 
@@ -51,6 +53,14 @@ public abstract class AbstractDatabaseConnection {
 		}
 		
 		return false;
+	}
+	
+	public Statement createStatement() throws SQLException {
+		return connection.createStatement();
+	}
+	
+	public PreparedStatement prepareStatement(String sql) throws SQLException {
+		return connection.prepareStatement(sql);
 	}
 	
 	/** @return Weather or not the database {@link Connection connection} is not <code>null</code>. */

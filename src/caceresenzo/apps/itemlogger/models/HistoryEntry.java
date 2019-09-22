@@ -29,6 +29,11 @@ public class HistoryEntry implements IDatabaseEntry, ISearchable<HistoryEntry> {
 	private final Date lendDate;
 	@DatabaseTableColumn(value = COLUMN_RETURN_DATE, flags = SqlTableBuilder.FLAG_NULL)
 	private final Date returnDate;
+
+	/* Constructor */
+	public HistoryEntry() {
+		this(0, 0, 0, null, null);
+	}
 	
 	/* Constructor */
 	public HistoryEntry(int id, int personId, int itemId, Date lendDate, Date returnDate) {
