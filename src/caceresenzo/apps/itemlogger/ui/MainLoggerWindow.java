@@ -44,6 +44,8 @@ public class MainLoggerWindow implements ActionListener {
 	public static final String ACTION_COMMAND_DISPLAY_HISTORY = "action_display_history";
 	public static final String ACTION_COMMAND_PRINT = "action_print";
 	
+	// public static final List<JButton>
+	
 	/* UI */
 	private JFrame frame;
 	private JPanel searchPanel;
@@ -185,16 +187,19 @@ public class MainLoggerWindow implements ActionListener {
 		searchPanel.setLayout(gl_searchPanel);
 		frame.getContentPane().setLayout(groupLayout);
 		
-		changeModel(Item.class);
+		changeModel(Item.class, null);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private void changeModel(Class<?> newClassModel) {
+	private void changeModel(Class<?> newClassModel, List<JButton> rowActionButtons) {
 		if (currentDisplayedModelClass == newClassModel) {
 			return;
 		}
 		
-		DatabaseEntryTableModel model = new DatabaseEntryTableModel(dataTable, currentDisplayedModelClass = newClassModel, new ArrayList<>(), false);
+		DatabaseEntryTableModel model = new DatabaseEntryTableModel(dataTable, currentDisplayedModelClass = newClassModel, new ArrayList<>(), rowActionButtons);
+		
+		((TitledBorder) dataPanel.getBorder()).setTitle(i18n.string("logger.panel.data.title.with", i18n.string(String.format("logger.panel.data.title.with.part.%s", newClassModel.getSimpleName().toLowerCase()))));
+		dataPanel.repaint();
 		
 		dataTable.setModel(model);
 		model.synchronize();
@@ -206,7 +211,12 @@ public class MainLoggerWindow implements ActionListener {
 		
 		switch (actionCommand) {
 			case ACTION_COMMAND_ADD: {
-				
+				AddNewDialog.open(frame, currentDisplayedModelClass, new AddNewDialog.Callback() {
+					@Override
+					public void onCreatedItem(Class<?> modelClass, Object instance) {
+						LOGGER.info(String.valueOf(instance));
+					}
+				});
 				break;
 			}
 			
@@ -233,7 +243,7 @@ public class MainLoggerWindow implements ActionListener {
 					}
 				}
 				
-				changeModel(newModelClass);
+				changeModel(newModelClass, null);
 				break;
 			}
 			

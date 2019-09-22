@@ -35,6 +35,10 @@ public class Language {
 			o("logger.panel.search.filters.title", "Filtres");
 			o("logger.panel.action.title", "Actions");
 			o("logger.panel.data.title", "Données");
+			o("logger.panel.data.title.with", "Données — %s");
+			o("logger.panel.data.title.with.part.item", "Inventaire");
+			o("logger.panel.data.title.with.part.person", "Personnes");
+			o("logger.panel.data.title.with.part.historyentry", "Historique");
 
 			o("logger.button.search", "Rechercher");
 
@@ -43,13 +47,16 @@ public class Language {
 			o("logger.button.action.persons", "Personnes");
 			o("logger.button.action.history", "Historique");
 			o("logger.button.action.print", "Imprimer");
-
+			
 			o("logger.table.column.id", "ID");
 			o("logger.table.column.name", "Nom");
 			o("logger.table.column.quantity", "Quantité");
 			o("logger.table.column.firstname", "Prénom");
 			o("logger.table.column.lastname", "Nom de Famille");
 			o("logger.table.column.phone", "Numéro de Téléphone");
+
+			o("create-dialog.button.done", "Valider");
+			o("create-dialog.button.cancel", "Annuler");
 			
 			o("application.copyright.full", "SIMPLE CARNET D'OBJET\nCRÉE PAR ENZO CACERES POUR L'ENTREPRISE NEGRO SA");
 			

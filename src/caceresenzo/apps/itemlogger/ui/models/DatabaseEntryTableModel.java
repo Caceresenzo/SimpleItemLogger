@@ -27,7 +27,7 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 	/* Variables */
 	private final Class<T> modelClass;
 	private final List<T> entries;
-	private final boolean useActionColumn;
+	private final List<JButton> rowActionButtons;
 	private Callback<T> actionCallback;
 	
 	/* Update */
@@ -40,15 +40,15 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 	
 	/* Constructor */
 	public DatabaseEntryTableModel(JTable table, Class<T> modelClass, List<T> databaseEntries) {
-		this(table, modelClass, databaseEntries, true);
+		this(table, modelClass, databaseEntries, null);
 	}
 	
 	/* Constructor */
-	public DatabaseEntryTableModel(JTable table, Class<T> modelClass, List<T> databaseEntries, boolean useActionColumn) {
+	public DatabaseEntryTableModel(JTable table, Class<T> modelClass, List<T> databaseEntries, List<JButton> rowActionButtons) {
 		this.table = table;
 		this.modelClass = modelClass;
 		this.entries = databaseEntries;
-		this.useActionColumn = useActionColumn;
+		this.rowActionButtons = rowActionButtons;
 		
 		this.synchronizer = DataManager.get().getDatabaseSynchronizer();
 		
@@ -66,7 +66,7 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 		columns = TableAnalizer.get().analizeColumns(clazz);
 		columns.remove(BindableColumn.findIdColumn(columns));
 		
-		int actionColumnSize = useActionColumn ? 1 : 0;
+		int actionColumnSize = rowActionButtons != null ? 1 : 0;
 		
 		columnNames = new String[columns.size() + actionColumnSize];
 		columnClass = new Class[columns.size() + actionColumnSize];
@@ -89,13 +89,13 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 	
 	/** Initialize the render system of the action column only if the <code>useActionColumn</code> was set to <code>true</code> in the constructor. */
 	private void initilizeRenderer() {
-		if (!useActionColumn) {
+		if (rowActionButtons == null) {
 			return;
 		}
 		
 		SwingUtilities.invokeLater(() -> {
 			int actionColumnIndex = getActionColumnIndex();
-			ActionCellPanel actionCellPanel = new ActionCellPanel(Arrays.asList(new JButton("Hello"), new JButton("Hello1"), new JButton("Hell2o")));
+			ActionCellPanel actionCellPanel = new ActionCellPanel(rowActionButtons);
 			ActionCellRenderer renderer = new ActionCellRenderer(actionCellPanel.copy());
 			
 			table.getColumnModel().getColumn(actionColumnIndex).setCellRenderer(renderer);
