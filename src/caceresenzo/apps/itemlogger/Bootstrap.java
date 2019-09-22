@@ -1,22 +1,18 @@
 package caceresenzo.apps.itemlogger;
 
-import caceresenzo.apps.itemlogger.models.HistoryEntry;
-import caceresenzo.apps.itemlogger.models.Item;
-import caceresenzo.apps.itemlogger.models.Person;
-import caceresenzo.frameworks.database.connections.implementations.SqliteConnection;
-import caceresenzo.frameworks.database.setup.TableCreator;
+import caceresenzo.apps.itemlogger.configuration.Config;
+import caceresenzo.apps.itemlogger.configuration.Language;
+import caceresenzo.apps.itemlogger.managers.ItemLoggerManager;
+import caceresenzo.apps.itemlogger.ui.MainLoggerWindow;
 
 public class Bootstrap {
 	
 	public static void main(String[] args) throws Exception {
-		SqliteConnection sqliteConnection = new SqliteConnection("hello.db");
-		sqliteConnection.connect();
+		Config.get();
+		Language.get().initialize();
+		ItemLoggerManager.get().initialize();
 		
-		new TableCreator()
-				.with(Person.class)
-				.with(Item.class)
-				.with(HistoryEntry.class)
-				.autoCreate(sqliteConnection);
+		MainLoggerWindow.open();
 	}
 	
 }

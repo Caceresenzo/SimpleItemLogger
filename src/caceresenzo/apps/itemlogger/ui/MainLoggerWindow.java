@@ -22,12 +22,19 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import caceresenzo.apps.itemlogger.models.Person;
 import caceresenzo.apps.itemlogger.ui.models.DatabaseEntryTableModel;
 import caceresenzo.frameworks.database.connections.implementations.SqliteConnection;
 import caceresenzo.frameworks.database.synchronization.DatabaseSynchronizer;
+import caceresenzo.libs.internationalization.i18n;
 
-public class AbstractLoggerWindow<T> {
+public class MainLoggerWindow {
+	
+	/* Logger */
+	private static Logger LOGGER = LoggerFactory.getLogger(MainLoggerWindow.class);
 	
 	/* UI */
 	private JFrame frame;
@@ -43,27 +50,8 @@ public class AbstractLoggerWindow<T> {
 	private JCheckBox checkBox;
 	private JCheckBox checkBox_1;
 	
-	/** Launch the application. */
-	public static void main(String[] args) {
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (Throwable e) {
-			e.printStackTrace();
-		}
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					AbstractLoggerWindow window = new AbstractLoggerWindow();
-					window.frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-	
 	/* Constructor */
-	public AbstractLoggerWindow() {
+	public MainLoggerWindow() {
 		initialize();
 		
 		DatabaseEntryTableModel<Person> model = new DatabaseEntryTableModel<>(dataTable, Person.class, new ArrayList<>(), false);
@@ -92,15 +80,16 @@ public class AbstractLoggerWindow<T> {
 		frame.setMinimumSize(frame.getSize());
 		frame.setLocationRelativeTo(null);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setTitle(i18n.string("application.title"));
 		
 		searchPanel = new JPanel();
-		searchPanel.setBorder(new TitledBorder(null, "Search", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		searchPanel.setBorder(new TitledBorder(null, i18n.string("logger.panel.search.title"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
 		actionContainerPanel = new JPanel();
-		actionContainerPanel.setBorder(new TitledBorder(null, "Actions", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		actionContainerPanel.setBorder(new TitledBorder(null, i18n.string("logger.panel.action.title"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
 		dataPanel = new JPanel();
-		dataPanel.setBorder(new TitledBorder(null, "Data", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		dataPanel.setBorder(new TitledBorder(null, i18n.string("logger.panel.data.title"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
 		groupLayout.setHorizontalGroup(
 				groupLayout.createParallelGroup(Alignment.TRAILING)
@@ -167,10 +156,10 @@ public class AbstractLoggerWindow<T> {
 		
 		searchBarTextField = new JTextField();
 		
-		searchButton = new JButton("New button");
+		searchButton = new JButton(i18n.string("logger.button.search"));
 		
 		searchFilterPanel = new JPanel();
-		searchFilterPanel.setBorder(new TitledBorder(null, "Filters", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		searchFilterPanel.setBorder(new TitledBorder(null, i18n.string("logger.panel.search.filters.title"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		GroupLayout gl_searchPanel = new GroupLayout(searchPanel);
 		gl_searchPanel.setHorizontalGroup(
 				gl_searchPanel.createParallelGroup(Alignment.LEADING)
@@ -207,12 +196,51 @@ public class AbstractLoggerWindow<T> {
 	protected List<JButton> getActionButtons() {
 		List<JButton> buttons = new ArrayList<>();
 		
-		buttons.add(new JButton("Print", new ImageIcon(AbstractLoggerWindow.class.getResource("/caceresenzo/apps/itemlogger/assets/icons/icon-print-32px.png"))));
-		buttons.add(new JButton("Users", new ImageIcon(AbstractLoggerWindow.class.getResource("/caceresenzo/apps/itemlogger/assets/icons/icon-user-men-32px.png"))));
-		buttons.add(new JButton("History", new ImageIcon(AbstractLoggerWindow.class.getResource("/caceresenzo/apps/itemlogger/assets/icons/icon-history-32px.png"))));
-		buttons.add(new JButton("Add", new ImageIcon(AbstractLoggerWindow.class.getResource("/caceresenzo/apps/itemlogger/assets/icons/icon-plus-32px.png"))));
+		Arrays.asList(
+				new ActionButton("add", "icon-plus-32px", "add"),
+				new ActionButton("items", "icon-new-product-32px", "items"),
+				new ActionButton("persons", "icon-user-men-32px", "users"),
+				new ActionButton("history", "icon-history-32px", "history"),
+				new ActionButton("print", "icon-print-32px", "print")  //
+		).forEach((actionButton) -> buttons.add(actionButton.toJButton()));
 		
 		return buttons;
+	}
+	
+	public static void open() {
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (Exception exception) {
+			LOGGER.warn("Failed to apply system look and feel.", exception);
+		}
+		
+		EventQueue.invokeLater(() -> {
+			MainLoggerWindow window = new MainLoggerWindow();
+			window.frame.setVisible(true);
+		});
+	}
+	
+	private class ActionButton {
+		
+		/* Variables */
+		private final String actionKey, icon, actionCommand;
+		
+		/* Constructor */
+		public ActionButton(String actionKey, String icon, String actionCommand) {
+			this.actionKey = actionKey;
+			this.icon = icon;
+			this.actionCommand = actionCommand;
+		}
+		
+		public JButton toJButton() {
+			ImageIcon imageIcon = new ImageIcon(MainLoggerWindow.class.getResource(String.format("/caceresenzo/apps/itemlogger/assets/icons/%s.png", icon)));
+			
+			JButton jButton = new JButton(i18n.string("logger.button.action." + actionKey), imageIcon);
+			jButton.setActionCommand(actionCommand);
+			
+			return jButton;
+		}
+		
 	}
 	
 }

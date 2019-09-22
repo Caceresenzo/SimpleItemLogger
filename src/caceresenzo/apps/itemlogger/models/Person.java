@@ -10,17 +10,17 @@ import caceresenzo.frameworks.search.filters.IFilter;
 public class Person implements IDatabaseEntry, ISearchable<Person> {
 
 	/* Database Fields */
-	public static final String COLUMN_FIRSTNAME = "firstname";
 	public static final String COLUMN_LASTNAME = "lastname";
+	public static final String COLUMN_FIRSTNAME = "firstname";
 	public static final String COLUMN_PHONE = "phone";
 	
 	/* Variables */
 	@DatabaseTableColumn(DatabaseTableColumn.COLUMN_ID)
 	private final int id;
-	@DatabaseTableColumn(COLUMN_FIRSTNAME)
-	private String firstname;
 	@DatabaseTableColumn(COLUMN_LASTNAME)
 	private String lastname;
+	@DatabaseTableColumn(COLUMN_FIRSTNAME)
+	private String firstname;
 	@DatabaseTableColumn(COLUMN_PHONE)
 	private String phone;
 	
@@ -30,10 +30,10 @@ public class Person implements IDatabaseEntry, ISearchable<Person> {
 	}
 	
 	/* Constructor */
-	public Person(int id, String firstname, String lastname, String phone) {
+	public Person(int id, String lastname, String firstname, String phone) {
 		this.id = id;
-		this.firstname = firstname;
 		this.lastname = lastname;
+		this.firstname = firstname;
 		this.phone = phone;
 	}
 	

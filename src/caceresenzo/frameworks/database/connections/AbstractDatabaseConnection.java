@@ -39,6 +39,20 @@ public abstract class AbstractDatabaseConnection {
 	}
 	
 	/**
+	 * Same as {@link #connect()} but it will return the {@link AbstractDatabaseConnection} instance instead.
+	 * 
+	 * @return <code>this</code> for method chaining (fluent API).
+	 * @throws SQLException
+	 *             If anything goes wrong.
+	 * @see {@link #connect()}
+	 */
+	public AbstractDatabaseConnection connectAndGet() throws SQLException {
+		connect();
+		
+		return this;
+	}
+	
+	/**
 	 * Close the currently open connection to the database.
 	 * 
 	 * @return If the connection has been close, otherwise the connection was <code>null</code> and could not be close.
@@ -55,10 +69,28 @@ public abstract class AbstractDatabaseConnection {
 		return false;
 	}
 	
+	/**
+	 * Create an empty {@link Statement}.
+	 * 
+	 * @return The empty statement.
+	 * @throws SQLException
+	 *             If anything goes wrong.
+	 * @see Connection#createStatement()
+	 */
 	public Statement createStatement() throws SQLException {
 		return connection.createStatement();
 	}
 	
+	/**
+	 * Prepare a statement.
+	 * 
+	 * @param sql
+	 *            Target SQL to prepare.
+	 * @return A prepared statement.
+	 * @throws SQLException
+	 *             If anything goes wrong.
+	 * @see Connection#prepareStatement(String)
+	 */
 	public PreparedStatement prepareStatement(String sql) throws SQLException {
 		return connection.prepareStatement(sql);
 	}

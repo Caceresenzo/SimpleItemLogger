@@ -30,14 +30,29 @@ public class DatabaseSynchronizer {
 		this.databaseConnection = databaseConnection;
 	}
 	
+	/**
+	 * Analize a class model.
+	 * 
+	 * @param <T>
+	 *            Paramerized class model.
+	 * @param modelClass
+	 *            Model's class.
+	 * @return Analized {@link BindableTable}.
+	 * @see TableAnalizer#analizeTable(Class)
+	 */
 	private <T> BindableTable getTable(Class<T> modelClass) {
 		return TableAnalizer.get().analizeTable(modelClass);
 	}
 	
-	private <T> List<BindableColumn> getColumn(Class<T> modelClass) {
-		return TableAnalizer.get().analizeColumns(modelClass);
-	}
-	
+	/**
+	 * Load data from a model class.
+	 * 
+	 * @param <T>
+	 *            Paramerized class model.
+	 * @param modelClass
+	 *            Model's class.
+	 * @return A {@link List list} of model class instance filled with information found in the database.
+	 */
 	public <T> List<T> load(Class<T> modelClass) {
 		BindableTable bindableTable = getTable(modelClass);
 		List<T> items = new ArrayList<>();
@@ -66,10 +81,21 @@ public class DatabaseSynchronizer {
 		return items;
 	}
 	
+	/**
+	 * Update a model class instance data to the database.
+	 * 
+	 * @param <T>
+	 *            Paramerized class model.
+	 * @param modelClass
+	 *            Model's class.
+	 * @param instance
+	 *            Instance to update.
+	 * @return Weather or not the request has been a success.
+	 */
 	public <T> boolean update(Class<T> modelClass, T instance) {
 		BindableTable bindableTable = getTable(modelClass);
 		List<BindableColumn> bindableColumns = new ArrayList<>(bindableTable.getBindableColumns());
-
+		
 		BindableColumn idBindableColumn = BindableColumn.findIdColumn(bindableColumns);
 		bindableColumns.remove(idBindableColumn);
 		

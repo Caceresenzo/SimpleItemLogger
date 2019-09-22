@@ -16,6 +16,7 @@ import caceresenzo.frameworks.database.IDatabaseEntry;
 import caceresenzo.frameworks.database.binder.BindableColumn;
 import caceresenzo.frameworks.database.setup.TableAnalizer;
 import caceresenzo.frameworks.database.synchronization.DatabaseSynchronizer;
+import caceresenzo.libs.internationalization.i18n;
 
 public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractTableModel {
 	
@@ -71,7 +72,7 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 		for (; index < columns.size(); index++) {
 			BindableColumn bindableColumn = columns.get(index);
 			
-			columnNames[index] = bindableColumn.getColumnName();
+			columnNames[index] = i18n.string("logger.table.column." + bindableColumn.getColumnName());
 			columnClass[index] = bindableColumn.getField().getType();
 			
 			bindableColumn.getField().setAccessible(true);
