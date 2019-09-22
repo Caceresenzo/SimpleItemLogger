@@ -8,7 +8,7 @@ import caceresenzo.frameworks.search.filters.IFilter;
 
 @DatabaseTable("items")
 public class Item implements IDatabaseEntry, ISearchable<Item> {
-
+	
 	/* Database Fields */
 	public static final String COLUMN_NAME = "name";
 	public static final String COLUMN_QUANTITY = "quantity";
@@ -20,7 +20,7 @@ public class Item implements IDatabaseEntry, ISearchable<Item> {
 	private String name;
 	@DatabaseTableColumn(COLUMN_QUANTITY)
 	private int quantity;
-
+	
 	/* Constructor */
 	public Item() {
 		this(0, null, 0);
@@ -67,10 +67,15 @@ public class Item implements IDatabaseEntry, ISearchable<Item> {
 	public void setQuantity(int quantity) {
 		this.quantity = quantity;
 	}
-
+	
 	@Override
 	public boolean search(IFilter<Item> filters) {
 		return false;
+	}
+	
+	@Override
+	public String toString() {
+		return "Item[id=" + id + ", name=" + name + ", quantity=" + quantity + "]";
 	}
 	
 }

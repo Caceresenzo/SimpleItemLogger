@@ -9,6 +9,7 @@ import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 
+import caceresenzo.apps.itemlogger.managers.DataManager;
 import caceresenzo.apps.itemlogger.ui.models.table.ActionCellEditor;
 import caceresenzo.apps.itemlogger.ui.models.table.ActionCellPanel;
 import caceresenzo.apps.itemlogger.ui.models.table.ActionCellRenderer;
@@ -48,6 +49,8 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 		this.modelClass = modelClass;
 		this.entries = databaseEntries;
 		this.useActionColumn = useActionColumn;
+		
+		this.synchronizer = DataManager.get().getDatabaseSynchronizer();
 		
 		initializeColumns(modelClass);
 		initilizeRenderer();
@@ -99,6 +102,13 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 			table.getColumnModel().getColumn(actionColumnIndex).setCellEditor(new ActionCellEditor(actionCellPanel));
 			table.setRowHeight(renderer.getTableCellRendererComponent(table, null, true, true, 0, 0).getPreferredSize().height);
 		});
+	}
+
+	public void synchronize() {
+		this.entries.clear();
+		this.entries.addAll(synchronizer.load(modelClass));
+		
+		fireTableDataChanged();
 	}
 	
 	@Override
@@ -190,10 +200,6 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 	 */
 	public void setActionCallback(Callback<T> actionCallback) {
 		this.actionCallback = actionCallback;
-	}
-	
-	public void setSynchronizer(DatabaseSynchronizer synchronizer) {
-		this.synchronizer = synchronizer;
 	}
 	
 	/** @return Source {@link JTable}. */

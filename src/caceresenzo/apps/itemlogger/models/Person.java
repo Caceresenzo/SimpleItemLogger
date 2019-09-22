@@ -8,7 +8,7 @@ import caceresenzo.frameworks.search.filters.IFilter;
 
 @DatabaseTable("persons")
 public class Person implements IDatabaseEntry, ISearchable<Person> {
-
+	
 	/* Database Fields */
 	public static final String COLUMN_LASTNAME = "lastname";
 	public static final String COLUMN_FIRSTNAME = "firstname";
@@ -86,10 +86,15 @@ public class Person implements IDatabaseEntry, ISearchable<Person> {
 	public void setPhone(String email) {
 		this.phone = email;
 	}
-
+	
 	@Override
 	public boolean search(IFilter<Person> filters) {
 		return false;
+	}
+	
+	@Override
+	public String toString() {
+		return "Person[id=" + id + ", lastname=" + lastname + ", firstname=" + firstname + ", phone=" + phone + "]";
 	}
 	
 }

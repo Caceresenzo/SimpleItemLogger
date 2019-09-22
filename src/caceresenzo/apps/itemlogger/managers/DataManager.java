@@ -12,6 +12,7 @@ import caceresenzo.apps.itemlogger.models.Person;
 import caceresenzo.frameworks.database.connections.AbstractDatabaseConnection;
 import caceresenzo.frameworks.database.connections.implementations.SqliteConnection;
 import caceresenzo.frameworks.database.setup.TableCreator;
+import caceresenzo.frameworks.database.synchronization.DatabaseSynchronizer;
 import caceresenzo.frameworks.managers.AbstractManager;
 
 public class DataManager extends AbstractManager {
@@ -24,12 +25,14 @@ public class DataManager extends AbstractManager {
 	
 	/* Database */
 	private final AbstractDatabaseConnection databaseConnection;
+	private final DatabaseSynchronizer databaseSynchronizer;
 	
 	/* Private Constructor */
 	private DataManager() {
 		super();
-
-		databaseConnection = new SqliteConnection(Config.SQLITE_PATH);
+		
+		this.databaseConnection = new SqliteConnection(Config.SQLITE_PATH);
+		this.databaseSynchronizer = new DatabaseSynchronizer(databaseConnection);
 	}
 	
 	@Override
@@ -52,9 +55,20 @@ public class DataManager extends AbstractManager {
 					.with(HistoryEntry.class)
 					.autoCreate(databaseConnection);
 		} catch (Exception exception) {
-			// TODO Auto-generated catch block
-			exception.printStackTrace();
+			LOGGER.error("Failed to auto-create tables, application can't continue.", exception);
+			System.exit(0);
+			return;
 		}
+	}
+	
+	/** @return Main {@link AbstractDatabaseConnection database connection}. */
+	public AbstractDatabaseConnection getDatabaseConnection() {
+		return databaseConnection;
+	}
+	
+	/** @return Main {@link DatabaseSynchronizer database data synchronizer}. */
+	public DatabaseSynchronizer getDatabaseSynchronizer() {
+		return databaseSynchronizer;
 	}
 	
 	/** @return DataManager's singleton instance. */

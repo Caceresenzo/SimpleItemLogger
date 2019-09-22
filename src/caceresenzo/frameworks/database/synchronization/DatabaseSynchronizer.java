@@ -56,7 +56,8 @@ public class DatabaseSynchronizer {
 	public <T> List<T> load(Class<T> modelClass) {
 		BindableTable bindableTable = getTable(modelClass);
 		List<T> items = new ArrayList<>();
-		
+
+		LOGGER.info("Loading data from model class \"{}\".", modelClass.getSimpleName());
 		try (ResultSet resultSet = databaseConnection.prepareStatement(String.format("SELECT * FROM %s", bindableTable.getTableName())).executeQuery()) {
 			while (resultSet.next()) {
 				@SuppressWarnings("unchecked")
@@ -73,6 +74,7 @@ public class DatabaseSynchronizer {
 				});
 				
 				items.add(instance);
+				LOGGER.info(instance.toString());
 			}
 		} catch (Exception exception) {
 			LOGGER.error("Failed to load model rows.", exception);

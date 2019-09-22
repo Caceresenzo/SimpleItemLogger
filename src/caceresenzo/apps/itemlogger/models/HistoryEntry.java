@@ -29,7 +29,7 @@ public class HistoryEntry implements IDatabaseEntry, ISearchable<HistoryEntry> {
 	private final Date lendDate;
 	@DatabaseTableColumn(value = COLUMN_RETURN_DATE, flags = SqlTableBuilder.FLAG_NULL)
 	private final Date returnDate;
-
+	
 	/* Constructor */
 	public HistoryEntry() {
 		this(0, 0, 0, null, null);
@@ -68,10 +68,15 @@ public class HistoryEntry implements IDatabaseEntry, ISearchable<HistoryEntry> {
 	public Date getReturnDate() {
 		return returnDate;
 	}
-
+	
 	@Override
 	public boolean search(IFilter<HistoryEntry> filters) {
 		return false;
+	}
+	
+	@Override
+	public String toString() {
+		return "HistoryEntry[id=" + id + ", personId=" + personId + ", itemId=" + itemId + ", lendDate=" + lendDate + ", returnDate=" + returnDate + "]";
 	}
 	
 }

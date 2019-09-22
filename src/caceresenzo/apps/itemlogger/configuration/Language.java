@@ -45,6 +45,8 @@ public class Language {
 			o("logger.button.action.print", "Imprimer");
 
 			o("logger.table.column.id", "ID");
+			o("logger.table.column.name", "Nom");
+			o("logger.table.column.quantity", "Quantité");
 			o("logger.table.column.firstname", "Prénom");
 			o("logger.table.column.lastname", "Nom de Famille");
 			o("logger.table.column.phone", "Numéro de Téléphone");

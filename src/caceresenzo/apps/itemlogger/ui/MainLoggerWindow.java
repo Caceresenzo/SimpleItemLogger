@@ -1,7 +1,8 @@
 package caceresenzo.apps.itemlogger.ui;
 
 import java.awt.EventQueue;
-import java.sql.SQLException;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -25,16 +26,23 @@ import javax.swing.border.TitledBorder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import caceresenzo.apps.itemlogger.models.HistoryEntry;
+import caceresenzo.apps.itemlogger.models.Item;
 import caceresenzo.apps.itemlogger.models.Person;
 import caceresenzo.apps.itemlogger.ui.models.DatabaseEntryTableModel;
-import caceresenzo.frameworks.database.connections.implementations.SqliteConnection;
-import caceresenzo.frameworks.database.synchronization.DatabaseSynchronizer;
 import caceresenzo.libs.internationalization.i18n;
 
-public class MainLoggerWindow {
+public class MainLoggerWindow implements ActionListener {
 	
 	/* Logger */
 	private static Logger LOGGER = LoggerFactory.getLogger(MainLoggerWindow.class);
+	
+	/* Action Commands */
+	public static final String ACTION_COMMAND_ADD = "action_add";
+	public static final String ACTION_COMMAND_DISPLAY_ITEMS = "action_display_items";
+	public static final String ACTION_COMMAND_DISPLAY_PERSONS = "action_display_persons";
+	public static final String ACTION_COMMAND_DISPLAY_HISTORY = "action_display_history";
+	public static final String ACTION_COMMAND_PRINT = "action_print";
 	
 	/* UI */
 	private JFrame frame;
@@ -50,30 +58,15 @@ public class MainLoggerWindow {
 	private JCheckBox checkBox;
 	private JCheckBox checkBox_1;
 	
+	/* Variables */
+	private Class<?> currentDisplayedModelClass;
+	
 	/* Constructor */
 	public MainLoggerWindow() {
 		initialize();
-		
-		DatabaseEntryTableModel<Person> model = new DatabaseEntryTableModel<>(dataTable, Person.class, new ArrayList<>(), false);
-		
-		dataTable.setModel(model);
-		
-		SqliteConnection sqliteConnection = new SqliteConnection("hello.db");
-		try {
-			sqliteConnection.connect();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		DatabaseSynchronizer a = new DatabaseSynchronizer(sqliteConnection);
-		model.setSynchronizer(a);
-		model.getEntries().addAll(a.load(Person.class));
 	}
 	
-	/**
-	 * Initialize the contents of the frame.
-	 */
+	/** Initialize the contents of the frame. */
 	private void initialize() {
 		frame = new JFrame();
 		frame.setSize(700, 500);
@@ -191,18 +184,80 @@ public class MainLoggerWindow {
 		searchFilterPanel.add(checkBox_1);
 		searchPanel.setLayout(gl_searchPanel);
 		frame.getContentPane().setLayout(groupLayout);
+		
+		changeModel(Item.class);
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private void changeModel(Class<?> newClassModel) {
+		if (currentDisplayedModelClass == newClassModel) {
+			return;
+		}
+		
+		DatabaseEntryTableModel model = new DatabaseEntryTableModel(dataTable, currentDisplayedModelClass = newClassModel, new ArrayList<>(), false);
+		
+		dataTable.setModel(model);
+		model.synchronize();
+	}
+	
+	@Override
+	public void actionPerformed(ActionEvent event) {
+		String actionCommand = event.getActionCommand();
+		
+		switch (actionCommand) {
+			case ACTION_COMMAND_ADD: {
+				
+				break;
+			}
+			
+			case ACTION_COMMAND_DISPLAY_ITEMS:
+			case ACTION_COMMAND_DISPLAY_PERSONS:
+			case ACTION_COMMAND_DISPLAY_HISTORY: {
+				Class<?> newModelClass;
+				
+				switch (actionCommand) {
+					case ACTION_COMMAND_DISPLAY_ITEMS:
+					default: {
+						newModelClass = Item.class;
+						break;
+					}
+					
+					case ACTION_COMMAND_DISPLAY_PERSONS: {
+						newModelClass = Person.class;
+						break;
+					}
+					
+					case ACTION_COMMAND_DISPLAY_HISTORY: {
+						newModelClass = HistoryEntry.class;
+						break;
+					}
+				}
+				
+				changeModel(newModelClass);
+				break;
+			}
+			
+			case ACTION_COMMAND_PRINT: {
+				
+				break;
+			}
+			
+			default: {
+				throw new IllegalStateException("Unknown action command: " + actionCommand);
+			}
+		}
 	}
 	
 	protected List<JButton> getActionButtons() {
 		List<JButton> buttons = new ArrayList<>();
 		
 		Arrays.asList(
-				new ActionButton("add", "icon-plus-32px", "add"),
-				new ActionButton("items", "icon-new-product-32px", "items"),
-				new ActionButton("persons", "icon-user-men-32px", "users"),
-				new ActionButton("history", "icon-history-32px", "history"),
-				new ActionButton("print", "icon-print-32px", "print")  //
-		).forEach((actionButton) -> buttons.add(actionButton.toJButton()));
+				new ActionButton("add", "icon-plus-32px", ACTION_COMMAND_ADD),
+				new ActionButton("items", "icon-new-product-32px", ACTION_COMMAND_DISPLAY_ITEMS),
+				new ActionButton("persons", "icon-user-men-32px", ACTION_COMMAND_DISPLAY_PERSONS),
+				new ActionButton("history", "icon-history-32px", ACTION_COMMAND_DISPLAY_HISTORY),
+				new ActionButton("print", "icon-print-32px", ACTION_COMMAND_PRINT) //
+		).forEach((actionButton) -> buttons.add(actionButton.toJButton(this)));
 		
 		return buttons;
 	}
@@ -232,11 +287,15 @@ public class MainLoggerWindow {
 			this.actionCommand = actionCommand;
 		}
 		
-		public JButton toJButton() {
+		public JButton toJButton(ActionListener actionListener) {
 			ImageIcon imageIcon = new ImageIcon(MainLoggerWindow.class.getResource(String.format("/caceresenzo/apps/itemlogger/assets/icons/%s.png", icon)));
 			
 			JButton jButton = new JButton(i18n.string("logger.button.action." + actionKey), imageIcon);
 			jButton.setActionCommand(actionCommand);
+			
+			if (actionListener != null) {
+				jButton.addActionListener(actionListener);
+			}
 			
 			return jButton;
 		}
