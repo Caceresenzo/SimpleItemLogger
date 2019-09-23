@@ -5,12 +5,8 @@ import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Objects;
 
 import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
@@ -104,18 +100,7 @@ public class AddNewDialog extends JDialog implements ActionListener {
 		
 		getRootPane().setDefaultButton(doneButton);
 		
-		KeyListener keyListener = new KeyAdapter() {
-			@Override
-			public void keyPressed(KeyEvent keyEvent) {
-				super.keyPressed(keyEvent);
-				
-				if (keyEvent.getKeyCode() == KeyEvent.VK_ENTER) {
-					// fireCallback();
-				}
-			}
-		};
-		
-		bindableColumns.forEach((bindableColumn) -> fieldListPanel.add(new FieldPartPanel(modelClass, bindableColumn, keyListener)));
+		bindableColumns.forEach((bindableColumn) -> fieldListPanel.add(new FieldPartPanel(modelClass, bindableColumn, null)));
 	}
 	
 	@Override
@@ -139,12 +124,17 @@ public class AddNewDialog extends JDialog implements ActionListener {
 		}
 	}
 	
+	/** Create the item model if the callback is not <code>null</code> and return it. */
 	public void fireCallback() {
 		if (callback != null) {
 			Object instance = null;
 			
 			try {
-				instance = Objects.requireNonNull(createInstanceFromField(), "Instanced model can't be null.");
+				instance = createInstanceFromField();
+				
+				if (instance == null) {
+					return;
+				}
 				
 				setVisible(false);
 			} catch (Exception exception) {
@@ -155,6 +145,13 @@ public class AddNewDialog extends JDialog implements ActionListener {
 		}
 	}
 	
+	/**
+	 * Create an model instance from the fields.
+	 * 
+	 * @return Created instance from field, or <code>null</code> if an error append in the {@link FieldPartPanel#getObject()} method.
+	 * @throws Exception
+	 *             If anything goes wrong.
+	 */
 	public Object createInstanceFromField() throws Exception {
 		Object instance = modelClass.getConstructors()[0].newInstance();
 		
@@ -169,7 +166,7 @@ public class AddNewDialog extends JDialog implements ActionListener {
 					value = fieldPartPanel.getObject();
 				} catch (Exception exception) {
 					LOGGER.warn("Failed to convert field to object.", exception);
-					JOptionPane.showMessageDialog(this, "Failed");
+					JOptionPane.showMessageDialog(this, "Failed\n" + exception.getLocalizedMessage());
 					return null;
 				}
 				
@@ -180,19 +177,39 @@ public class AddNewDialog extends JDialog implements ActionListener {
 		return instance;
 	}
 	
+	/**
+	 * Open a new {@link AddNewDialog} instance.
+	 * 
+	 * @param parent
+	 *            Parent {@link JFrame}.
+	 * @param modelClass
+	 *            Model class of the item.
+	 * @param callback
+	 *            Callback for knowing when an item has been created.
+	 */
 	public static void open(JFrame parent, Class<?> modelClass, Callback callback) {
 		AddNewDialog dialog = new AddNewDialog(parent, modelClass, callback);
 		
 		dialog.setVisible(true);
 	}
 	
+	/**
+	 * {@link AddNewDialog}'s callback.
+	 *
+	 * @author Enzo CACERES
+	 */
 	public interface Callback {
 		
+		/**
+		 * Called when an item has been created and is valid.
+		 * 
+		 * @param modelClass
+		 *            Item model class.
+		 * @param instance
+		 *            Created instance.
+		 */
 		public void onCreatedItem(Class<?> modelClass, Object instance);
 		
 	}
 	
-	public JPanel getPanel() {
-		return fieldListPanel;
-	}
 }

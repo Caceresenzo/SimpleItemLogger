@@ -7,7 +7,7 @@ import caceresenzo.apps.itemlogger.ui.MainLoggerWindow;
 
 public class Bootstrap {
 	
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) {
 		Config.get();
 		Language.get().initialize();
 		ItemLoggerManager.get().initialize();

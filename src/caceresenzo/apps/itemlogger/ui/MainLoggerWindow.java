@@ -26,10 +26,12 @@ import javax.swing.border.TitledBorder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import caceresenzo.apps.itemlogger.managers.DataManager;
 import caceresenzo.apps.itemlogger.models.HistoryEntry;
 import caceresenzo.apps.itemlogger.models.Item;
 import caceresenzo.apps.itemlogger.models.Person;
 import caceresenzo.apps.itemlogger.ui.models.DatabaseEntryTableModel;
+import caceresenzo.frameworks.database.synchronization.DatabaseSynchronizer;
 import caceresenzo.libs.internationalization.i18n;
 
 public class MainLoggerWindow implements ActionListener {
@@ -215,6 +217,9 @@ public class MainLoggerWindow implements ActionListener {
 					@Override
 					public void onCreatedItem(Class<?> modelClass, Object instance) {
 						LOGGER.info(String.valueOf(instance));
+						
+						DataManager.get().getDatabaseSynchronizer().insert(modelClass, instance);
+						((DatabaseEntryTableModel<?>) dataTable.getModel()).synchronize();
 					}
 				});
 				break;

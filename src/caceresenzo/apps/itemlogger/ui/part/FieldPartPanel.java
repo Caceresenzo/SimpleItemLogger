@@ -2,15 +2,13 @@ package caceresenzo.apps.itemlogger.ui.part;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.text.NumberFormat;
-import java.text.ParseException;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JFormattedTextField;
+import javax.swing.JFormattedTextField.AbstractFormatter;
 import javax.swing.JFormattedTextField.AbstractFormatterFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -19,21 +17,13 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 import javax.swing.text.DefaultFormatterFactory;
-import javax.swing.text.MaskFormatter;
 import javax.swing.text.NumberFormatter;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import caceresenzo.frameworks.database.binder.BindableColumn;
 import caceresenzo.libs.internationalization.i18n;
 import caceresenzo.libs.string.StringUtils;
-import caceresenzo.libs.thread.ThreadUtils;
 
 public class FieldPartPanel extends JPanel {
-	
-	/* Logger */
-	private static Logger LOGGER = LoggerFactory.getLogger(FieldPartPanel.class);
 	
 	/* UI */
 	private JFormattedTextField formattedTextField;
@@ -81,6 +71,7 @@ public class FieldPartPanel extends JPanel {
 		applyCorrectFormatter();
 	}
 	
+	/** Apply the best {@link AbstractFormatter formatter} for this field. */
 	private void applyCorrectFormatter() {
 		Class<?> type = bindableColumn.getField().getType();
 		AbstractFormatterFactory formatterFactory;
@@ -101,13 +92,25 @@ public class FieldPartPanel extends JPanel {
 		formattedTextField.setFormatterFactory(formatterFactory);
 	}
 	
+	/**
+	 * Recreate an object from field value.
+	 * 
+	 * @return Created object.
+	 * @throws NullPointerException
+	 *             If the field is empty (after being {@link String#trim() trim()}).
+	 */
 	public Object getObject() {
 		Class<?> type = bindableColumn.getField().getType();
+		String text = formattedTextField.getText().trim();
+		
+		if (!StringUtils.validate(text)) {
+			throw new NullPointerException("Empty field: " + bindableColumn.getColumnName());
+		}
 		
 		if (type == Integer.class || type == int.class) {
 			return Integer.parseInt(String.valueOf(formattedTextField.getValue()));
 		} else {
-			return formattedTextField.getText().trim();
+			return text;
 		}
 	}
 	

@@ -56,8 +56,7 @@ public class DatabaseSynchronizer {
 	public <T> List<T> load(Class<T> modelClass) {
 		BindableTable bindableTable = getTable(modelClass);
 		List<T> items = new ArrayList<>();
-
-		LOGGER.info("Loading data from model class \"{}\".", modelClass.getSimpleName());
+		
 		try (ResultSet resultSet = databaseConnection.prepareStatement(String.format("SELECT * FROM %s", bindableTable.getTableName())).executeQuery()) {
 			while (resultSet.next()) {
 				@SuppressWarnings("unchecked")
@@ -74,7 +73,6 @@ public class DatabaseSynchronizer {
 				});
 				
 				items.add(instance);
-				LOGGER.info(instance.toString());
 			}
 		} catch (Exception exception) {
 			LOGGER.error("Failed to load model rows.", exception);
@@ -136,6 +134,68 @@ public class DatabaseSynchronizer {
 		}
 		
 		return false;
+	}
+	
+	/**
+	 * Insert a new model class instance to the database.
+	 * 
+	 * @param modelClass
+	 *            Model's class.
+	 * @param instance
+	 *            Instance to insert.
+	 * @return Database insert row, or -1 if an error has append.
+	 */
+	public int insert(Class<?> modelClass, Object instance) {
+		BindableTable bindableTable = getTable(modelClass);
+		List<BindableColumn> bindableColumns = new ArrayList<>(bindableTable.getBindableColumns());
+		
+		BindableColumn idBindableColumn = BindableColumn.findIdColumn(bindableColumns);
+		bindableColumns.remove(idBindableColumn);
+		
+		try {
+			/* SQL statement generation */
+			StringBuilder stringBuilder = new StringBuilder(String.format("INSERT INTO %s (", bindableTable.getTableName()));
+			
+			Iterator<BindableColumn> columnIterator = bindableColumns.iterator();
+			while (columnIterator.hasNext()) {
+				BindableColumn bindableColumn = columnIterator.next();
+				
+				stringBuilder.append(bindableColumn.getColumnName());
+				
+				if (columnIterator.hasNext()) {
+					stringBuilder.append(", ");
+				}
+			}
+			
+			stringBuilder.append(") VALUES (");
+			
+			int size = bindableColumns.size();
+			for (int index = 0; index < bindableColumns.size(); index++) {
+				stringBuilder.append("?");
+				
+				if (index != size - 1) {
+					stringBuilder.append(", ");
+				}
+			}
+			
+			stringBuilder.append(");");
+			
+			/* SQL statement value binding */
+			PreparedStatement preparedStatement = databaseConnection.prepareStatement(stringBuilder.toString());
+			
+			for (int index = 0; index < bindableColumns.size(); index++) {
+				BindableColumn bindableColumn = bindableColumns.get(index);
+				Field field = bindableColumn.getField();
+				
+				preparedStatement.setObject(index + 1, field.get(instance));
+			}
+			
+			return preparedStatement.executeUpdate();
+		} catch (Exception exception) {
+			LOGGER.error("Failed to insert row.", exception);
+		}
+		
+		return -1;
 	}
 	
 	/** @return Executor's {@link AbstractDatabaseConnection database connection}. */

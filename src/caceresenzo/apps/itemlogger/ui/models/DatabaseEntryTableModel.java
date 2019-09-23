@@ -1,7 +1,6 @@
 package caceresenzo.apps.itemlogger.ui.models;
 
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -103,7 +102,8 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 			table.setRowHeight(renderer.getTableCellRendererComponent(table, null, true, true, 0, 0).getPreferredSize().height);
 		});
 	}
-
+	
+	/** Synchronize the model with the database values. */
 	public void synchronize() {
 		this.entries.clear();
 		this.entries.addAll(synchronizer.load(modelClass));
