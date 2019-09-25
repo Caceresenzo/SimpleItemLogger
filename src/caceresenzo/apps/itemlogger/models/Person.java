@@ -3,11 +3,9 @@ package caceresenzo.apps.itemlogger.models;
 import caceresenzo.frameworks.database.IDatabaseEntry;
 import caceresenzo.frameworks.database.annotations.DatabaseTable;
 import caceresenzo.frameworks.database.annotations.DatabaseTableColumn;
-import caceresenzo.frameworks.search.ISearchable;
-import caceresenzo.frameworks.search.filters.IFilter;
 
 @DatabaseTable("persons")
-public class Person implements IDatabaseEntry, ISearchable<Person> {
+public class Person implements IDatabaseEntry {
 	
 	/* Database Fields */
 	public static final String COLUMN_LASTNAME = "lastname";
@@ -37,7 +35,7 @@ public class Person implements IDatabaseEntry, ISearchable<Person> {
 		this.phone = phone;
 	}
 	
-	/** @return Person's database row id. */
+	@Override
 	public int getId() {
 		return id;
 	}
@@ -47,29 +45,9 @@ public class Person implements IDatabaseEntry, ISearchable<Person> {
 		return firstname;
 	}
 	
-	/**
-	 * Change person's first name.
-	 * 
-	 * @param firstname
-	 *            New person's first name.
-	 */
-	public void setFirstname(String firstname) {
-		this.firstname = firstname;
-	}
-	
 	/** @return Person's last name. */
 	public String getLastname() {
 		return lastname;
-	}
-	
-	/**
-	 * Change person's last name.
-	 * 
-	 * @param lastname
-	 *            New person's last name.
-	 */
-	public void setLastname(String lastname) {
-		this.lastname = lastname;
 	}
 	
 	/** @return Person's phone. */
@@ -77,24 +55,9 @@ public class Person implements IDatabaseEntry, ISearchable<Person> {
 		return phone;
 	}
 	
-	/**
-	 * Change person's phone.
-	 * 
-	 * @param phone
-	 *            New person's phone.
-	 */
-	public void setPhone(String email) {
-		this.phone = email;
-	}
-
 	@Override
 	public String toSimpleRepresentation() {
 		return String.format("%S %s (%s)", lastname, firstname, phone);
-	}
-	
-	@Override
-	public boolean search(IFilter<Person> filters) {
-		return false;
 	}
 	
 	@Override

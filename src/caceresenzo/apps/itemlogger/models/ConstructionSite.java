@@ -3,11 +3,9 @@ package caceresenzo.apps.itemlogger.models;
 import caceresenzo.frameworks.database.IDatabaseEntry;
 import caceresenzo.frameworks.database.annotations.DatabaseTable;
 import caceresenzo.frameworks.database.annotations.DatabaseTableColumn;
-import caceresenzo.frameworks.search.ISearchable;
-import caceresenzo.frameworks.search.filters.IFilter;
 
 @DatabaseTable("construction_sites")
-public class ConstructionSite implements IDatabaseEntry, ISearchable<ConstructionSite> {
+public class ConstructionSite implements IDatabaseEntry {
 	
 	/* Database Fields */
 	public static final String COLUMN_NAME = "name";
@@ -33,7 +31,7 @@ public class ConstructionSite implements IDatabaseEntry, ISearchable<Constructio
 		this.address = address;
 	}
 	
-	/** @return Construction site's database row id. */
+	@Override
 	public int getId() {
 		return id;
 	}
@@ -43,39 +41,14 @@ public class ConstructionSite implements IDatabaseEntry, ISearchable<Constructio
 		return name;
 	}
 	
-	/**
-	 * Change construction site's name.
-	 * 
-	 * @param name
-	 *            New construction site's name.
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
-	
 	/** @return Construction site's address. */
 	public String getAddress() {
 		return address;
-	}
-	
-	/**
-	 * Change construction site's address.
-	 * 
-	 * @param address
-	 *            New construction site's address.
-	 */
-	public void setAddress(String address) {
-		this.address = address;
 	}
 
 	@Override
 	public String toSimpleRepresentation() {
 		return String.format("%s (%s)", name, address);
-	}
-	
-	@Override
-	public boolean search(IFilter<ConstructionSite> filters) {
-		return false;
 	}
 	
 }

@@ -23,4 +23,6 @@ public @interface DatabaseTableColumn {
 	/** @return Column's SQL custom flags. */
 	public int flags() default SqlTableBuilder.FLAG_NOT_NULL;
 	
+	public boolean isReference() default false;
+	
 }

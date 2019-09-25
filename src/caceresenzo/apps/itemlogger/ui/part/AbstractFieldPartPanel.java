@@ -5,7 +5,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.KeyListener;
 import java.time.LocalDate;
-import java.util.Date;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -16,8 +15,10 @@ import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 
 import caceresenzo.apps.itemlogger.ui.part.implementations.LocalDateFieldPartPanel;
+import caceresenzo.apps.itemlogger.ui.part.implementations.ModelSelectionFieldPartPanel;
 import caceresenzo.apps.itemlogger.ui.part.implementations.NumberFieldPartPanel;
 import caceresenzo.apps.itemlogger.ui.part.implementations.TextFieldPartPanel;
+import caceresenzo.frameworks.database.IDatabaseEntry;
 import caceresenzo.frameworks.database.binder.BindableColumn;
 import caceresenzo.libs.internationalization.i18n;
 
@@ -127,6 +128,8 @@ public abstract class AbstractFieldPartPanel<T> extends JPanel {
 			clazz = NumberFieldPartPanel.class;
 		}  else if (columnClass == LocalDate.class) {
 			clazz = LocalDateFieldPartPanel.class;
+		} else if (IDatabaseEntry.class.isAssignableFrom(bindableColumn.getField().getType())) {
+			clazz = ModelSelectionFieldPartPanel.class;
 		} else {
 			throw new IllegalStateException("Unknown field type: " + columnClass);
 		}

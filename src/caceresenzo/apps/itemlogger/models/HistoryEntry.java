@@ -6,25 +6,26 @@ import caceresenzo.frameworks.database.IDatabaseEntry;
 import caceresenzo.frameworks.database.annotations.DatabaseTable;
 import caceresenzo.frameworks.database.annotations.DatabaseTableColumn;
 import caceresenzo.frameworks.database.setup.sql.SqlTableBuilder;
-import caceresenzo.frameworks.search.ISearchable;
-import caceresenzo.frameworks.search.filters.IFilter;
 
 @DatabaseTable("history_entries")
-public class HistoryEntry implements IDatabaseEntry, ISearchable<HistoryEntry> {
+public class HistoryEntry implements IDatabaseEntry {
 	
 	/* Database Fields */
-	public static final String COLUMN_PERSON_ID = "person_id";
-	public static final String COLUMN_ITEM_ID = "item_id";
+	public static final String COLUMN_PERSON = "person";
+	public static final String COLUMN_ITEM = "item";
+	public static final String COLUMN_LEND_CONSTRUCTION_SITE = "construction_site";
 	public static final String COLUMN_LEND_DATE = "lend";
 	public static final String COLUMN_RETURN_DATE = "return";
 	
 	/* Variables */
 	@DatabaseTableColumn(DatabaseTableColumn.COLUMN_ID)
 	private final int id;
-	@DatabaseTableColumn(COLUMN_PERSON_ID)
-	private final int personId;
-	@DatabaseTableColumn(COLUMN_ITEM_ID)
-	private final int itemId;
+	@DatabaseTableColumn(value = COLUMN_ITEM, isReference = true)
+	private final Item item;
+	@DatabaseTableColumn(value = COLUMN_PERSON, isReference = true)
+	private final Person person;
+	@DatabaseTableColumn(value = COLUMN_LEND_CONSTRUCTION_SITE, isReference = true)
+	private ConstructionSite constructionSite;
 	@DatabaseTableColumn(COLUMN_LEND_DATE)
 	private final LocalDate lendDate;
 	@DatabaseTableColumn(value = COLUMN_RETURN_DATE, flags = SqlTableBuilder.FLAG_NULL)
@@ -32,31 +33,37 @@ public class HistoryEntry implements IDatabaseEntry, ISearchable<HistoryEntry> {
 	
 	/* Constructor */
 	public HistoryEntry() {
-		this(0, 0, 0, null, null);
+		this(0, null, null, null, null, null);
 	}
 	
 	/* Constructor */
-	public HistoryEntry(int id, int personId, int itemId, LocalDate lendDate, LocalDate returnDate) {
+	public HistoryEntry(int id, Person person, Item item, ConstructionSite constructionSite, LocalDate lendDate, LocalDate returnDate) {
 		this.id = id;
-		this.personId = personId;
-		this.itemId = itemId;
+		this.person = person;
+		this.item = item;
+		this.constructionSite = constructionSite;
 		this.lendDate = lendDate;
 		this.returnDate = returnDate;
 	}
 	
-	/** @return History entry's database row id. */
+	@Override
 	public int getId() {
 		return id;
 	}
 	
-	/** @return History entry's target person id. */
-	public int getPersonId() {
-		return personId;
+	/** @return History entry's target person. */
+	public Person getPerson() {
+		return person;
 	}
 	
-	/** @return History entry's target item id. */
-	public int getItemId() {
-		return itemId;
+	/** @return History entry's target item. */
+	public Item getItem() {
+		return item;
+	}
+
+	/** @return History entry's target construction site. */
+	public ConstructionSite getConstructionSite() {
+		return constructionSite;
 	}
 	
 	/** @return History entry's lend date. */
@@ -68,20 +75,15 @@ public class HistoryEntry implements IDatabaseEntry, ISearchable<HistoryEntry> {
 	public LocalDate getReturnDate() {
 		return returnDate;
 	}
-
-	@Override
-	public String toSimpleRepresentation() {
-		return null;
-	}
 	
 	@Override
-	public boolean search(IFilter<HistoryEntry> filters) {
-		return false;
+	public String toSimpleRepresentation() {
+		throw new UnsupportedOperationException();
 	}
 	
 	@Override
 	public String toString() {
-		return "HistoryEntry[id=" + id + ", personId=" + personId + ", itemId=" + itemId + ", lendDate=" + lendDate + ", returnDate=" + returnDate + "]";
+		return "HistoryEntry[id=" + id + ", person=" + person + ", item=" + item + ", lendDate=" + lendDate + ", returnDate=" + returnDate + "]";
 	}
 	
 }

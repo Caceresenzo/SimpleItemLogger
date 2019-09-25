@@ -25,6 +25,11 @@ public class BindableColumn {
 		return annotation.value();
 	}
 	
+	/** @return Weather or not this column is a reference to another table entry. */
+	public boolean isReference() {
+		return this.annotation.isReference();
+	}
+	
 	/** @return Field's {@link DatabaseTableColumn} annotation. */
 	public DatabaseTableColumn getAnnotation() {
 		return annotation;

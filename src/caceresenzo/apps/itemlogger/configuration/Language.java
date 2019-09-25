@@ -61,6 +61,9 @@ public class Language {
 			o("logger.table.column.lastname", "Nom de Famille");
 			o("logger.table.column.phone", "Numéro de Téléphone");
 			o("logger.table.column.address", "Adresse");
+			o("logger.table.column.item", "Objet");
+			o("logger.table.column.person", "À");
+			o("logger.table.column.construction-sites", "Pour le chantier");
 			o("logger.table.column.lend", "Prêt");
 			o("logger.table.column.return", "Retour");
 

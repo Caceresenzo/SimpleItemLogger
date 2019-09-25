@@ -147,7 +147,8 @@ public class SqlTableBuilder implements IBuilder<String> {
 		} else if (type.equals(Date.class)) {
 			return "INTEGER";
 		}
-		return null;
+		
+		return "INTEGER";
 	}
 	
 	@Override

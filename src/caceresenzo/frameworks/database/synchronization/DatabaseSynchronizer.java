@@ -12,11 +12,14 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import caceresenzo.frameworks.database.IDatabaseEntry;
 import caceresenzo.frameworks.database.annotations.DatabaseTableColumn;
 import caceresenzo.frameworks.database.binder.BindableColumn;
 import caceresenzo.frameworks.database.binder.BindableTable;
 import caceresenzo.frameworks.database.connections.AbstractDatabaseConnection;
 import caceresenzo.frameworks.database.setup.TableAnalizer;
+import caceresenzo.frameworks.database.synchronization.convertor.AbstractDatabaseObjectConvertor;
+import caceresenzo.frameworks.database.synchronization.convertor.DatabaseObjectConvertorManager;
 
 public class DatabaseSynchronizer {
 	
@@ -54,13 +57,13 @@ public class DatabaseSynchronizer {
 	 *            Model's class.
 	 * @return A {@link List list} of model class instance filled with information found in the database.
 	 */
+	@SuppressWarnings("unchecked")
 	public <T> List<T> load(Class<T> modelClass) {
 		BindableTable bindableTable = getTable(modelClass);
 		List<T> items = new ArrayList<>();
 		
 		try (ResultSet resultSet = databaseConnection.prepareStatement(String.format("SELECT * FROM %s", bindableTable.getTableName())).executeQuery()) {
 			while (resultSet.next()) {
-				@SuppressWarnings("unchecked")
 				T instance = (T) modelClass.getConstructors()[0].newInstance();
 				
 				bindableTable.getBindableColumns().forEach((bindableColumn) -> {
@@ -69,8 +72,12 @@ public class DatabaseSynchronizer {
 					try {
 						Object object = resultSet.getObject(bindableColumn.getColumnName());
 						
-						if (field.getType() == LocalDate.class) {
-							object = LocalDate.parse(String.valueOf(object));
+						if (object != null) {
+							AbstractDatabaseObjectConvertor<?> convertor = DatabaseObjectConvertorManager.get().find(field.getType(), object.getClass());
+							
+							if (convertor != null) {
+								object = convertor.convert(this, (Class<? extends IDatabaseEntry>) field.getType(), object.getClass(), object);
+							}
 						}
 						
 						field.set(instance, object);
@@ -131,7 +138,12 @@ public class DatabaseSynchronizer {
 				BindableColumn bindableColumn = bindableColumns.get(index);
 				Field field = bindableColumn.getField();
 				
-				preparedStatement.setObject(index + 1, field.get(instance));
+				Object value = field.get(instance);
+				if (bindableColumn.isReference()) {
+					value = getReferenceIdOf(value);
+				}
+				
+				preparedStatement.setObject(index + 1, value);
 			}
 			preparedStatement.setObject(index + 1, idBindableColumn.getField().get(instance));
 			
@@ -194,7 +206,12 @@ public class DatabaseSynchronizer {
 				BindableColumn bindableColumn = bindableColumns.get(index);
 				Field field = bindableColumn.getField();
 				
-				preparedStatement.setObject(index + 1, field.get(instance));
+				Object value = field.get(instance);
+				if (bindableColumn.isReference()) {
+					value = getReferenceIdOf(value);
+				}
+				
+				preparedStatement.setObject(index + 1, value);
 			}
 			
 			return preparedStatement.executeUpdate();
@@ -203,6 +220,14 @@ public class DatabaseSynchronizer {
 		}
 		
 		return -1;
+	}
+	
+	private int getReferenceIdOf(Object value) throws Exception {
+		if (value == null) {
+			return -1;
+		} else {
+			return (int) BindableColumn.findIdColumn(TableAnalizer.get().analizeColumns(value.getClass())).getField().get(value);
+		}
 	}
 	
 	/** @return Executor's {@link AbstractDatabaseConnection database connection}. */

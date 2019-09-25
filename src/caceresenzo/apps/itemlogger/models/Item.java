@@ -3,11 +3,9 @@ package caceresenzo.apps.itemlogger.models;
 import caceresenzo.frameworks.database.IDatabaseEntry;
 import caceresenzo.frameworks.database.annotations.DatabaseTable;
 import caceresenzo.frameworks.database.annotations.DatabaseTableColumn;
-import caceresenzo.frameworks.search.ISearchable;
-import caceresenzo.frameworks.search.filters.IFilter;
 
 @DatabaseTable("items")
-public class Item implements IDatabaseEntry, ISearchable<Item> {
+public class Item implements IDatabaseEntry {
 	
 	/* Database Fields */
 	public static final String COLUMN_NAME = "name";
@@ -33,7 +31,7 @@ public class Item implements IDatabaseEntry, ISearchable<Item> {
 		this.quantity = quantity;
 	}
 	
-	/** @return Item's database row id. */
+	@Override
 	public int getId() {
 		return id;
 	}
@@ -43,39 +41,14 @@ public class Item implements IDatabaseEntry, ISearchable<Item> {
 		return name;
 	}
 	
-	/**
-	 * Change item's name.
-	 * 
-	 * @param name
-	 *            New item's name.
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
-	
 	/** @return Item's total quantity. */
 	public int getQuantity() {
 		return quantity;
 	}
 	
-	/**
-	 * Change item's total quantity.
-	 * 
-	 * @param quantity
-	 *            New item's quantity.
-	 */
-	public void setQuantity(int quantity) {
-		this.quantity = quantity;
-	}
-
 	@Override
 	public String toSimpleRepresentation() {
 		return String.format("%s (%s)", name, quantity);
-	}
-	
-	@Override
-	public boolean search(IFilter<Item> filters) {
-		return false;
 	}
 	
 	@Override
