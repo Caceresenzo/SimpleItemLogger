@@ -4,11 +4,15 @@ import java.lang.reflect.Modifier;
 import java.util.List;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 
 import caceresenzo.apps.itemlogger.managers.DataManager;
+import caceresenzo.apps.itemlogger.ui.models.combobox.DatabaseEntryComboBoxCellEditor;
+import caceresenzo.apps.itemlogger.ui.models.combobox.DatabaseEntryComboBoxCellRenderer;
+import caceresenzo.apps.itemlogger.ui.models.combobox.DatabaseEntryComboBoxRenderer;
 import caceresenzo.apps.itemlogger.ui.models.table.ActionCellEditor;
 import caceresenzo.apps.itemlogger.ui.models.table.ActionCellPanel;
 import caceresenzo.apps.itemlogger.ui.models.table.ActionCellRenderer;
@@ -55,7 +59,8 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 		this.synchronizer = DataManager.get().getDatabaseSynchronizer();
 		
 		initializeColumns(modelClass);
-		initilizeRenderer();
+		initializeComboBoxRenderer();
+		initilizeActionButtonsRenderer();
 	}
 	
 	/**
@@ -89,8 +94,26 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 		}
 	}
 	
+	/** Initialize the {@link JComboBox} for columns with references. */
+	@SuppressWarnings("unchecked")
+	private void initializeComboBoxRenderer() {
+		SwingUtilities.invokeLater(() -> {
+			for (int index = 0; index < columns.size(); index++) {
+				BindableColumn bindableColumn = columns.get(index);
+				
+				if (bindableColumn.isReference()) {
+					JComboBox<?> comboBox = new JComboBox<>(synchronizer.load(bindableColumn.getField().getType()).toArray());
+					comboBox.setRenderer(new DatabaseEntryComboBoxRenderer());
+					
+					table.getColumnModel().getColumn(index).setCellRenderer(new DatabaseEntryComboBoxCellRenderer());
+					table.getColumnModel().getColumn(index).setCellEditor(new DatabaseEntryComboBoxCellEditor<>(comboBox));
+				}
+			}
+		});
+	}
+	
 	/** Initialize the render system of the action column only if the <code>useActionColumn</code> was set to <code>true</code> in the constructor. */
-	private void initilizeRenderer() {
+	private void initilizeActionButtonsRenderer() {
 		if (rowActionButtons == null) {
 			return;
 		}

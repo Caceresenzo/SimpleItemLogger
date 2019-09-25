@@ -23,6 +23,7 @@ public @interface DatabaseTableColumn {
 	/** @return Column's SQL custom flags. */
 	public int flags() default SqlTableBuilder.FLAG_NOT_NULL;
 	
+	/** @return Weather or not the column is considered as a reference to another model. */
 	public boolean isReference() default false;
 	
 }

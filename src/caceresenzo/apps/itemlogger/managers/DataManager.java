@@ -27,6 +27,7 @@ public class DataManager extends AbstractManager {
 	/* Database */
 	private final AbstractDatabaseConnection databaseConnection;
 	private final DatabaseSynchronizer databaseSynchronizer;
+	private final TableCreator tableCreator;
 	
 	/* Private Constructor */
 	private DataManager() {
@@ -34,6 +35,11 @@ public class DataManager extends AbstractManager {
 		
 		this.databaseConnection = new SqliteConnection(Config.SQLITE_PATH);
 		this.databaseSynchronizer = new DatabaseSynchronizer(databaseConnection);
+		this.tableCreator = new TableCreator()
+				.with(Person.class)
+				.with(Item.class)
+				.with(ConstructionSite.class)
+				.with(HistoryEntry.class);
 	}
 	
 	@Override
@@ -50,12 +56,7 @@ public class DataManager extends AbstractManager {
 		}
 		
 		try {
-			new TableCreator()
-					.with(Person.class)
-					.with(Item.class)
-					.with(ConstructionSite.class)
-					.with(HistoryEntry.class)
-					.autoCreate(databaseConnection);
+			tableCreator.autoCreate(databaseConnection);
 		} catch (Exception exception) {
 			LOGGER.error("Failed to auto-create tables, application can't continue.", exception);
 			System.exit(0);
@@ -71,6 +72,11 @@ public class DataManager extends AbstractManager {
 	/** @return Main {@link DatabaseSynchronizer database data synchronizer}. */
 	public DatabaseSynchronizer getDatabaseSynchronizer() {
 		return databaseSynchronizer;
+	}
+	
+	/** @return {@link TableCreator} used to initialize the database. */
+	public TableCreator getTableCreator() {
+		return tableCreator;
 	}
 	
 	/** @return DataManager's singleton instance. */

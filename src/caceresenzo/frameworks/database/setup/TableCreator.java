@@ -77,7 +77,7 @@ public class TableCreator {
 			
 			createSql.add(tableBuilder.build());
 		}
-
+		
 		Statement statement = databaseConnection.getConnection().createStatement();
 		
 		for (String sql : createSql) {
@@ -85,6 +85,11 @@ public class TableCreator {
 		}
 		
 		statement.executeBatch();
+	}
+	
+	/** @return Map containing all model class used to create the database tables. */
+	public Map<Class<?>, BindableTable> getBindables() {
+		return bindables;
 	}
 	
 }

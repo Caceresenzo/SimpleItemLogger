@@ -4,7 +4,6 @@ import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -222,6 +221,15 @@ public class DatabaseSynchronizer {
 		return -1;
 	}
 	
+	/**
+	 * If the value is considered as a {@link DatabaseTableColumn#isReference() reference}, the value of his target's id will be returned.
+	 * 
+	 * @param value
+	 *            Original value.
+	 * @return Referenced model's instance's id. Or <code>-1</code> if the <code>value</code> is <code>null</code>.
+	 * @throws Exception
+	 *             If anything goes wrong.
+	 */
 	private int getReferenceIdOf(Object value) throws Exception {
 		if (value == null) {
 			return -1;

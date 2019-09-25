@@ -45,10 +45,15 @@ public class ConstructionSite implements IDatabaseEntry {
 	public String getAddress() {
 		return address;
 	}
-
+	
 	@Override
 	public String toSimpleRepresentation() {
 		return String.format("%s (%s)", name, address);
+	}
+	
+	@Override
+	public String toString() {
+		return "ConstructionSite[id=" + id + ", name=" + name + ", address=" + address + "]";
 	}
 	
 }
