@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -66,7 +67,13 @@ public class DatabaseSynchronizer {
 					Field field = bindableColumn.getField();
 					
 					try {
-						field.set(instance, resultSet.getObject(bindableColumn.getColumnName()));
+						Object object = resultSet.getObject(bindableColumn.getColumnName());
+						
+						if (field.getType() == Date.class) {
+							object = new Date(Long.valueOf(String.valueOf(object)));
+						}
+						
+						field.set(instance, object);
 					} catch (IllegalArgumentException | IllegalAccessException | SQLException exception) {
 						LOGGER.error("Failed to set model field.", exception);
 					}

@@ -24,7 +24,7 @@ import javax.swing.border.TitledBorder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import caceresenzo.apps.itemlogger.ui.part.FieldPartPanel;
+import caceresenzo.apps.itemlogger.ui.part.AbstractFieldPartPanel;
 import caceresenzo.frameworks.database.binder.BindableColumn;
 import caceresenzo.frameworks.database.setup.TableAnalizer;
 import caceresenzo.libs.internationalization.i18n;
@@ -100,7 +100,7 @@ public class AddNewDialog extends JDialog implements ActionListener {
 		
 		getRootPane().setDefaultButton(doneButton);
 		
-		bindableColumns.forEach((bindableColumn) -> fieldListPanel.add(new FieldPartPanel(modelClass, bindableColumn, null)));
+		bindableColumns.forEach((bindableColumn) -> fieldListPanel.add(AbstractFieldPartPanel.find(modelClass, bindableColumn, null)));
 	}
 	
 	@Override
@@ -148,7 +148,7 @@ public class AddNewDialog extends JDialog implements ActionListener {
 	/**
 	 * Create an model instance from the fields.
 	 * 
-	 * @return Created instance from field, or <code>null</code> if an error append in the {@link FieldPartPanel#getObject()} method.
+	 * @return Created instance from field, or <code>null</code> if an error append in the {@link AbstractFieldPartPanel#getObject()} method.
 	 * @throws Exception
 	 *             If anything goes wrong.
 	 */
@@ -156,8 +156,8 @@ public class AddNewDialog extends JDialog implements ActionListener {
 		Object instance = modelClass.getConstructors()[0].newInstance();
 		
 		for (Component component : fieldListPanel.getComponents()) {
-			if (component instanceof FieldPartPanel) {
-				FieldPartPanel fieldPartPanel = (FieldPartPanel) component;
+			if (component instanceof AbstractFieldPartPanel) {
+				AbstractFieldPartPanel fieldPartPanel = (AbstractFieldPartPanel) component;
 				BindableColumn bindableColumn = fieldPartPanel.getBindableColumn();
 				Field field = bindableColumn.getField();
 				
