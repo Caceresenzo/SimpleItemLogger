@@ -3,7 +3,7 @@ package caceresenzo.apps.itemlogger.ui.part.implementations;
 import java.awt.Component;
 import java.awt.event.KeyListener;
 import java.time.DayOfWeek;
-import java.util.Date;
+import java.time.LocalDate;
 
 import com.github.lgooddatepicker.components.DatePicker;
 import com.github.lgooddatepicker.components.DatePickerSettings;
@@ -11,16 +11,11 @@ import com.github.lgooddatepicker.components.DatePickerSettings;
 import caceresenzo.apps.itemlogger.ui.part.AbstractFieldPartPanel;
 import caceresenzo.frameworks.database.binder.BindableColumn;
 
-public class DateFieldPartPanel extends AbstractFieldPartPanel<Date> {
+public class LocalDateFieldPartPanel extends AbstractFieldPartPanel<LocalDate> {
 	
 	/* Constructor */
-	public DateFieldPartPanel(Class<?> modelClass, BindableColumn bindableColumn, KeyListener keyListener) {
+	public LocalDateFieldPartPanel(Class<?> modelClass, BindableColumn bindableColumn, KeyListener keyListener) {
 		super(modelClass, bindableColumn, keyListener);
-	}
-	
-	@Override
-	public Date getObject() {
-		return new Date(((DatePicker) getFieldComponent()).getDate().toEpochDay());
 	}
 	
 	@Override
@@ -33,6 +28,11 @@ public class DateFieldPartPanel extends AbstractFieldPartPanel<Date> {
 		datePicker.setDateToToday();
 		
 		return datePicker;
+	}
+	
+	@Override
+	public LocalDate getObject() {
+		return ((DatePicker) getFieldComponent()).getDate();
 	}
 	
 }

@@ -1,6 +1,6 @@
 package caceresenzo.apps.itemlogger.models;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import caceresenzo.frameworks.database.IDatabaseEntry;
 import caceresenzo.frameworks.database.annotations.DatabaseTable;
@@ -26,9 +26,9 @@ public class HistoryEntry implements IDatabaseEntry, ISearchable<HistoryEntry> {
 	@DatabaseTableColumn(COLUMN_ITEM_ID)
 	private final int itemId;
 	@DatabaseTableColumn(COLUMN_LEND_DATE)
-	private final Date lendDate;
+	private final LocalDate lendDate;
 	@DatabaseTableColumn(value = COLUMN_RETURN_DATE, flags = SqlTableBuilder.FLAG_NULL)
-	private final Date returnDate;
+	private LocalDate returnDate;
 	
 	/* Constructor */
 	public HistoryEntry() {
@@ -36,7 +36,7 @@ public class HistoryEntry implements IDatabaseEntry, ISearchable<HistoryEntry> {
 	}
 	
 	/* Constructor */
-	public HistoryEntry(int id, int personId, int itemId, Date lendDate, Date returnDate) {
+	public HistoryEntry(int id, int personId, int itemId, LocalDate lendDate, LocalDate returnDate) {
 		this.id = id;
 		this.personId = personId;
 		this.itemId = itemId;
@@ -60,13 +60,18 @@ public class HistoryEntry implements IDatabaseEntry, ISearchable<HistoryEntry> {
 	}
 	
 	/** @return History entry's lend date. */
-	public Date getLendDate() {
+	public LocalDate getLendDate() {
 		return lendDate;
 	}
 	
 	/** @return History entry's return date. */
-	public Date getReturnDate() {
+	public LocalDate getReturnDate() {
 		return returnDate;
+	}
+
+	@Override
+	public String toSimpleRepresentation() {
+		return null;
 	}
 	
 	@Override

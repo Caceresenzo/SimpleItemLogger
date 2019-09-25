@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.KeyListener;
+import java.time.LocalDate;
 import java.util.Date;
 
 import javax.swing.GroupLayout;
@@ -14,7 +15,7 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.UIManager;
 import javax.swing.border.TitledBorder;
 
-import caceresenzo.apps.itemlogger.ui.part.implementations.DateFieldPartPanel;
+import caceresenzo.apps.itemlogger.ui.part.implementations.LocalDateFieldPartPanel;
 import caceresenzo.apps.itemlogger.ui.part.implementations.NumberFieldPartPanel;
 import caceresenzo.apps.itemlogger.ui.part.implementations.TextFieldPartPanel;
 import caceresenzo.frameworks.database.binder.BindableColumn;
@@ -124,8 +125,8 @@ public abstract class AbstractFieldPartPanel<T> extends JPanel {
 			clazz = TextFieldPartPanel.class;
 		} else if (columnClass == int.class || columnClass == Integer.class) {
 			clazz = NumberFieldPartPanel.class;
-		}  else if (columnClass == Date.class) {
-			clazz = DateFieldPartPanel.class;
+		}  else if (columnClass == LocalDate.class) {
+			clazz = LocalDateFieldPartPanel.class;
 		} else {
 			throw new IllegalStateException("Unknown field type: " + columnClass);
 		}

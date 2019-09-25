@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import caceresenzo.apps.itemlogger.configuration.Config;
+import caceresenzo.apps.itemlogger.models.ConstructionSite;
 import caceresenzo.apps.itemlogger.models.HistoryEntry;
 import caceresenzo.apps.itemlogger.models.Item;
 import caceresenzo.apps.itemlogger.models.Person;
@@ -52,6 +53,7 @@ public class DataManager extends AbstractManager {
 			new TableCreator()
 					.with(Person.class)
 					.with(Item.class)
+					.with(ConstructionSite.class)
 					.with(HistoryEntry.class)
 					.autoCreate(databaseConnection);
 		} catch (Exception exception) {

@@ -6,81 +6,76 @@ import caceresenzo.frameworks.database.annotations.DatabaseTableColumn;
 import caceresenzo.frameworks.search.ISearchable;
 import caceresenzo.frameworks.search.filters.IFilter;
 
-@DatabaseTable("items")
-public class Item implements IDatabaseEntry, ISearchable<Item> {
+@DatabaseTable("construction_sites")
+public class ConstructionSite implements IDatabaseEntry, ISearchable<ConstructionSite> {
 	
 	/* Database Fields */
 	public static final String COLUMN_NAME = "name";
-	public static final String COLUMN_QUANTITY = "quantity";
+	public static final String COLUMN_ADDRESS = "address";
 	
 	/* Variables */
 	@DatabaseTableColumn(DatabaseTableColumn.COLUMN_ID)
 	private final int id;
 	@DatabaseTableColumn(COLUMN_NAME)
 	private String name;
-	@DatabaseTableColumn(COLUMN_QUANTITY)
-	private int quantity;
+	@DatabaseTableColumn(COLUMN_ADDRESS)
+	private String address;
 	
 	/* Constructor */
-	public Item() {
-		this(0, null, 0);
+	public ConstructionSite() {
+		this(0, null, null);
 	}
 	
 	/* Constructor */
-	public Item(final int id, String name, int quantity) {
+	public ConstructionSite(final int id, String name, String address) {
 		this.id = id;
 		this.name = name;
-		this.quantity = quantity;
+		this.address = address;
 	}
 	
-	/** @return Item's database row id. */
+	/** @return Construction site's database row id. */
 	public int getId() {
 		return id;
 	}
 	
-	/** @return Item's name. */
+	/** @return Construction site's name. */
 	public String getName() {
 		return name;
 	}
 	
 	/**
-	 * Change item's name.
+	 * Change construction site's name.
 	 * 
 	 * @param name
-	 *            New item's name.
+	 *            New construction site's name.
 	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 	
-	/** @return Item's total quantity. */
-	public int getQuantity() {
-		return quantity;
+	/** @return Construction site's address. */
+	public String getAddress() {
+		return address;
 	}
 	
 	/**
-	 * Change item's total quantity.
+	 * Change construction site's address.
 	 * 
-	 * @param quantity
-	 *            New item's quantity.
+	 * @param address
+	 *            New construction site's address.
 	 */
-	public void setQuantity(int quantity) {
-		this.quantity = quantity;
+	public void setAddress(String address) {
+		this.address = address;
 	}
 
 	@Override
 	public String toSimpleRepresentation() {
-		return String.format("%s (%s)", name, quantity);
+		return String.format("%s (%s)", name, address);
 	}
 	
 	@Override
-	public boolean search(IFilter<Item> filters) {
+	public boolean search(IFilter<ConstructionSite> filters) {
 		return false;
-	}
-	
-	@Override
-	public String toString() {
-		return "Item[id=" + id + ", name=" + name + ", quantity=" + quantity + "]";
 	}
 	
 }

@@ -20,6 +20,9 @@ import caceresenzo.libs.internationalization.i18n;
 
 public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractTableModel {
 	
+	/* Serialization */
+	private static final long serialVersionUID = 1082999014657444212L;
+	
 	/* UI */
 	private final JTable table;
 	

@@ -1,8 +1,10 @@
 package caceresenzo.apps.itemlogger.ui;
 
+import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,12 +28,14 @@ import javax.swing.border.TitledBorder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.lgooddatepicker.tableeditors.DateTableEditor;
+
 import caceresenzo.apps.itemlogger.managers.DataManager;
+import caceresenzo.apps.itemlogger.models.ConstructionSite;
 import caceresenzo.apps.itemlogger.models.HistoryEntry;
 import caceresenzo.apps.itemlogger.models.Item;
 import caceresenzo.apps.itemlogger.models.Person;
 import caceresenzo.apps.itemlogger.ui.models.DatabaseEntryTableModel;
-import caceresenzo.frameworks.database.synchronization.DatabaseSynchronizer;
 import caceresenzo.libs.internationalization.i18n;
 
 public class MainLoggerWindow implements ActionListener {
@@ -43,6 +47,7 @@ public class MainLoggerWindow implements ActionListener {
 	public static final String ACTION_COMMAND_ADD = "action_add";
 	public static final String ACTION_COMMAND_DISPLAY_ITEMS = "action_display_items";
 	public static final String ACTION_COMMAND_DISPLAY_PERSONS = "action_display_persons";
+	public static final String ACTION_COMMAND_DISPLAY_CONSTRUCTION_SITES = "action_display_construction_sites";
 	public static final String ACTION_COMMAND_DISPLAY_HISTORY = "action_display_history";
 	public static final String ACTION_COMMAND_PRINT = "action_print";
 	
@@ -73,7 +78,7 @@ public class MainLoggerWindow implements ActionListener {
 	/** Initialize the contents of the frame. */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setSize(700, 500);
+		frame.setSize(800, 500);
 		frame.setMinimumSize(frame.getSize());
 		frame.setLocationRelativeTo(null);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -128,6 +133,12 @@ public class MainLoggerWindow implements ActionListener {
 		
 		dataTable = new JTable();
 		dataTable.setFillsViewportHeight(true);
+		dataTable.setSelectionForeground(Color.BLACK);
+		dataTable.setSelectionBackground(Color.decode("#D9EBF9"));
+		
+		dataTable.setDefaultRenderer(LocalDate.class, new DateTableEditor());
+		dataTable.setDefaultEditor(LocalDate.class, new DateTableEditor());
+		
 		dataScrollPane.setViewportView(dataTable);
 		dataPanel.setLayout(gl_dataPanel);
 		
@@ -227,6 +238,7 @@ public class MainLoggerWindow implements ActionListener {
 			
 			case ACTION_COMMAND_DISPLAY_ITEMS:
 			case ACTION_COMMAND_DISPLAY_PERSONS:
+			case ACTION_COMMAND_DISPLAY_CONSTRUCTION_SITES:
 			case ACTION_COMMAND_DISPLAY_HISTORY: {
 				Class<?> newModelClass;
 				
@@ -239,6 +251,11 @@ public class MainLoggerWindow implements ActionListener {
 					
 					case ACTION_COMMAND_DISPLAY_PERSONS: {
 						newModelClass = Person.class;
+						break;
+					}
+					
+					case ACTION_COMMAND_DISPLAY_CONSTRUCTION_SITES: {
+						newModelClass = ConstructionSite.class;
 						break;
 					}
 					
@@ -270,6 +287,7 @@ public class MainLoggerWindow implements ActionListener {
 				new ActionButton("add", "icon-plus-32px", ACTION_COMMAND_ADD),
 				new ActionButton("items", "icon-new-product-32px", ACTION_COMMAND_DISPLAY_ITEMS),
 				new ActionButton("persons", "icon-user-men-32px", ACTION_COMMAND_DISPLAY_PERSONS),
+				new ActionButton("construction-sites", "icon-in-construction-32px", ACTION_COMMAND_DISPLAY_CONSTRUCTION_SITES),
 				new ActionButton("history", "icon-history-32px", ACTION_COMMAND_DISPLAY_HISTORY),
 				new ActionButton("print", "icon-print-32px", ACTION_COMMAND_PRINT) //
 		).forEach((actionButton) -> buttons.add(actionButton.toJButton(this)));

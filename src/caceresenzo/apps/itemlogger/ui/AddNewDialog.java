@@ -157,7 +157,7 @@ public class AddNewDialog extends JDialog implements ActionListener {
 		
 		for (Component component : fieldListPanel.getComponents()) {
 			if (component instanceof AbstractFieldPartPanel) {
-				AbstractFieldPartPanel fieldPartPanel = (AbstractFieldPartPanel) component;
+				AbstractFieldPartPanel<?> fieldPartPanel = (AbstractFieldPartPanel<?>) component;
 				BindableColumn bindableColumn = fieldPartPanel.getBindableColumn();
 				Field field = bindableColumn.getField();
 				

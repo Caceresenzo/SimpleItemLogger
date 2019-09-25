@@ -86,6 +86,11 @@ public class Person implements IDatabaseEntry, ISearchable<Person> {
 	public void setPhone(String email) {
 		this.phone = email;
 	}
+
+	@Override
+	public String toSimpleRepresentation() {
+		return String.format("%S %s (%s)", lastname, firstname, phone);
+	}
 	
 	@Override
 	public boolean search(IFilter<Person> filters) {
