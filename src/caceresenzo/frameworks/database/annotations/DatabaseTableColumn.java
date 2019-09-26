@@ -27,6 +27,9 @@ public @interface DatabaseTableColumn {
 	/** @return Weather or not the column is considered as a reference to another model. */
 	public boolean isReference() default false;
 	
+	/** @return Weather or not the column can be edited. */
+	public boolean editable() default true;
+	
 	@SuppressWarnings("rawtypes")
 	public Class<? extends AbstractDatabaseColumnValueAutomator> automator() default AbstractDatabaseColumnValueAutomator.class;
 	

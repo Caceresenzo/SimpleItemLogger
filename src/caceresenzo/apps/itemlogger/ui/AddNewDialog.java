@@ -56,6 +56,7 @@ public class AddNewDialog extends JDialog implements ActionListener {
 		
 		this.bindableColumns = TableAnalizer.get().analizeColumns(modelClass);
 		this.bindableColumns.remove(BindableColumn.findIdColumn(bindableColumns));
+		BindableColumn.removeAutomatable(bindableColumns);
 		
 		setSize(700, 400);
 		setModal(true);

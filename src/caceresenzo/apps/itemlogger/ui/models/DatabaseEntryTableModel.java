@@ -3,11 +3,16 @@ package caceresenzo.apps.itemlogger.ui.models;
 import java.lang.reflect.Modifier;
 import java.util.List;
 
+import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableColumn;
 
 import caceresenzo.apps.itemlogger.managers.DataManager;
 import caceresenzo.apps.itemlogger.ui.models.combobox.DatabaseEntryComboBoxCellEditor;
@@ -83,7 +88,12 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 			BindableColumn bindableColumn = columns.get(index);
 			
 			columnNames[index] = i18n.string("logger.table.column." + bindableColumn.getColumnName());
-			columnClass[index] = bindableColumn.getField().getType();
+			
+			Class<?> type = bindableColumn.getField().getType();
+			if (type == int.class) {
+				type = Integer.class;
+			}
+			columnClass[index] = type;
 			
 			bindableColumn.getField().setAccessible(true);
 		}
@@ -92,6 +102,23 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 			columnNames[index] = "ACTIONS";
 			columnClass[index] = Object.class;
 		}
+		
+		SwingUtilities.invokeLater(() -> {
+			for (int jndex = 0; jndex < columns.size(); jndex++) {
+				if (columnClass[jndex] == Integer.class) {
+					TableColumn tableColumn = table.getColumnModel().getColumn(jndex);
+					
+					DefaultTableCellRenderer cellRenderer = new DefaultTableCellRenderer();
+					cellRenderer.setHorizontalAlignment(SwingConstants.LEFT);
+					
+					DefaultCellEditor cellEditor = (DefaultCellEditor) table.getDefaultEditor(Integer.class);
+					((JTextField) cellEditor.getComponent()).setHorizontalAlignment(SwingConstants.LEFT);
+					
+					tableColumn.setCellRenderer(cellRenderer);
+					tableColumn.setCellEditor(cellEditor);
+				}
+			}
+		});
 	}
 	
 	/** Initialize the {@link JComboBox} for columns with references. */
@@ -178,7 +205,13 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 			return true;
 		}
 		
-		return !Modifier.isFinal(columns.get(columnIndex).getField().getModifiers());
+		BindableColumn bindableColumn = columns.get(columnIndex);
+		
+		if (bindableColumn.isAutomatable()) {
+			return false;
+		}
+		
+		return !Modifier.isFinal(bindableColumn.getField().getModifiers());
 	}
 	
 	@Override

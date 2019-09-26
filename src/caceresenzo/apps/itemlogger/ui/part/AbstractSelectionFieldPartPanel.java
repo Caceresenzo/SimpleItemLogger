@@ -3,7 +3,6 @@ package caceresenzo.apps.itemlogger.ui.part;
 import java.awt.Component;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JComboBox;
@@ -16,13 +15,11 @@ import caceresenzo.libs.internationalization.i18n;
 public abstract class AbstractSelectionFieldPartPanel<T extends IDatabaseEntry> extends AbstractFieldPartPanel<T> {
 	
 	/* Variables */
-	protected final List<T> items;
+	protected List<T> items;
 	
 	/* Constructor */
 	public AbstractSelectionFieldPartPanel(Class<?> modelClass, BindableColumn bindableColumn, KeyListener keyListener) {
 		super(modelClass, bindableColumn, keyListener);
-		
-		this.items = Collections.unmodifiableList(getItems());
 	}
 	
 	/** @return An final {@link List list} of item that are able to be {@link IModel selected}. */
@@ -32,8 +29,10 @@ public abstract class AbstractSelectionFieldPartPanel<T extends IDatabaseEntry> 
 	protected Component createComponent() {
 		List<String> stringItems = new ArrayList<>();
 		
-		getItems().forEach((item) -> stringItems.add(item.toSimpleRepresentation()));
-		stringItems.sort((string1, string2) -> string1.compareTo(string2));
+		items = getItems();
+		items.sort((item1, item2) -> item1.toSimpleRepresentation().compareTo(item2.toSimpleRepresentation()));
+		items.forEach((item) -> stringItems.add(item.toSimpleRepresentation()));
+		
 		stringItems.add(0, i18n.string("create-dialog.combobox.default.select-an-item"));
 		
 		return new JComboBox<>(stringItems.toArray());

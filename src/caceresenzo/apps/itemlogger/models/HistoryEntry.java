@@ -30,7 +30,7 @@ public class HistoryEntry implements IDatabaseEntry {
 	@DatabaseTableColumn(value = COLUMN_LEND_CONSTRUCTION_SITE, isReference = true)
 	private ConstructionSite constructionSite;
 	@DatabaseTableColumn(COLUMN_LEND_DATE)
-	private final LocalDate lendDate;
+	private LocalDate lendDate;
 	@DatabaseTableColumn(value = COLUMN_RETURN_DATE, flags = SqlTableBuilder.FLAG_NULL)
 	private LocalDate returnDate;
 	

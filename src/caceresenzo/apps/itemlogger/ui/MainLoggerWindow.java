@@ -202,11 +202,7 @@ public class MainLoggerWindow implements ActionListener {
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private void changeModel(Class<?> newClassModel, List<JButton> rowActionButtons) {
-		if (currentDisplayedModelClass == newClassModel) {
-			return;
-		}
-		
+	private void changeModel(Class<?> newClassModel, List<JButton> rowActionButtons) {		
 		DatabaseEntryTableModel model = new DatabaseEntryTableModel(dataTable, currentDisplayedModelClass = newClassModel, new ArrayList<>(), rowActionButtons);
 		
 		((TitledBorder) dataPanel.getBorder()).setTitle(i18n.string("logger.panel.data.title.with", i18n.string(String.format("logger.panel.data.title.with.part.%s", newClassModel.getSimpleName().toLowerCase()))));
