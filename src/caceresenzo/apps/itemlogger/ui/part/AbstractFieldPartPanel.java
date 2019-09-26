@@ -19,6 +19,7 @@ import caceresenzo.apps.itemlogger.ui.part.implementations.ModelSelectionFieldPa
 import caceresenzo.apps.itemlogger.ui.part.implementations.NumberFieldPartPanel;
 import caceresenzo.apps.itemlogger.ui.part.implementations.TextFieldPartPanel;
 import caceresenzo.frameworks.database.IDatabaseEntry;
+import caceresenzo.frameworks.database.annotations.DatabaseTableColumn;
 import caceresenzo.frameworks.database.binder.BindableColumn;
 import caceresenzo.frameworks.database.setup.sql.SqlTableBuilder;
 import caceresenzo.libs.internationalization.i18n;
@@ -45,6 +46,9 @@ public abstract class AbstractFieldPartPanel<T> extends JPanel {
 		setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 		
 		label = new JLabel(i18n.string("logger.table.column." + bindableColumn.getColumnName()));
+		if (canBeNull()) {
+			label.setText(label.getText() + " " + i18n.string("create-dialog.field.optional"));
+		}
 		
 		fieldComponent = createComponent();
 		if (keyListener != null) {
@@ -84,6 +88,7 @@ public abstract class AbstractFieldPartPanel<T> extends JPanel {
 	 */
 	public abstract T getObject();
 	
+	/** @return Weather or not this field can be <code>null</code>. It is set by with the flag {@link SqlTableBuilder#FLAG_NULL} declared in the {@link DatabaseTableColumn} annotation. */
 	public boolean canBeNull() {
 		return (bindableColumn.getAnnotation().flags() & SqlTableBuilder.FLAG_NULL) == SqlTableBuilder.FLAG_NULL;
 	}
@@ -96,13 +101,6 @@ public abstract class AbstractFieldPartPanel<T> extends JPanel {
 	/** @return Field's source {@link BindableColumn}. */
 	public BindableColumn getBindableColumn() {
 		return bindableColumn;
-	}
-	
-	public static final class EmptyFieldException extends IllegalStateException {
-		
-		/* Serialization */
-		private static final long serialVersionUID = -1003252877471551269L;
-		
 	}
 	
 	/**
@@ -144,6 +142,13 @@ public abstract class AbstractFieldPartPanel<T> extends JPanel {
 		} catch (Exception exception) {
 			throw new IllegalStateException("Failed to instanciate the class constructor.", exception);
 		}
+	}
+	
+	public static final class EmptyFieldException extends IllegalStateException {
+		
+		/* Serialization */
+		private static final long serialVersionUID = -1003252877471551269L;
+		
 	}
 	
 }

@@ -59,6 +59,7 @@ public class AddNewDialog extends JDialog implements ActionListener {
 		
 		setSize(700, 400);
 		setModal(true);
+		setTitle(i18n.string("create-dialog.window.title"));
 		setMinimumSize(getSize());
 		setLocationRelativeTo(null);
 		getContentPane().setLayout(new BorderLayout());
@@ -68,7 +69,8 @@ public class AddNewDialog extends JDialog implements ActionListener {
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		scrollPane.setBorder(new TitledBorder(null, "New", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		scrollPane.getVerticalScrollBar().setUnitIncrement(8);
+		scrollPane.setBorder(new TitledBorder(null, i18n.string("create-dialog.frame.new-line-part", i18n.string("model." + modelClass.getSimpleName().toLowerCase())), TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		GroupLayout gl_contentPanel = new GroupLayout(contentPanel);
 		gl_contentPanel.setHorizontalGroup(
 				gl_contentPanel.createParallelGroup(Alignment.LEADING)
@@ -166,7 +168,10 @@ public class AddNewDialog extends JDialog implements ActionListener {
 					value = fieldPartPanel.getObject();
 				} catch (Exception exception) {
 					LOGGER.warn("Failed to convert field to object.", exception);
-					JOptionPane.showMessageDialog(this, "Failed\n" + exception.getLocalizedMessage());
+					
+					String errorMessage = i18n.string("create-dialog.error.dialog.message", i18n.string("logger.table.column." + bindableColumn.getColumnName()), exception.getLocalizedMessage());
+					JOptionPane.showMessageDialog(this, errorMessage, i18n.string("create-dialog.error.dialog.title"), JOptionPane.ERROR_MESSAGE);
+					
 					return null;
 				}
 				

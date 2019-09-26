@@ -47,7 +47,7 @@ public abstract class AbstractFormattedFieldPartPanel<T> extends AbstractFieldPa
 	public void validateInput() {
 		String text = getFormattedFieldComponent().getText().trim();
 		
-		if (!StringUtils.validate(text)) {
+		if (!StringUtils.validate(text) && !canBeNull()) {
 			throw new EmptyFieldException();
 		}
 	}

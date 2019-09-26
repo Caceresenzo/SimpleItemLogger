@@ -11,6 +11,7 @@ import javax.swing.JFormattedTextField;
 
 import caceresenzo.frameworks.database.IDatabaseEntry;
 import caceresenzo.frameworks.database.binder.BindableColumn;
+import caceresenzo.libs.internationalization.i18n;
 
 public abstract class AbstractSelectionFieldPartPanel<T extends IDatabaseEntry> extends AbstractFieldPartPanel<T> {
 	
@@ -33,7 +34,7 @@ public abstract class AbstractSelectionFieldPartPanel<T extends IDatabaseEntry> 
 		
 		getItems().forEach((item) -> stringItems.add(item.toSimpleRepresentation()));
 		stringItems.sort((string1, string2) -> string1.compareTo(string2));
-		stringItems.add(0, "Select an item");
+		stringItems.add(0, i18n.string("create-dialog.combobox.default.select-an-item"));
 		
 		return new JComboBox<>(stringItems.toArray());
 	}
@@ -50,6 +51,10 @@ public abstract class AbstractSelectionFieldPartPanel<T extends IDatabaseEntry> 
 	 *             If the selected item index is <code>0</code>.
 	 */
 	public void validateInput() {
+		if (canBeNull()) {
+			return;
+		}
+		
 		if (getComboBoxFieldComponent().getSelectedIndex() == 0) {
 			throw new EmptyFieldException();
 		}

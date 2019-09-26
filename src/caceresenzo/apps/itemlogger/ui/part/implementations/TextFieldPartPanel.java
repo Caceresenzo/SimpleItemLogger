@@ -20,19 +20,6 @@ public class TextFieldPartPanel extends AbstractFormattedFieldPartPanel<String> 
 		validateInput();
 		
 		return getFormattedFieldComponent().getText().trim();
-		
-		// Class<?> type = bindableColumn.getField().getType();
-		// String text = formattedTextField.getText().trim();
-		//
-		// if (!StringUtils.validate(text)) {
-		// throw new NullPointerException("Empty field: " + bindableColumn.getColumnName());
-		// }
-		//
-		// if (type == Integer.class || type == int.class) {
-		// return Integer.parseInt(String.valueOf(formattedTextField.getValue()));
-		// } else {
-		// return text;
-		// }
 	}
 	
 	@Override

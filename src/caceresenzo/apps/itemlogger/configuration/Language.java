@@ -32,9 +32,9 @@ public class Language {
 		@Override
 		public void set() {
 			o("multiple-element-letter", "s");
-
+			
 			o("application.title", "Simple Carnet d'Objet");
-
+			
 			o("logger.panel.search.title", "Recherche");
 			o("logger.panel.search.filters.title", "Filtres");
 			o("logger.panel.action.title", "Actions");
@@ -44,9 +44,9 @@ public class Language {
 			o("logger.panel.data.title.with.part.person", "Personnes");
 			o("logger.panel.data.title.with.part.constructionsite", "Chantiers");
 			o("logger.panel.data.title.with.part.historyentry", "Historique");
-
+			
 			o("logger.button.search", "Rechercher");
-
+			
 			o("logger.button.action.add", "Ajouter");
 			o("logger.button.action.items", "Inventaire");
 			o("logger.button.action.persons", "Personnes");
@@ -67,9 +67,20 @@ public class Language {
 			o("logger.table.column.construction_site", "Pour le chantier");
 			o("logger.table.column.lend", "Prêt");
 			o("logger.table.column.return", "Retour");
-
+			
+			o("create-dialog.window.title", "Ajout d'une ligne");
+			o("create-dialog.frame.new-line-part", "Nouvelle ligne — %s");
+			o("create-dialog.field.optional", "(optionel)");
 			o("create-dialog.button.done", "Valider");
 			o("create-dialog.button.cancel", "Annuler");
+			o("create-dialog.combobox.default.select-an-item", "Selectionner un élément");
+			o("create-dialog.error.dialog.title", "Champ manquant");
+			o("create-dialog.error.dialog.message", "Certain champ sont manquant ou n'ont pas été traité correctement.\nSi vous pendez que tout est correcte, et que ce n'est pas un bug, contactez le développeur.\n\nDétails:\n    - Champ: \"%s\"\n    - Erreur: %s");
+			
+			o("model.item", "Item");
+			o("model.person", "Personne");
+			o("model.constructionsite", "Chantier");
+			o("model.historyentry", "Entré d'Historique");
 			
 			o("application.copyright.full", "SIMPLE CARNET D'OBJET\nCRÉE PAR ENZO CACERES POUR L'ENTREPRISE NEGRO SA");
 			
@@ -77,7 +88,7 @@ public class Language {
 		}
 		
 	}
-
+	
 	/** @return Language's singleton instance. */
 	public static final Language get() {
 		if (INSTANCE == null) {
