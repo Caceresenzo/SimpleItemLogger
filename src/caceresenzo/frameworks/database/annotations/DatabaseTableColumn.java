@@ -7,6 +7,7 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import caceresenzo.frameworks.database.automator.AbstractDatabaseColumnValueAutomator;
 import caceresenzo.frameworks.database.setup.sql.SqlTableBuilder;
 
 @Documented
@@ -25,5 +26,8 @@ public @interface DatabaseTableColumn {
 	
 	/** @return Weather or not the column is considered as a reference to another model. */
 	public boolean isReference() default false;
+	
+	@SuppressWarnings("rawtypes")
+	public Class<? extends AbstractDatabaseColumnValueAutomator> automator() default AbstractDatabaseColumnValueAutomator.class;
 	
 }

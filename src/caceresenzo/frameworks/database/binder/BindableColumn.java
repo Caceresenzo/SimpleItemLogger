@@ -1,9 +1,11 @@
 package caceresenzo.frameworks.database.binder;
 
 import java.lang.reflect.Field;
+import java.util.Iterator;
 import java.util.List;
 
 import caceresenzo.frameworks.database.annotations.DatabaseTableColumn;
+import caceresenzo.frameworks.database.automator.AbstractDatabaseColumnValueAutomator;
 import caceresenzo.libs.reflection.ReflectionUtils;
 
 public class BindableColumn {
@@ -28,6 +30,10 @@ public class BindableColumn {
 	/** @return Weather or not this column is a reference to another table entry. */
 	public boolean isReference() {
 		return this.annotation.isReference();
+	}
+	
+	public boolean isAutomatable() {
+		return !this.annotation.automator().equals(AbstractDatabaseColumnValueAutomator.class);
 	}
 	
 	/** @return Field's {@link DatabaseTableColumn} annotation. */
@@ -55,6 +61,18 @@ public class BindableColumn {
 		}
 		
 		return null;
+	}
+
+	public static void removeAutomatable(List<BindableColumn> bindableColumns) {
+		Iterator<BindableColumn> iterator = bindableColumns.listIterator();
+		
+		while (iterator.hasNext()) {
+			BindableColumn bindableColumn = iterator.next();
+			
+			if (bindableColumn.isAutomatable()) {
+				iterator.remove();
+			}
+		}
 	}
 	
 }

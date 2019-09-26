@@ -1,6 +1,5 @@
 package caceresenzo.frameworks.database.binder;
 
-import java.util.Collections;
 import java.util.List;
 
 import caceresenzo.frameworks.database.annotations.DatabaseTable;
@@ -16,7 +15,7 @@ public class BindableTable {
 	public BindableTable(DatabaseTable annotation, Class<?> clazz, List<BindableColumn> bindableFields) {
 		this.annotation = annotation;
 		this.clazz = clazz;
-		this.bindableFields = Collections.unmodifiableList(bindableFields);
+		this.bindableFields = bindableFields;
 	}
 	
 	/** @return Table's name. */

@@ -194,7 +194,9 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 				columns.get(columnIndex).getField().set(row, aValue);
 				
 				if (synchronizer != null) {
-					synchronizer.update(modelClass, row);
+					if (!synchronizer.update(modelClass, row)) {
+						synchronize();
+					}
 				}
 			} catch (IllegalArgumentException | IllegalAccessException exception) {
 				throw new RuntimeException(exception);

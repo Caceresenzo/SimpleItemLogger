@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import caceresenzo.frameworks.database.IDatabaseEntry;
 import caceresenzo.frameworks.database.annotations.DatabaseTableColumn;
+import caceresenzo.frameworks.database.automator.AbstractDatabaseColumnValueAutomator;
 import caceresenzo.frameworks.database.binder.BindableColumn;
 import caceresenzo.frameworks.database.binder.BindableTable;
 import caceresenzo.frameworks.database.connections.AbstractDatabaseConnection;
@@ -47,6 +48,10 @@ public class DatabaseSynchronizer {
 		return TableAnalizer.get().analizeTable(modelClass);
 	}
 	
+	public <T> List<T> load(Class<T> modelClass) {
+		return load(modelClass, false);
+	}
+	
 	/**
 	 * Load data from a model class.
 	 * 
@@ -57,7 +62,7 @@ public class DatabaseSynchronizer {
 	 * @return A {@link List list} of model class instance filled with information found in the database.
 	 */
 	@SuppressWarnings("unchecked")
-	public <T> List<T> load(Class<T> modelClass) {
+	public <T> List<T> load(Class<T> modelClass, boolean disableAutomator) {
 		BindableTable bindableTable = getTable(modelClass);
 		List<T> items = new ArrayList<>();
 		
@@ -69,19 +74,31 @@ public class DatabaseSynchronizer {
 					Field field = bindableColumn.getField();
 					
 					try {
-						Object object = resultSet.getObject(bindableColumn.getColumnName());
-						
-						if (object != null) {
-							AbstractDatabaseObjectConvertor<?> convertor = DatabaseObjectConvertorManager.get().find(field.getType(), object.getClass());
-							
-							if (convertor != null) {
-								object = convertor.convert(this, (Class<? extends IDatabaseEntry>) field.getType(), object.getClass(), object);
+						if (bindableColumn.isAutomatable()) {
+							if (!disableAutomator) {
+								@SuppressWarnings("rawtypes")
+								Class<? extends AbstractDatabaseColumnValueAutomator> automatorClass = bindableColumn.getAnnotation().automator();
+								AbstractDatabaseColumnValueAutomator<?> automator = automatorClass.newInstance();
+								
+								automator.automate(modelClass, field.getType(), field, instance);
 							}
+						} else {
+							Object object = resultSet.getObject(bindableColumn.getColumnName());
+							
+							if (object != null) {
+								AbstractDatabaseObjectConvertor<?> convertor = DatabaseObjectConvertorManager.get().find(field.getType(), object.getClass());
+								
+								if (convertor != null) {
+									object = convertor.convert(this, (Class<? extends IDatabaseEntry>) field.getType(), object.getClass(), object);
+								}
+							}
+							
+							field.set(instance, object);
 						}
-						
-						field.set(instance, object);
 					} catch (IllegalArgumentException | IllegalAccessException | SQLException exception) {
 						LOGGER.error("Failed to set model field.", exception);
+					} catch (InstantiationException exception) {
+						LOGGER.error("Failed automate field.", exception);
 					}
 				});
 				
@@ -111,6 +128,7 @@ public class DatabaseSynchronizer {
 		
 		BindableColumn idBindableColumn = BindableColumn.findIdColumn(bindableColumns);
 		bindableColumns.remove(idBindableColumn);
+		BindableColumn.removeAutomatable(bindableColumns);
 		
 		try {
 			/* SQL statement generation */
@@ -169,6 +187,7 @@ public class DatabaseSynchronizer {
 		
 		BindableColumn idBindableColumn = BindableColumn.findIdColumn(bindableColumns);
 		bindableColumns.remove(idBindableColumn);
+		BindableColumn.removeAutomatable(bindableColumns);
 		
 		try {
 			/* SQL statement generation */

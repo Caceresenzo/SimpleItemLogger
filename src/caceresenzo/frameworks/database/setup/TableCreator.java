@@ -61,6 +61,10 @@ public class TableCreator {
 					.setIfNotExists(true);
 			
 			for (BindableColumn bindableField : bindableTable.getBindableColumns()) {
+				if (bindableField.isAutomatable()) {
+					continue;
+				}
+				
 				String name = bindableField.getColumnName();
 				String type = tableBuilder.findTypeFor(bindableField.getField().getType());
 				int flags = 0;

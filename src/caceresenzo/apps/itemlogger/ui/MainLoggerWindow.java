@@ -51,8 +51,6 @@ public class MainLoggerWindow implements ActionListener {
 	public static final String ACTION_COMMAND_DISPLAY_HISTORY = "action_display_history";
 	public static final String ACTION_COMMAND_PRINT = "action_print";
 	
-	// public static final List<JButton>
-	
 	/* UI */
 	private JFrame frame;
 	private JPanel searchPanel;
@@ -224,14 +222,11 @@ public class MainLoggerWindow implements ActionListener {
 		
 		switch (actionCommand) {
 			case ACTION_COMMAND_ADD: {
-				AddNewDialog.open(frame, currentDisplayedModelClass, new AddNewDialog.Callback() {
-					@Override
-					public void onCreatedItem(Class<?> modelClass, Object instance) {
-						LOGGER.info(String.valueOf(instance));
-						
-						DataManager.get().getDatabaseSynchronizer().insert(modelClass, instance);
-						((DatabaseEntryTableModel<?>) dataTable.getModel()).synchronize();
-					}
+				AddNewDialog.open(frame, currentDisplayedModelClass, (Class<?> modelClass, Object instance) -> {
+					LOGGER.info(String.valueOf(instance));
+					
+					DataManager.get().getDatabaseSynchronizer().insert(modelClass, instance);
+					((DatabaseEntryTableModel<?>) dataTable.getModel()).synchronize();
 				});
 				break;
 			}

@@ -20,6 +20,7 @@ import caceresenzo.apps.itemlogger.ui.part.implementations.NumberFieldPartPanel;
 import caceresenzo.apps.itemlogger.ui.part.implementations.TextFieldPartPanel;
 import caceresenzo.frameworks.database.IDatabaseEntry;
 import caceresenzo.frameworks.database.binder.BindableColumn;
+import caceresenzo.frameworks.database.setup.sql.SqlTableBuilder;
 import caceresenzo.libs.internationalization.i18n;
 
 public abstract class AbstractFieldPartPanel<T> extends JPanel {
@@ -83,6 +84,10 @@ public abstract class AbstractFieldPartPanel<T> extends JPanel {
 	 */
 	public abstract T getObject();
 	
+	public boolean canBeNull() {
+		return (bindableColumn.getAnnotation().flags() & SqlTableBuilder.FLAG_NULL) == SqlTableBuilder.FLAG_NULL;
+	}
+	
 	/** @return Field's Swing component. */
 	public Component getFieldComponent() {
 		return fieldComponent;
@@ -126,7 +131,7 @@ public abstract class AbstractFieldPartPanel<T> extends JPanel {
 			clazz = TextFieldPartPanel.class;
 		} else if (columnClass == int.class || columnClass == Integer.class) {
 			clazz = NumberFieldPartPanel.class;
-		}  else if (columnClass == LocalDate.class) {
+		} else if (columnClass == LocalDate.class) {
 			clazz = LocalDateFieldPartPanel.class;
 		} else if (IDatabaseEntry.class.isAssignableFrom(bindableColumn.getField().getType())) {
 			clazz = ModelSelectionFieldPartPanel.class;

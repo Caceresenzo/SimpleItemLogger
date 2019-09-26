@@ -13,6 +13,7 @@ public class HistoryEntry implements IDatabaseEntry {
 	/* Database Fields */
 	public static final String COLUMN_PERSON = "person";
 	public static final String COLUMN_ITEM = "item";
+	public static final String COLUMN_QUANTITY = "quantity";
 	public static final String COLUMN_LEND_CONSTRUCTION_SITE = "construction_site";
 	public static final String COLUMN_LEND_DATE = "lend";
 	public static final String COLUMN_RETURN_DATE = "return";
@@ -21,9 +22,11 @@ public class HistoryEntry implements IDatabaseEntry {
 	@DatabaseTableColumn(DatabaseTableColumn.COLUMN_ID)
 	private final int id;
 	@DatabaseTableColumn(value = COLUMN_ITEM, isReference = true)
-	private final Item item;
+	private Item item;
 	@DatabaseTableColumn(value = COLUMN_PERSON, isReference = true)
-	private final Person person;
+	private Person person;
+	@DatabaseTableColumn(COLUMN_QUANTITY)
+	private int quantity;
 	@DatabaseTableColumn(value = COLUMN_LEND_CONSTRUCTION_SITE, isReference = true)
 	private ConstructionSite constructionSite;
 	@DatabaseTableColumn(COLUMN_LEND_DATE)

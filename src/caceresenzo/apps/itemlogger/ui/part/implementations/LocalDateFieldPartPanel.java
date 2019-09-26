@@ -22,10 +22,13 @@ public class LocalDateFieldPartPanel extends AbstractFieldPartPanel<LocalDate> {
 	protected Component createComponent() {
 		DatePickerSettings dateSettings = new DatePickerSettings();
 		dateSettings.setFirstDayOfWeek(DayOfWeek.MONDAY);
-		dateSettings.setAllowEmptyDates(false);
+		dateSettings.setAllowEmptyDates(canBeNull());
 		
 		DatePicker datePicker = new DatePicker(dateSettings);
-		datePicker.setDateToToday();
+		
+		if (!canBeNull()) {
+			datePicker.setDateToToday();
+		}
 		
 		return datePicker;
 	}
