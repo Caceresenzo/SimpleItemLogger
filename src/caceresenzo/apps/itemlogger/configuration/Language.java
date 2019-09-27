@@ -74,13 +74,13 @@ public class Language {
 			o("create-dialog.button.done", "Valider");
 			o("create-dialog.button.cancel", "Annuler");
 			o("create-dialog.combobox.default.select-an-item", "Selectionner un élément");
-			o("create-dialog.error.dialog.title", "Champ manquant");
-			o("create-dialog.error.dialog.message", "Certain champ sont manquant ou n'ont pas été traité correctement.\nSi vous pendez que tout est correcte, et que ce n'est pas un bug, contactez le développeur.\n\nDétails:\n    - Champ: \"%s\"\n    - Erreur: %s");
+			o("create-dialog.error.dialog.title", "Champs manquant");
+			o("create-dialog.error.dialog.message", "Certains champs sont manquants ou n'ont pas été traités correctement.\nSi vous pensez que tout est correct, et que ce n'est pas un bug, contactez le développeur.\n\nDétails:\n    - Champs : \"%s\"\n    - Erreur : %s");
 			
 			o("model.item", "Item");
 			o("model.person", "Personne");
 			o("model.constructionsite", "Chantier");
-			o("model.historyentry", "Entré d'Historique");
+			o("model.historyentry", "Entrée d'Historique");
 			
 			o("application.copyright.full", "SIMPLE CARNET D'OBJET\nCRÉE PAR ENZO CACERES POUR L'ENTREPRISE NEGRO SA");
 			
