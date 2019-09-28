@@ -14,7 +14,6 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -55,7 +54,6 @@ public class MainLoggerWindow implements ActionListener {
 	/* UI */
 	private JFrame frame;
 	private JPanel searchPanel;
-	private JPanel searchFilterPanel;
 	private JPanel actionContainerPanel;
 	private JPanel actionPanel;
 	private JPanel dataPanel;
@@ -63,8 +61,6 @@ public class MainLoggerWindow implements ActionListener {
 	private JTable dataTable;
 	private JTextField searchBarTextField;
 	private JButton searchButton;
-	private JCheckBox checkBox;
-	private JCheckBox checkBox_1;
 	
 	/* Variables */
 	private Class<?> currentDisplayedModelClass;
@@ -97,19 +93,19 @@ public class MainLoggerWindow implements ActionListener {
 						.addGroup(groupLayout.createSequentialGroup()
 								.addContainerGap()
 								.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-										.addComponent(dataPanel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 664, Short.MAX_VALUE)
-										.addComponent(actionContainerPanel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 664, Short.MAX_VALUE)
-										.addComponent(searchPanel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 664, Short.MAX_VALUE))
+										.addComponent(dataPanel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 764, Short.MAX_VALUE)
+										.addComponent(searchPanel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+										.addComponent(actionContainerPanel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 764, Short.MAX_VALUE))
 								.addContainerGap()));
 		groupLayout.setVerticalGroup(
 				groupLayout.createParallelGroup(Alignment.LEADING)
 						.addGroup(groupLayout.createSequentialGroup()
 								.addContainerGap()
-								.addComponent(searchPanel, GroupLayout.PREFERRED_SIZE, 128, GroupLayout.PREFERRED_SIZE)
+								.addComponent(searchPanel, GroupLayout.PREFERRED_SIZE, 75, GroupLayout.PREFERRED_SIZE)
 								.addPreferredGap(ComponentPlacement.RELATED)
 								.addComponent(actionContainerPanel, GroupLayout.PREFERRED_SIZE, 79, GroupLayout.PREFERRED_SIZE)
 								.addPreferredGap(ComponentPlacement.RELATED)
-								.addComponent(dataPanel, GroupLayout.DEFAULT_SIZE, 220, Short.MAX_VALUE)
+								.addComponent(dataPanel, GroupLayout.DEFAULT_SIZE, 273, Short.MAX_VALUE)
 								.addContainerGap()));
 		
 		dataScrollPane = new JScrollPane();
@@ -165,54 +161,37 @@ public class MainLoggerWindow implements ActionListener {
 		
 		searchButton = new JButton(i18n.string("logger.button.search"));
 		
-		searchFilterPanel = new JPanel();
-		searchFilterPanel.setBorder(new TitledBorder(null, i18n.string("logger.panel.search.filters.title"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		
 		JButton clearSearchButton = new JButton(i18n.string("logger.button.clear-search"));
 		GroupLayout gl_searchPanel = new GroupLayout(searchPanel);
 		gl_searchPanel.setHorizontalGroup(
-			gl_searchPanel.createParallelGroup(Alignment.TRAILING)
-				.addGroup(gl_searchPanel.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_searchPanel.createParallelGroup(Alignment.LEADING)
-						.addComponent(searchFilterPanel, GroupLayout.DEFAULT_SIZE, 732, Short.MAX_VALUE)
-						.addGroup(Alignment.TRAILING, gl_searchPanel.createSequentialGroup()
-							.addComponent(searchBarTextField, GroupLayout.DEFAULT_SIZE, 518, Short.MAX_VALUE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(searchButton, GroupLayout.PREFERRED_SIZE, 101, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(clearSearchButton, GroupLayout.PREFERRED_SIZE, 101, GroupLayout.PREFERRED_SIZE)))
-					.addContainerGap())
-		);
+				gl_searchPanel.createParallelGroup(Alignment.TRAILING)
+						.addGroup(gl_searchPanel.createSequentialGroup()
+								.addContainerGap()
+								.addComponent(searchBarTextField, GroupLayout.DEFAULT_SIZE, 518, Short.MAX_VALUE)
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addComponent(searchButton, GroupLayout.PREFERRED_SIZE, 101, GroupLayout.PREFERRED_SIZE)
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addComponent(clearSearchButton, GroupLayout.PREFERRED_SIZE, 101, GroupLayout.PREFERRED_SIZE)
+								.addContainerGap()));
 		gl_searchPanel.setVerticalGroup(
-			gl_searchPanel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_searchPanel.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_searchPanel.createParallelGroup(Alignment.LEADING)
-						.addComponent(searchBarTextField, GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
-						.addComponent(clearSearchButton, GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
-						.addComponent(searchButton, GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(searchFilterPanel, GroupLayout.PREFERRED_SIZE, 46, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap())
-		);
-		searchFilterPanel.setLayout(new BoxLayout(searchFilterPanel, BoxLayout.X_AXIS));
-		
-		checkBox = new JCheckBox("New check box");
-		searchFilterPanel.add(checkBox);
-		
-		checkBox_1 = new JCheckBox("New check box");
-		searchFilterPanel.add(checkBox_1);
+				gl_searchPanel.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_searchPanel.createSequentialGroup()
+								.addContainerGap()
+								.addGroup(gl_searchPanel.createParallelGroup(Alignment.LEADING)
+										.addComponent(clearSearchButton, GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
+										.addComponent(searchButton, GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
+										.addComponent(searchBarTextField, GroupLayout.PREFERRED_SIZE, 31, GroupLayout.PREFERRED_SIZE))
+								.addGap(55)));
 		searchPanel.setLayout(gl_searchPanel);
 		frame.getContentPane().setLayout(groupLayout);
-
+		
 		SearchManager.get().updateUiElements(searchBarTextField, searchButton, clearSearchButton, dataTable);
 		
 		changeModel(Item.class, null);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private void changeModel(Class<?> newClassModel, List<JButton> rowActionButtons) {		
+	private void changeModel(Class<?> newClassModel, List<JButton> rowActionButtons) {
 		SearchManager.get().clearSearch(false);
 		
 		DatabaseEntryTableModel model = new DatabaseEntryTableModel(dataTable, currentDisplayedModelClass = newClassModel, new ArrayList<>(), rowActionButtons);
