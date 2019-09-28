@@ -1,6 +1,9 @@
 package caceresenzo.apps.itemlogger.ui.models;
 
 import java.lang.reflect.Modifier;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.List;
 
 import javax.swing.DefaultCellEditor;
@@ -8,11 +11,14 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.RowFilter;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 import caceresenzo.apps.itemlogger.managers.DataManager;
 import caceresenzo.apps.itemlogger.ui.models.combobox.DatabaseEntryComboBoxCellEditor;
@@ -158,10 +164,58 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 	
 	/** Synchronize the model with the database values. */
 	public void synchronize() {
-		this.entries.clear();
-		this.entries.addAll(synchronizer.load(modelClass));
+		filter(null);
 		
-		fireTableDataChanged();
+		SwingUtilities.invokeLater(() -> {
+			this.entries.clear();
+			this.entries.addAll(synchronizer.load(modelClass));
+			
+			fireTableDataChanged();
+		});
+	}
+	
+	/**
+	 * Filter the {@link JTable table} with a query.<br>
+	 * A row will only be accepted if at least one of her column contains one of the words of the query.
+	 * 
+	 * @param query
+	 *            Target query to filter with. Or <code>null</code> to disable the filtering.
+	 */
+	public void filter(final String query) {
+		TableRowSorter<TableModel> sorter = null;
+		
+		if (query != null) {
+			String lowerQuery = query.toLowerCase();
+			String[] splitedQuery = lowerQuery.split(" ");
+			
+			sorter = new TableRowSorter<>(this);
+			sorter.setRowFilter(new RowFilter<Object, Object>() {
+				public boolean include(RowFilter.Entry<?, ?> entry) {
+					for (int index = 0; index < entry.getValueCount(); index++) {
+						Object object = entry.getValue(index);
+						String stringValue = null;
+						
+						if (object instanceof IDatabaseEntry) {
+							stringValue = ((IDatabaseEntry) object).toSimpleRepresentation();
+						} else if (object instanceof LocalDate) {
+							stringValue = ((LocalDate) object).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
+						} else {
+							stringValue = String.valueOf(object);
+						}
+						
+						for (String word : splitedQuery) {
+							if (stringValue.toLowerCase().contains(word)) {
+								return true;
+							}
+						}
+					}
+					
+					return false;
+				}
+			});
+		}
+		
+		table.setRowSorter(sorter);
 	}
 	
 	@Override

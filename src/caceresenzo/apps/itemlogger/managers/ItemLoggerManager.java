@@ -10,8 +10,9 @@ public class ItemLoggerManager extends AbstractMainManager {
 	/* Private Constructor */
 	private ItemLoggerManager() {
 		super();
-		
+
 		register(DataManager.get());
+		register(SearchManager.get());
 	}
 	
 	/** @return ItemLoggerManager's singleton instance. */

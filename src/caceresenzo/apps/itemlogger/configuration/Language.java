@@ -44,8 +44,9 @@ public class Language {
 			o("logger.panel.data.title.with.part.person", "Personnes");
 			o("logger.panel.data.title.with.part.constructionsite", "Chantiers");
 			o("logger.panel.data.title.with.part.historyentry", "Historique");
-			
+
 			o("logger.button.search", "Rechercher");
+			o("logger.button.clear-search", "Vider la rech.");
 			
 			o("logger.button.action.add", "Ajouter");
 			o("logger.button.action.items", "Inventaire");

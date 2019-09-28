@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import com.github.lgooddatepicker.tableeditors.DateTableEditor;
 
 import caceresenzo.apps.itemlogger.managers.DataManager;
+import caceresenzo.apps.itemlogger.managers.SearchManager;
 import caceresenzo.apps.itemlogger.models.ConstructionSite;
 import caceresenzo.apps.itemlogger.models.HistoryEntry;
 import caceresenzo.apps.itemlogger.models.Item;
@@ -166,28 +167,35 @@ public class MainLoggerWindow implements ActionListener {
 		
 		searchFilterPanel = new JPanel();
 		searchFilterPanel.setBorder(new TitledBorder(null, i18n.string("logger.panel.search.filters.title"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		
+		JButton clearSearchButton = new JButton(i18n.string("logger.button.clear-search"));
 		GroupLayout gl_searchPanel = new GroupLayout(searchPanel);
 		gl_searchPanel.setHorizontalGroup(
-				gl_searchPanel.createParallelGroup(Alignment.LEADING)
+			gl_searchPanel.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_searchPanel.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(gl_searchPanel.createParallelGroup(Alignment.LEADING)
+						.addComponent(searchFilterPanel, GroupLayout.DEFAULT_SIZE, 732, Short.MAX_VALUE)
 						.addGroup(Alignment.TRAILING, gl_searchPanel.createSequentialGroup()
-								.addContainerGap()
-								.addGroup(gl_searchPanel.createParallelGroup(Alignment.TRAILING)
-										.addComponent(searchFilterPanel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 632, Short.MAX_VALUE)
-										.addGroup(gl_searchPanel.createSequentialGroup()
-												.addComponent(searchBarTextField, GroupLayout.DEFAULT_SIZE, 525, Short.MAX_VALUE)
-												.addPreferredGap(ComponentPlacement.RELATED)
-												.addComponent(searchButton, GroupLayout.PREFERRED_SIZE, 101, GroupLayout.PREFERRED_SIZE)))
-								.addContainerGap()));
+							.addComponent(searchBarTextField, GroupLayout.DEFAULT_SIZE, 518, Short.MAX_VALUE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(searchButton, GroupLayout.PREFERRED_SIZE, 101, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(clearSearchButton, GroupLayout.PREFERRED_SIZE, 101, GroupLayout.PREFERRED_SIZE)))
+					.addContainerGap())
+		);
 		gl_searchPanel.setVerticalGroup(
-				gl_searchPanel.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_searchPanel.createSequentialGroup()
-								.addContainerGap()
-								.addGroup(gl_searchPanel.createParallelGroup(Alignment.TRAILING, false)
-										.addComponent(searchButton, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-										.addComponent(searchBarTextField, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE))
-								.addPreferredGap(ComponentPlacement.RELATED)
-								.addComponent(searchFilterPanel, GroupLayout.PREFERRED_SIZE, 46, GroupLayout.PREFERRED_SIZE)
-								.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
+			gl_searchPanel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_searchPanel.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(gl_searchPanel.createParallelGroup(Alignment.LEADING)
+						.addComponent(searchBarTextField, GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
+						.addComponent(clearSearchButton, GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
+						.addComponent(searchButton, GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(searchFilterPanel, GroupLayout.PREFERRED_SIZE, 46, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap())
+		);
 		searchFilterPanel.setLayout(new BoxLayout(searchFilterPanel, BoxLayout.X_AXIS));
 		
 		checkBox = new JCheckBox("New check box");
@@ -197,12 +205,16 @@ public class MainLoggerWindow implements ActionListener {
 		searchFilterPanel.add(checkBox_1);
 		searchPanel.setLayout(gl_searchPanel);
 		frame.getContentPane().setLayout(groupLayout);
+
+		SearchManager.get().updateUiElements(searchBarTextField, searchButton, clearSearchButton, dataTable);
 		
 		changeModel(Item.class, null);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void changeModel(Class<?> newClassModel, List<JButton> rowActionButtons) {		
+		SearchManager.get().clearSearch(false);
+		
 		DatabaseEntryTableModel model = new DatabaseEntryTableModel(dataTable, currentDisplayedModelClass = newClassModel, new ArrayList<>(), rowActionButtons);
 		
 		((TitledBorder) dataPanel.getBorder()).setTitle(i18n.string("logger.panel.data.title.with", i18n.string(String.format("logger.panel.data.title.with.part.%s", newClassModel.getSimpleName().toLowerCase()))));
@@ -325,5 +337,4 @@ public class MainLoggerWindow implements ActionListener {
 		}
 		
 	}
-	
 }
