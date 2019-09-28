@@ -49,14 +49,11 @@ public class MainLoggerWindow implements ActionListener {
 	public static final String ACTION_COMMAND_DISPLAY_PERSONS = "action_display_persons";
 	public static final String ACTION_COMMAND_DISPLAY_CONSTRUCTION_SITES = "action_display_construction_sites";
 	public static final String ACTION_COMMAND_DISPLAY_HISTORY = "action_display_history";
-	public static final String ACTION_COMMAND_PRINT = "action_print";
+	public static final String ACTION_COMMAND_EXPORT_TO_PDF = "action_export_to_pdf";
 	
 	/* UI */
 	private JFrame frame;
-	private JPanel searchPanel;
-	private JPanel actionContainerPanel;
-	private JPanel actionPanel;
-	private JPanel dataPanel;
+	private JPanel searchPanel, actionContainerPanel, actionPanel, dataPanel;
 	private JScrollPane dataScrollPane;
 	private JTable dataTable;
 	private JTextField searchBarTextField;
@@ -190,6 +187,14 @@ public class MainLoggerWindow implements ActionListener {
 		changeModel(Item.class, null);
 	}
 	
+	/**
+	 * Change the {@link JTable table}'s model.
+	 * 
+	 * @param newClassModel
+	 *            New model class to display.
+	 * @param rowActionButtons
+	 *            A {@link List list} of contextualized buttons to display in a dedicated "Action" column. Can be <code>null</code>.
+	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void changeModel(Class<?> newClassModel, List<JButton> rowActionButtons) {
 		SearchManager.get().clearSearch(false);
@@ -251,8 +256,8 @@ public class MainLoggerWindow implements ActionListener {
 				break;
 			}
 			
-			case ACTION_COMMAND_PRINT: {
-				
+			case ACTION_COMMAND_EXPORT_TO_PDF: {
+				ExportToPdfDialog.open(frame);
 				break;
 			}
 			
@@ -262,6 +267,7 @@ public class MainLoggerWindow implements ActionListener {
 		}
 	}
 	
+	/** @return A {@link List list} of {@link JButton button}s that will be used to fill the "Actions" section. */
 	protected List<JButton> getActionButtons() {
 		List<JButton> buttons = new ArrayList<>();
 		
@@ -271,12 +277,13 @@ public class MainLoggerWindow implements ActionListener {
 				new ActionButton("persons", "icon-user-men-32px", ACTION_COMMAND_DISPLAY_PERSONS),
 				new ActionButton("construction-sites", "icon-in-construction-32px", ACTION_COMMAND_DISPLAY_CONSTRUCTION_SITES),
 				new ActionButton("history", "icon-history-32px", ACTION_COMMAND_DISPLAY_HISTORY),
-				new ActionButton("print", "icon-print-32px", ACTION_COMMAND_PRINT) //
+				new ActionButton("export-pdf", "icon-file-pdf-32px", ACTION_COMMAND_EXPORT_TO_PDF) //
 		).forEach((actionButton) -> buttons.add(actionButton.toJButton(this)));
 		
 		return buttons;
 	}
 	
+	/** Apply the {@link UIManager#getSystemLookAndFeelClassName() system LookAndFeel} and start a new {@link MainLoggerWindow} instance. */
 	public static void open() {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -302,6 +309,13 @@ public class MainLoggerWindow implements ActionListener {
 			this.actionCommand = actionCommand;
 		}
 		
+		/**
+		 * Convert this {@link ActionButton} holder class to a real {@link JButton} with provided informations.
+		 * 
+		 * @param actionListener
+		 *            Custom {@link ActionListener action listener} to add to the {@link JButton button}. Can be <code>null</code>.
+		 * @return A created {@link JButton} instance with {@link ActionButton}'s provided informations.
+		 */
 		public JButton toJButton(ActionListener actionListener) {
 			ImageIcon imageIcon = new ImageIcon(MainLoggerWindow.class.getResource(String.format("/caceresenzo/apps/itemlogger/assets/icons/%s.png", icon)));
 			

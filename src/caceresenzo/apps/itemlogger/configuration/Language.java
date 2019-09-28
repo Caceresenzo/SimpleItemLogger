@@ -44,7 +44,7 @@ public class Language {
 			o("logger.panel.data.title.with.part.person", "Personnes");
 			o("logger.panel.data.title.with.part.constructionsite", "Chantiers");
 			o("logger.panel.data.title.with.part.historyentry", "Historique");
-
+			
 			o("logger.button.search", "Rechercher");
 			o("logger.button.clear-search", "Vider la rech.");
 			
@@ -53,7 +53,7 @@ public class Language {
 			o("logger.button.action.persons", "Personnes");
 			o("logger.button.action.construction-sites", "Chantiers");
 			o("logger.button.action.history", "Historique");
-			o("logger.button.action.print", "Imprimer");
+			o("logger.button.action.export-pdf", "Exporter en PDF");
 			
 			o("logger.table.column.id", "ID");
 			o("logger.table.column.name", "Nom");
@@ -77,6 +77,16 @@ public class Language {
 			o("create-dialog.combobox.default.select-an-item", "Selectionner un élément");
 			o("create-dialog.error.dialog.title", "Champs manquant");
 			o("create-dialog.error.dialog.message", "Certains champs sont manquants ou n'ont pas été traités correctement.\nSi vous pensez que tout est correct, et que ce n'est pas un bug, contactez le développeur.\n\nDétails:\n    - Champs : \"%s\"\n    - Erreur : %s");
+
+			o("export-dialog.window.title", "Exporter vers un PDF");
+			o("export-dialog.file-chooser.title", "Selectionner le fichier de destination...");
+			o("export-dialog.panel.settings.title", "Paramètres");
+			o("export-dialog.panel.file.title", "Fichier");
+			o("export-dialog.button.browse", "Explorer...");
+			o("export-dialog.button.do-export", "Exporter");
+			o("export-dialog.button.cancel", "Annuler");
+			o("export-dialog.button.toggle.enabled", "ACTIVÉ");
+			o("export-dialog.button.toggle.disabled", "DÉSACTIVÉ");
 			
 			o("model.item", "Item");
 			o("model.person", "Personne");
