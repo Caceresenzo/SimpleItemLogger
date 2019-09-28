@@ -196,7 +196,7 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 						String stringValue = null;
 						
 						if (object instanceof IDatabaseEntry) {
-							stringValue = ((IDatabaseEntry) object).toSimpleRepresentation();
+							stringValue = ((IDatabaseEntry) object).describe();
 						} else if (object instanceof LocalDate) {
 							stringValue = ((LocalDate) object).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
 						} else {

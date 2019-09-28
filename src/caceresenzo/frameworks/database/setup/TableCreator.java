@@ -2,7 +2,7 @@ package caceresenzo.frameworks.database.setup;
 
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -21,7 +21,7 @@ public class TableCreator {
 	
 	/* Constructor */
 	public TableCreator() {
-		this.bindables = new HashMap<>();
+		this.bindables = new LinkedHashMap<>();
 	}
 	
 	/**

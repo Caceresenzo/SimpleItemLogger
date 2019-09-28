@@ -16,7 +16,7 @@ public class DatabaseEntryComboBoxCellRenderer extends DefaultTableCellRenderer 
 		IDatabaseEntry entry = (IDatabaseEntry) value;
 		
 		setIcon(null);
-		setText(entry.toSimpleRepresentation());
+		setText(entry.describe());
 		
 		return this;
 	}

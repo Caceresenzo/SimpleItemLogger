@@ -34,6 +34,7 @@ public class Language {
 			o("multiple-element-letter", "s");
 			
 			o("application.title", "Simple Carnet d'Objet");
+			o("application.copyright.full", getTranslation().getString("application.title").toUpperCase() + "\nCRÉE PAR ENZO CACERES POUR L'ENTREPRISE NEGRO SA");
 			
 			o("logger.panel.search.title", "Recherche");
 			o("logger.panel.search.filters.title", "Filtres");
@@ -65,7 +66,7 @@ public class Language {
 			o("logger.table.column.address", "Adresse");
 			o("logger.table.column.item", "Objet");
 			o("logger.table.column.person", "À");
-			o("logger.table.column.construction_site", "Pour le chantier");
+			o("logger.table.column.construction_site", "Chantier");
 			o("logger.table.column.lend", "Prêt");
 			o("logger.table.column.return", "Retour");
 			
@@ -92,8 +93,6 @@ public class Language {
 			o("model.person", "Personne");
 			o("model.constructionsite", "Chantier");
 			o("model.historyentry", "Entrée d'Historique");
-			
-			o("application.copyright.full", "SIMPLE CARNET D'OBJET\nCRÉE PAR ENZO CACERES POUR L'ENTREPRISE NEGRO SA");
 			
 			o("", "");
 		}

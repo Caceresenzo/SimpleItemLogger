@@ -47,8 +47,13 @@ public class ConstructionSite implements IDatabaseEntry {
 	}
 	
 	@Override
-	public String toSimpleRepresentation() {
+	public String describe() {
 		return String.format("%s (%s)", name, address);
+	}
+
+	@Override
+	public String toSimpleRepresentation() {
+		return name;
 	}
 	
 	@Override

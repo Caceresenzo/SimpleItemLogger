@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import com.github.lgooddatepicker.tableeditors.DateTableEditor;
 
+import caceresenzo.apps.itemlogger.assets.Assets;
 import caceresenzo.apps.itemlogger.managers.DataManager;
 import caceresenzo.apps.itemlogger.managers.SearchManager;
 import caceresenzo.apps.itemlogger.models.ConstructionSite;
@@ -272,12 +273,12 @@ public class MainLoggerWindow implements ActionListener {
 		List<JButton> buttons = new ArrayList<>();
 		
 		Arrays.asList(
-				new ActionButton("add", "icon-plus-32px", ACTION_COMMAND_ADD),
-				new ActionButton("items", "icon-new-product-32px", ACTION_COMMAND_DISPLAY_ITEMS),
-				new ActionButton("persons", "icon-user-men-32px", ACTION_COMMAND_DISPLAY_PERSONS),
-				new ActionButton("construction-sites", "icon-in-construction-32px", ACTION_COMMAND_DISPLAY_CONSTRUCTION_SITES),
-				new ActionButton("history", "icon-history-32px", ACTION_COMMAND_DISPLAY_HISTORY),
-				new ActionButton("export-pdf", "icon-file-pdf-32px", ACTION_COMMAND_EXPORT_TO_PDF) //
+				new ActionButton("add", Assets.ICON_PLUS_32PX, ACTION_COMMAND_ADD),
+				new ActionButton("items", Assets.ICON_NEW_PRODUCT_32PX, ACTION_COMMAND_DISPLAY_ITEMS),
+				new ActionButton("persons", Assets.ICON_USER_MEN_32PX, ACTION_COMMAND_DISPLAY_PERSONS),
+				new ActionButton("construction-sites", Assets.ICON_IN_CONSTRUCTION_32PX, ACTION_COMMAND_DISPLAY_CONSTRUCTION_SITES),
+				new ActionButton("history", Assets.ICON_HISTORY_32PX, ACTION_COMMAND_DISPLAY_HISTORY),
+				new ActionButton("export-pdf", Assets.ICON_FILE_PDF_32PX, ACTION_COMMAND_EXPORT_TO_PDF) //
 		).forEach((actionButton) -> buttons.add(actionButton.toJButton(this)));
 		
 		return buttons;
@@ -300,12 +301,12 @@ public class MainLoggerWindow implements ActionListener {
 	private class ActionButton {
 		
 		/* Variables */
-		private final String actionKey, icon, actionCommand;
+		private final String actionKey, iconRessourcePath, actionCommand;
 		
 		/* Constructor */
-		public ActionButton(String actionKey, String icon, String actionCommand) {
+		public ActionButton(String actionKey, String iconRessourcePath, String actionCommand) {
 			this.actionKey = actionKey;
-			this.icon = icon;
+			this.iconRessourcePath = iconRessourcePath;
 			this.actionCommand = actionCommand;
 		}
 		
@@ -317,7 +318,7 @@ public class MainLoggerWindow implements ActionListener {
 		 * @return A created {@link JButton} instance with {@link ActionButton}'s provided informations.
 		 */
 		public JButton toJButton(ActionListener actionListener) {
-			ImageIcon imageIcon = new ImageIcon(MainLoggerWindow.class.getResource(String.format("/caceresenzo/apps/itemlogger/assets/icons/%s.png", icon)));
+			ImageIcon imageIcon = new ImageIcon(MainLoggerWindow.class.getResource(iconRessourcePath));
 			
 			JButton jButton = new JButton(i18n.string("logger.button.action." + actionKey), imageIcon);
 			jButton.setActionCommand(actionCommand);

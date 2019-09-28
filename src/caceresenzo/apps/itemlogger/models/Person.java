@@ -56,8 +56,13 @@ public class Person implements IDatabaseEntry {
 	}
 	
 	@Override
-	public String toSimpleRepresentation() {
+	public String describe() {
 		return String.format("%S %s (%s)", lastname, firstname, phone);
+	}
+	
+	@Override
+	public String toSimpleRepresentation() {
+		return String.format("%S %s", lastname, firstname);
 	}
 	
 	@Override

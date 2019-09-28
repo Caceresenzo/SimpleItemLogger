@@ -64,8 +64,13 @@ public class Item implements IDatabaseEntry {
 	}
 	
 	@Override
-	public String toSimpleRepresentation() {
+	public String describe() {
 		return String.format("%s (%s/%s)", name, stock, quantity);
+	}
+
+	@Override
+	public String toSimpleRepresentation() {
+		return name;
 	}
 	
 	@Override

@@ -149,7 +149,7 @@ public class ExportToPdfDialog extends JDialog implements Constants, ActionListe
 	/** Initialize the {@link ExportSettingPanel} list with the {@link TableCreator}'s loaded {@link BindableTable bindables}. */
 	private void initializeSettings() {
 		DataManager.get().getTableCreator().getBindables().values().forEach((bindableTable) -> {
-			Class<?> modelClass = bindableTable.getClazz();
+			Class<?> modelClass = bindableTable.getModelClass();
 			
 			String key = Utils.formatModelClassSettingEntryKey(modelClass);
 			String display = i18n.string("logger.panel.data.title.with.part." + modelClass.getSimpleName().toLowerCase());

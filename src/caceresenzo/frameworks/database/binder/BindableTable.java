@@ -29,7 +29,7 @@ public class BindableTable {
 	}
 	
 	/** @return Table's original class. */
-	public Class<?> getClazz() {
+	public Class<?> getModelClass() {
 		return clazz;
 	}
 	

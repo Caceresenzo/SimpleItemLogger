@@ -30,8 +30,8 @@ public abstract class AbstractSelectionFieldPartPanel<T extends IDatabaseEntry> 
 		List<String> stringItems = new ArrayList<>();
 		
 		items = getItems();
-		items.sort((item1, item2) -> item1.toSimpleRepresentation().compareTo(item2.toSimpleRepresentation()));
-		items.forEach((item) -> stringItems.add(item.toSimpleRepresentation()));
+		items.sort((item1, item2) -> item1.describe().compareTo(item2.describe()));
+		items.forEach((item) -> stringItems.add(item.describe()));
 		
 		stringItems.add(0, i18n.string("create-dialog.combobox.default.select-an-item"));
 		

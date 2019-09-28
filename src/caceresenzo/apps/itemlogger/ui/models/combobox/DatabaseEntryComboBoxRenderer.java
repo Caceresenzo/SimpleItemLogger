@@ -21,7 +21,7 @@ public class DatabaseEntryComboBoxRenderer extends BasicComboBoxRenderer {
 		if (index == -1) {
 			setText(null);
 		} else {
-			setText(entry.toSimpleRepresentation());
+			setText(entry.describe());
 		}
 		
 		return this;
