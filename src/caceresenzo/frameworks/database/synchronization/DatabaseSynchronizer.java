@@ -48,6 +48,16 @@ public class DatabaseSynchronizer {
 		return TableAnalizer.get().analizeTable(modelClass);
 	}
 	
+	/**
+	 * Load data from a model class.
+	 * 
+	 * @param <T>
+	 *            Paramerized class model.
+	 * @param modelClass
+	 *            Model's class.
+	 * @return A {@link List list} of model class instance filled with information found in the database.
+	 * @see #load(Class, boolean) Load data from the database but with automator control.
+	 */
 	public <T> List<T> load(Class<T> modelClass) {
 		return load(modelClass, false);
 	}
@@ -59,6 +69,8 @@ public class DatabaseSynchronizer {
 	 *            Paramerized class model.
 	 * @param modelClass
 	 *            Model's class.
+	 * @param disableAutomator
+	 *            Weather or not the automator should be used when creating instances.
 	 * @return A {@link List list} of model class instance filled with information found in the database.
 	 */
 	@SuppressWarnings("unchecked")
@@ -76,9 +88,8 @@ public class DatabaseSynchronizer {
 					try {
 						if (bindableColumn.isAutomatable()) {
 							if (!disableAutomator) {
-								@SuppressWarnings("rawtypes")
 								Class<? extends AbstractDatabaseColumnValueAutomator> automatorClass = bindableColumn.getAnnotation().automator();
-								AbstractDatabaseColumnValueAutomator<?> automator = automatorClass.newInstance();
+								AbstractDatabaseColumnValueAutomator automator = automatorClass.newInstance();
 								
 								automator.automate(modelClass, field.getType(), field, instance);
 							}
@@ -240,6 +251,15 @@ public class DatabaseSynchronizer {
 		return -1;
 	}
 	
+	/**
+	 * Delete an model class instance from the database <b>BY ITS ID</b> field.
+	 * 
+	 * @param modelClass
+	 *            Model's class.
+	 * @param instance
+	 *            Instance to delete.
+	 * @return Database deleted row, or -1 if an error has append.
+	 */
 	public int delete(Class<?> modelClass, Object instance) {
 		BindableTable bindableTable = getTable(modelClass);
 		List<BindableColumn> bindableColumns = new ArrayList<>(bindableTable.getBindableColumns());

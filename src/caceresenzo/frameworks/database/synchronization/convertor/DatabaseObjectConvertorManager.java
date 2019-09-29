@@ -53,7 +53,19 @@ public class DatabaseObjectConvertorManager extends AbstractManager {
 		
 		return this;
 	}
-
+	
+	/**
+	 * Find the best match to convert an instance from a class to another.
+	 * 
+	 * @param <T>
+	 *            Paramerized target type.
+	 * @param targetClazz
+	 *            Target class.
+	 * @param objectClazz
+	 *            Source object class.
+	 * @return An {@link AbstractDatabaseObjectConvertor} instance able to convert an instance from an <code>objectClazz</code> to a <code>targetClazz</code>.<br>
+	 *         Or <code>null</code> if there is no implementation registered to do this conversion.
+	 */
 	@SuppressWarnings("unchecked")
 	public <T> AbstractDatabaseObjectConvertor<T> find(Class<T> targetClazz, Class<?> objectClazz) {
 		for (AbstractDatabaseObjectConvertor<?> convertor : convertors) {

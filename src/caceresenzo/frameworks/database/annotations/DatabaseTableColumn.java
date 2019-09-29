@@ -9,6 +9,7 @@ import java.lang.annotation.Target;
 
 import caceresenzo.frameworks.database.automator.AbstractDatabaseColumnValueAutomator;
 import caceresenzo.frameworks.database.setup.sql.SqlTableBuilder;
+import caceresenzo.frameworks.database.synchronization.DatabaseSynchronizer;
 
 @Documented
 @Retention(RUNTIME)
@@ -30,7 +31,7 @@ public @interface DatabaseTableColumn {
 	/** @return Weather or not the column can be edited. */
 	public boolean editable() default true;
 	
-	@SuppressWarnings("rawtypes")
+	/** @return An {@link AbstractDatabaseColumnValueAutomator} class to do more code when {@link DatabaseSynchronizer#load(Class) database synchronization loading} on an instance. */
 	public Class<? extends AbstractDatabaseColumnValueAutomator> automator() default AbstractDatabaseColumnValueAutomator.class;
 	
 }

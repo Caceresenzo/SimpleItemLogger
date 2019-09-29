@@ -52,23 +52,6 @@ public class PdfDataExporter implements DataExporter {
 	private PDFont font;
 	private PDPage lastestPage;
 	
-	public static void main(String[] args) throws Exception {
-		Config.get();
-		Language.get().initialize();
-		ItemLoggerManager.get().initialize();
-		
-		// for (int index = 0; index < 50; index++) {
-		// Item item = new Item(0, "item-" + ((char) (index + 65)), index, 0);
-		//
-		// DataManager.get().getDatabaseSynchronizer().insert(Item.class, item);
-		// }
-		
-		File targetFile = new File("test.pdf");
-		
-		new PdfDataExporter().exportToFile(new ArrayList<>(), targetFile);
-		Runtime.getRuntime().exec("cmd /c \"" + targetFile.getAbsolutePath() + "\"");
-	}
-	
 	@Override
 	public void exportToFile(List<SettingEntry<Boolean>> settingEntries, File file) throws Exception {
 		List<BindableTable> bindableTables = new ArrayList<>(DataManager.get().getTableCreator().getBindables().values());

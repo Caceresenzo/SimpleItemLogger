@@ -69,7 +69,7 @@ public class Item implements IDatabaseEntry {
 	}
 
 	@Override
-	public String toSimpleRepresentation() {
+	public String describeSimply() {
 		return name;
 	}
 	
@@ -78,7 +78,7 @@ public class Item implements IDatabaseEntry {
 		return "Item[id=" + id + ", name=" + name + ", quantity=" + quantity + ", stock=" + stock + "]";
 	}
 	
-	public static final class ItemInStockDatabaseColumnValueAutomator extends AbstractDatabaseColumnValueAutomator<Item> {
+	public static final class ItemInStockDatabaseColumnValueAutomator extends AbstractDatabaseColumnValueAutomator {
 		
 		@Override
 		public void automate(Class<?> forModelClass, Class<?> columnClass, Field field, Object instance) {

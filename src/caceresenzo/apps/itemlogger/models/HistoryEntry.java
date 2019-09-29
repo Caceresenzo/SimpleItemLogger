@@ -85,7 +85,7 @@ public class HistoryEntry implements IDatabaseEntry {
 	}
 
 	@Override
-	public String toSimpleRepresentation() {
+	public String describeSimply() {
 		throw new UnsupportedOperationException();
 	}
 	

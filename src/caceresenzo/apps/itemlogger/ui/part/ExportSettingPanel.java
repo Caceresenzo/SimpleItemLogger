@@ -20,6 +20,9 @@ import caceresenzo.libs.internationalization.i18n;
 
 public class ExportSettingPanel extends JPanel implements ActionListener, SettingEntry.Aware<Boolean> {
 	
+	/* Serialization */
+	private static final long serialVersionUID = -6002514162938940714L;
+
 	/* Action Commands */
 	public static final String ACTION_COMMAND_TOGGLE = "action_toggle";
 	

@@ -30,6 +30,7 @@ import caceresenzo.apps.itemlogger.ui.models.table.ActionCellEditor;
 import caceresenzo.apps.itemlogger.ui.models.table.ActionCellPanel;
 import caceresenzo.apps.itemlogger.ui.models.table.ActionCellRenderer;
 import caceresenzo.frameworks.database.IDatabaseEntry;
+import caceresenzo.frameworks.database.annotations.DatabaseTable;
 import caceresenzo.frameworks.database.binder.BindableColumn;
 import caceresenzo.frameworks.database.binder.BindableTable;
 import caceresenzo.frameworks.database.setup.TableAnalizer;
@@ -84,6 +85,7 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 		initilizeActionButtonsRenderer();
 	}
 	
+	/** Check if the {@link BindableTable} has its row "{@link DatabaseTable#removable() removable}" and add the action column (if not already enabled) to add a remove button. */
 	private void checkActionForRemovableRows() {
 		if (bindableTable.isRowRemovable()) {
 			JButton removeRowButton = new JButton(i18n.string("logger.table.column.actions.button.remove"));

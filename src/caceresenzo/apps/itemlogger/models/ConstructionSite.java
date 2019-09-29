@@ -52,7 +52,7 @@ public class ConstructionSite implements IDatabaseEntry {
 	}
 
 	@Override
-	public String toSimpleRepresentation() {
+	public String describeSimply() {
 		return name;
 	}
 	

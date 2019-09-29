@@ -61,7 +61,7 @@ public class Person implements IDatabaseEntry {
 	}
 	
 	@Override
-	public String toSimpleRepresentation() {
+	public String describeSimply() {
 		return String.format("%S %s", lastname, firstname);
 	}
 	

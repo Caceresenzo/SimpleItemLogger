@@ -37,6 +37,18 @@ public class SearchManager extends AbstractManager implements ActionListener, Ca
 		;
 	}
 	
+	/**
+	 * Update the UI elements instances stored in the {@link SearchManager} for quick response.
+	 * 
+	 * @param searchTextField
+	 *            {@link JTextField} where the search query should be typed.
+	 * @param searchButton
+	 *            {@link JButton} with which the search will be called.
+	 * @param clearSearchButton
+	 *            {@link JButton} with which the search will be cleared.
+	 * @param dataTable
+	 *            {@link JTable} to apply the filter to.
+	 */
 	public void updateUiElements(JTextField searchTextField, JButton searchButton, JButton clearSearchButton, JTable dataTable) {
 		this.searchTextField = searchTextField;
 		this.searchButton = searchButton;
@@ -58,6 +70,12 @@ public class SearchManager extends AbstractManager implements ActionListener, Ca
 		clearSearch(true);
 	}
 	
+	/**
+	 * Clear the search and update the UI accordingly.
+	 * 
+	 * @param updateModel
+	 *            If this also should update the filter of the {@link JTable}.
+	 */
 	public void clearSearch(boolean updateModel) {
 		if (!inSearch) {
 			return;
@@ -71,6 +89,7 @@ public class SearchManager extends AbstractManager implements ActionListener, Ca
 		}
 	}
 	
+	/** @return <code>null</code> if the search query if already <code>null</code> or empty, otherwise, return the {@link String#trim() trimmed} query. */
 	public String getValidatedSearchQuery() {
 		String query = searchTextField.getText().trim();
 		
@@ -81,6 +100,12 @@ public class SearchManager extends AbstractManager implements ActionListener, Ca
 		return query;
 	}
 	
+	/**
+	 * Do the search and update the UI accordingly.
+	 * 
+	 * @return If the search has been done or not. By exemple, if the query is <code>null</code>, the search will not be done.
+	 * @see #getValidatedSearchQuery()
+	 */
 	public boolean doSearch() {
 		String query = getValidatedSearchQuery();
 		
