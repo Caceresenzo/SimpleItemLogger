@@ -240,6 +240,32 @@ public class DatabaseSynchronizer {
 		return -1;
 	}
 	
+	public int delete(Class<?> modelClass, Object instance) {
+		BindableTable bindableTable = getTable(modelClass);
+		List<BindableColumn> bindableColumns = new ArrayList<>(bindableTable.getBindableColumns());
+		
+		BindableColumn idBindableColumn = BindableColumn.findIdColumn(bindableColumns);
+		
+		try {
+			/* SQL statement generation */
+			StringBuilder stringBuilder = new StringBuilder();
+			
+			stringBuilder
+					.append("DELETE FROM ").append(bindableTable.getTableName())
+					.append(" WHERE ").append(DatabaseTableColumn.COLUMN_ID).append(" = ?;");
+			
+			/* SQL statement value binding */
+			PreparedStatement preparedStatement = databaseConnection.prepareStatement(stringBuilder.toString());
+			preparedStatement.setObject(1, idBindableColumn.getField().get(instance));
+			
+			return preparedStatement.executeUpdate();
+		} catch (Exception exception) {
+			LOGGER.error("Failed to delete row.", exception);
+		}
+		
+		return -1;
+	}
+	
 	/**
 	 * If the value is considered as a {@link DatabaseTableColumn#isReference() reference}, the value of his target's id will be returned.
 	 * 

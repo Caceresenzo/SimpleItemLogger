@@ -69,6 +69,10 @@ public class Language {
 			o("logger.table.column.construction_site", "Chantier");
 			o("logger.table.column.lend", "Prêt");
 			o("logger.table.column.return", "Retour");
+			o("logger.table.column.actions", "Actions");
+			o("logger.table.column.actions.button.remove", "SUPPRIMER");
+			o("logger.table.column.actions.button.remove.confirm-dialog.title", "Confirmation de suppression");
+			o("logger.table.column.actions.button.remove.confirm-dialog.message", "Attention : Cette action n'est pas reversible !\nÊtes-vous sur de vouloir supprimer cette ligne ?");
 			
 			o("create-dialog.window.title", "Ajout d'une ligne");
 			o("create-dialog.frame.new-line-part", "Nouvelle ligne — %s");

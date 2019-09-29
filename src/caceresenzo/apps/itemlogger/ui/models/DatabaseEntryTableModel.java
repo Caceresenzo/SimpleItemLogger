@@ -4,11 +4,13 @@ import java.lang.reflect.Modifier;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.RowFilter;
@@ -29,6 +31,7 @@ import caceresenzo.apps.itemlogger.ui.models.table.ActionCellPanel;
 import caceresenzo.apps.itemlogger.ui.models.table.ActionCellRenderer;
 import caceresenzo.frameworks.database.IDatabaseEntry;
 import caceresenzo.frameworks.database.binder.BindableColumn;
+import caceresenzo.frameworks.database.binder.BindableTable;
 import caceresenzo.frameworks.database.setup.TableAnalizer;
 import caceresenzo.frameworks.database.synchronization.DatabaseSynchronizer;
 import caceresenzo.libs.internationalization.i18n;
@@ -37,6 +40,9 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 	
 	/* Serialization */
 	private static final long serialVersionUID = 1082999014657444212L;
+	
+	/* Action Commands */
+	private static final String ACTION_COMMAND_REMOVE_ROW = "action_remove_row";
 	
 	/* UI */
 	private final JTable table;
@@ -51,7 +57,8 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 	private DatabaseSynchronizer synchronizer;
 	
 	/* Table Model */
-	List<BindableColumn> columns;
+	private BindableTable bindableTable;
+	private List<BindableColumn> columns;
 	private String[] columnNames;
 	private Class<?>[] columnClass;
 	
@@ -65,26 +72,61 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 		this.table = table;
 		this.modelClass = modelClass;
 		this.entries = databaseEntries;
-		this.rowActionButtons = rowActionButtons;
+		this.rowActionButtons = rowActionButtons == null ? new ArrayList<>() : rowActionButtons;
 		
 		this.synchronizer = DataManager.get().getDatabaseSynchronizer();
 		
-		initializeColumns(modelClass);
+		this.bindableTable = TableAnalizer.get().analizeTable(modelClass);
+		
+		checkActionForRemovableRows();
+		initializeColumns();
 		initializeComboBoxRenderer();
 		initilizeActionButtonsRenderer();
 	}
 	
-	/**
-	 * Initialize the columns with the {@link TableAnalizer#analizeColumns(Class) analized} {@link BindableColumn columns}.
-	 * 
-	 * @param clazz
-	 *            Target class.
-	 */
-	private void initializeColumns(Class<T> clazz) {
-		columns = TableAnalizer.get().analizeColumns(clazz);
+	private void checkActionForRemovableRows() {
+		if (bindableTable.isRowRemovable()) {
+			JButton removeRowButton = new JButton(i18n.string("logger.table.column.actions.button.remove"));
+			removeRowButton.setActionCommand(ACTION_COMMAND_REMOVE_ROW);
+			
+			rowActionButtons.add(removeRowButton);
+			
+			final Callback<T> oldActionCallback = actionCallback;
+			actionCallback = new Callback<T>() {
+				@Override
+				public void openActionClick(JTable table, DatabaseEntryTableModel<T> tableModel, List<T> entries, int row, String action) {
+					switch (action) {
+						case ACTION_COMMAND_REMOVE_ROW: {
+							int reply = JOptionPane.showConfirmDialog(table, i18n.string("logger.table.column.actions.button.remove.confirm-dialog.message"), i18n.string("logger.table.column.actions.button.remove.confirm-dialog.title"), JOptionPane.YES_NO_OPTION);
+							
+							if (reply == JOptionPane.YES_OPTION) {
+								Object instance = entries.get(row);
+								Class<?> modelClass = instance.getClass();
+								
+								synchronizer.delete(modelClass, instance);
+								
+								synchronize();
+							}
+							break;
+						}
+						
+						default: {
+							if (oldActionCallback != null) {
+								oldActionCallback.openActionClick(table, tableModel, entries, row, action);
+							}
+						}
+					}
+				}
+			};
+		}
+	}
+	
+	/** Initialize the columns with the {@link TableAnalizer#analizeColumns(Class) analized} {@link BindableColumn columns}. */
+	private void initializeColumns() {
+		columns = bindableTable.getBindableColumns();
 		columns.remove(BindableColumn.findIdColumn(columns));
 		
-		int actionColumnSize = rowActionButtons != null ? 1 : 0;
+		int actionColumnSize = rowActionButtons.isEmpty() ? 0 : 1;
 		
 		columnNames = new String[columns.size() + actionColumnSize];
 		columnClass = new Class[columns.size() + actionColumnSize];
@@ -105,7 +147,7 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 		}
 		
 		if (actionColumnSize != 0) {
-			columnNames[index] = "ACTIONS";
+			columnNames[index] = i18n.string("logger.table.column.actions");
 			columnClass[index] = Object.class;
 		}
 		
@@ -147,7 +189,7 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 	
 	/** Initialize the render system of the action column only if the <code>useActionColumn</code> was set to <code>true</code> in the constructor. */
 	private void initilizeActionButtonsRenderer() {
-		if (rowActionButtons == null) {
+		if (rowActionButtons.isEmpty()) {
 			return;
 		}
 		
@@ -334,7 +376,7 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 		 * 
 		 * @param table
 		 *            Source {@link JTable}.
-		 * @param model
+		 * @param tableClass
 		 *            Source model.
 		 * @param entries
 		 *            The entries {@link List list}.
@@ -343,7 +385,7 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 		 * @param action
 		 *            {@link JButton} action command.
 		 */
-		void openActionClick(JTable table, DatabaseEntryTableModel<T> model, List<T> entries, int row, String action);
+		void openActionClick(JTable table, DatabaseEntryTableModel<T> tableClass, List<T> entries, int row, String action);
 		
 	}
 	

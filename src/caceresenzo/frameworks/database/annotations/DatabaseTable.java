@@ -14,5 +14,8 @@ public @interface DatabaseTable {
 	
 	/** @return Table's name. */
 	public String value();
+
+	/** @return Weather or not the table can has one of its row remove from the database. */
+	public boolean removable() default false;
 	
 }

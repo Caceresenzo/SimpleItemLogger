@@ -7,7 +7,7 @@ import caceresenzo.frameworks.database.annotations.DatabaseTable;
 import caceresenzo.frameworks.database.annotations.DatabaseTableColumn;
 import caceresenzo.frameworks.database.setup.sql.SqlTableBuilder;
 
-@DatabaseTable("history_entries")
+@DatabaseTable(value = "history_entries", removable = true)
 public class HistoryEntry implements IDatabaseEntry {
 	
 	/* Database Fields */

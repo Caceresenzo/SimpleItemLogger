@@ -23,6 +23,11 @@ public class BindableTable {
 		return annotation.value();
 	}
 	
+	/** @see DatabaseTable#removable() */
+	public boolean isRowRemovable() {
+		return annotation.removable();
+	}
+	
 	/** @return Table's annotation. */
 	public DatabaseTable getAnnotation() {
 		return annotation;
