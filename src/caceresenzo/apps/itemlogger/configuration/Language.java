@@ -41,7 +41,7 @@ public class Language {
 			o("logger.panel.action.title", "Actions");
 			o("logger.panel.data.title", "Données");
 			o("logger.panel.data.title.with", "Données — %s");
-			o("logger.panel.data.title.with.part.item", "Inventaire");
+			o("logger.panel.data.title.with.part.item", "Materiel");
 			o("logger.panel.data.title.with.part.person", "Personnes");
 			o("logger.panel.data.title.with.part.constructionsite", "Chantiers");
 			o("logger.panel.data.title.with.part.historyentry", "Historique");
@@ -50,7 +50,7 @@ public class Language {
 			o("logger.button.clear-search", "Vider la rech.");
 			
 			o("logger.button.action.add", "Ajouter");
-			o("logger.button.action.items", "Inventaire");
+			o("logger.button.action.items", "Materiel");
 			o("logger.button.action.persons", "Personnes");
 			o("logger.button.action.construction-sites", "Chantiers");
 			o("logger.button.action.history", "Historique");
@@ -92,10 +92,10 @@ public class Language {
 			o("export-dialog.button.cancel", "Annuler");
 			o("export-dialog.button.toggle.enabled", "ACTIVÉ");
 			o("export-dialog.button.toggle.disabled", "DÉSACTIVÉ");
-			o("export-dialog.dialog.error.nothing-enabled.title", "Paramètres invalide");
-			o("export-dialog.dialog.error.nothing-enabled.message", "Veuillez selectionnez au moins un ou plusieurs éléments a exporter.");
+			o("export-dialog.dialog.error.nothing-enabled.title", "Paramètres invalides");
+			o("export-dialog.dialog.error.nothing-enabled.message", "Veuillez selectionner au moins un ou plusieurs éléments à exporter.");
 			o("export-dialog.dialog.error.export-error.title", "Exportation en erreur");
-			o("export-dialog.dialog.error.export-error.message", "L'exportation a renvoyé une erreur.\nSi vous pendez que ce n'est pas normal, contactez le developpeur.\n\nErreur : %s");
+			o("export-dialog.dialog.error.export-error.message", "L'exportation a renvoyé une erreur.\nSi vous pensez que ce n'est pas normal, contactez le developpeur.\n\nErreur : %s");
 			o("export-dialog.dialog.open-file.title", "Ouvrir le fichier");
 			o("export-dialog.dialog.open-file.message", "Voulez vous ouvrir le fichier ?\nEmplacement : %s");
 			
