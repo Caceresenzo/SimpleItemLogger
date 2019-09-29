@@ -1,7 +1,6 @@
 package caceresenzo.apps.itemlogger.export.pdf;
 
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -36,7 +35,6 @@ import caceresenzo.frameworks.database.binder.BindableColumn;
 import caceresenzo.frameworks.database.binder.BindableTable;
 import caceresenzo.frameworks.settings.SettingEntry;
 import caceresenzo.libs.internationalization.i18n;
-import caceresenzo.libs.string.StringUtils;
 
 public class PdfDataExporter implements DataExporter {
 	
@@ -155,49 +153,72 @@ public class PdfDataExporter implements DataExporter {
 							
 							float usedY = FONT_SIZE;
 							
+							Object rawValue;
 							String text;
 							
 							try {
-								text = Utils.toAbsolutlySimpleString(bindableColumn.getField().get(modelInstance), true, true);
+								rawValue = bindableColumn.getField().get(modelInstance);
+								
+								text = Utils.toAbsolutlySimpleString(rawValue, true, true);
 							} catch (Exception exception) {
 								throw new IllegalStateException(exception);
 							}
 							
 							/* Handling long text on multiple lines */
 							if (text != null) {
-								String[] lines = text.split(" ");
-								List<String> fitLines = new ArrayList<>();
-								
-								String currentLine = null;
-								for (String line : lines) {
-									if (currentLine == null) {
-										currentLine = line;
-									} else {
-										String concat = currentLine + " " + line;
+								if (rawValue instanceof Integer) { /* Centering int values */
+									float valueWidth = computeStringWidth(text, FONT_SIZE_ROWS);
+									float x = (availableWidth / 2f) - (valueWidth / 2f);
+									
+									printSimpleText(contentStream, xStart + x, currentY - usedY, FONT_SIZE_ROWS, text);
+								} else {
+									String[] lines = text.split(" ");
+									List<String> fitLines = new ArrayList<>();
+									
+									String currentLine = null;
+									for (String line : lines) {
+										/* Short the word if it is too long for the line */
+										boolean hasBeenCut = false;
+										while (computeStringWidth(line, FONT_SIZE_ROWS) >= availableWidth) {
+											line = line.substring(0, line.length() - 2);
+											hasBeenCut = true;
+										}
 										
-										if (computeStringWidth(concat, FONT_SIZE_ROWS) < availableWidth - PADDING_COLUMNS) {
-											currentLine = concat;
-										} else {
-											fitLines.add(currentLine);
+										if (hasBeenCut) {
+											line = line.substring(0, Math.max(0, line.length() - 6));
+											line += "[...]";
+										}
+										
+										/* Store line in a list line-based */
+										if (currentLine == null) {
 											currentLine = line;
+										} else {
+											String concat = currentLine + " " + line;
+											
+											if (computeStringWidth(concat, FONT_SIZE_ROWS) < availableWidth - PADDING_COLUMNS) {
+												currentLine = concat;
+											} else {
+												fitLines.add(currentLine);
+												currentLine = line;
+											}
 										}
 									}
-								}
-								
-								if (currentLine != null) {
-									fitLines.add(currentLine);
-								}
-								
-								int lineCount = fitLines.size();
-								for (int jndex = 0; jndex < lineCount; jndex++) {
-									String line = fitLines.get(jndex);
-									boolean isLast = jndex == lineCount - 1;
 									
-									printSimpleText(contentStream, xStart + PADDING_COLUMNS, currentY - usedY, FONT_SIZE_ROWS, line);
+									if (currentLine != null) {
+										fitLines.add(currentLine);
+									}
 									
-									if (!isLast) {
-										usedY += FONT_SIZE_ROWS;
-										usedY += PADDING_COLUMNS / 2f;
+									int lineCount = fitLines.size();
+									for (int jndex = 0; jndex < lineCount; jndex++) {
+										String line = fitLines.get(jndex);
+										boolean isLast = jndex == lineCount - 1;
+										
+										printSimpleText(contentStream, xStart + PADDING_COLUMNS, currentY - usedY, FONT_SIZE_ROWS, line);
+										
+										if (!isLast) {
+											usedY += FONT_SIZE_ROWS;
+											usedY += PADDING_COLUMNS / 2f;
+										}
 									}
 								}
 							}

@@ -33,7 +33,7 @@ public class Language {
 		public void set() {
 			o("multiple-element-letter", "s");
 			
-			o("application.title", "Simple Carnet d'Objet");
+			o("application.title", "Negro MAT.");
 			o("application.copyright.full", getTranslation().getString("application.title").toUpperCase() + "\nCRÉE PAR ENZO CACERES POUR L'ENTREPRISE NEGRO SA");
 			
 			o("logger.panel.search.title", "Recherche");
