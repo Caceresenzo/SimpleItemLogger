@@ -78,7 +78,7 @@ public class Language {
 			o("create-dialog.combobox.default.select-an-item", "Selectionner un élément");
 			o("create-dialog.error.dialog.title", "Champs manquant");
 			o("create-dialog.error.dialog.message", "Certains champs sont manquants ou n'ont pas été traités correctement.\nSi vous pensez que tout est correct, et que ce n'est pas un bug, contactez le développeur.\n\nDétails:\n    - Champs : \"%s\"\n    - Erreur : %s");
-
+			
 			o("export-dialog.window.title", "Exporter vers un PDF");
 			o("export-dialog.file-chooser.title", "Selectionner le fichier de destination...");
 			o("export-dialog.panel.settings.title", "Paramètres");
@@ -88,6 +88,12 @@ public class Language {
 			o("export-dialog.button.cancel", "Annuler");
 			o("export-dialog.button.toggle.enabled", "ACTIVÉ");
 			o("export-dialog.button.toggle.disabled", "DÉSACTIVÉ");
+			o("export-dialog.dialog.error.nothing-enabled.title", "Paramètres invalide");
+			o("export-dialog.dialog.error.nothing-enabled.message", "Veuillez selectionnez au moins un ou plusieurs éléments a exporter.");
+			o("export-dialog.dialog.error.export-error.title", "Exportation en erreur");
+			o("export-dialog.dialog.error.export-error.message", "L'exportation a renvoyé une erreur.\nSi vous pendez que ce n'est pas normal, contactez le developpeur.\n\nErreur : %s");
+			o("export-dialog.dialog.open-file.title", "Ouvrir le fichier");
+			o("export-dialog.dialog.open-file.message", "Voulez vous ouvrir le fichier ?\nEmplacement : %s");
 			
 			o("model.item", "Item");
 			o("model.person", "Personne");

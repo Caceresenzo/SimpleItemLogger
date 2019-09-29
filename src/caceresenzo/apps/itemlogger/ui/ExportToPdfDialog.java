@@ -1,12 +1,15 @@
 package caceresenzo.apps.itemlogger.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.FileDialog;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
@@ -14,6 +17,7 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
@@ -23,20 +27,32 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import caceresenzo.apps.itemlogger.configuration.Constants;
+import caceresenzo.apps.itemlogger.export.DataExporter;
+import caceresenzo.apps.itemlogger.export.pdf.PdfDataExporter;
 import caceresenzo.apps.itemlogger.managers.DataManager;
 import caceresenzo.apps.itemlogger.ui.part.ExportSettingPanel;
 import caceresenzo.apps.itemlogger.utils.Utils;
 import caceresenzo.frameworks.database.binder.BindableTable;
 import caceresenzo.frameworks.database.setup.TableCreator;
+import caceresenzo.frameworks.settings.SettingEntry;
 import caceresenzo.libs.internationalization.i18n;
+import caceresenzo.libs.os.OS;
+import caceresenzo.libs.os.OSUtils;
 
 public class ExportToPdfDialog extends JDialog implements Constants, ActionListener {
+	
+	/* Logger */
+	private static Logger LOGGER = LoggerFactory.getLogger(ExportToPdfDialog.class);
 	
 	/* Action Commands */
 	public static final String ACTION_COMMAND_BROWSE_FILE = "action_browse";
 	public static final String ACTION_COMMAND_DO_EXPORT = "action_export";
 	public static final String ACTION_COMMAND_CANCEL = "action_cancel";
+	public static final String ACTION_COMMAND_CLOSE = "action_close";
 	
 	/* UI */
 	private final JPanel contentPanel;
@@ -179,6 +195,7 @@ public class ExportToPdfDialog extends JDialog implements Constants, ActionListe
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		String actionCommand = event.getActionCommand();
@@ -190,10 +207,52 @@ public class ExportToPdfDialog extends JDialog implements Constants, ActionListe
 			}
 			
 			case ACTION_COMMAND_DO_EXPORT: {
+				DataExporter dataExporter = new PdfDataExporter();
+				
+				List<SettingEntry<Boolean>> settingEntries = new ArrayList<>();
+				int enabledCount = 0;
+				
+				for (Component component : settingListPanel.getComponents()) {
+					if (component instanceof SettingEntry.Aware) {
+						SettingEntry.Aware<Boolean> aware = (SettingEntry.Aware<Boolean>) component;
+						SettingEntry<Boolean> settingEntry = aware.toSettingEntry();
+						
+						settingEntries.add(settingEntry);
+						
+						if (Boolean.TRUE.equals(settingEntry.getValue())) {
+							enabledCount++;
+						}
+					}
+				}
+				
+				if (enabledCount == 0) {
+					JOptionPane.showMessageDialog(this, i18n.string("export-dialog.dialog.error.nothing-enabled.message"), i18n.string("export-dialog.dialog.error.nothing-enabled.title"), JOptionPane.ERROR_MESSAGE);
+				} else {
+					try {
+						dataExporter.exportToFile(settingEntries, targetFile);
+						
+						if (OSUtils.checkOSType().equals(OS.WINDOWS)) {
+							String absolutePath = targetFile.getAbsolutePath();
+							int reply = JOptionPane.showConfirmDialog(this, i18n.string("export-dialog.dialog.open-file.message", absolutePath), i18n.string("export-dialog.dialog.open-file.title"), JOptionPane.YES_NO_OPTION);
+							
+							if (reply == JOptionPane.YES_OPTION) {
+								Runtime.getRuntime().exec("cmd /c \"" + absolutePath + "\"");
+							}
+						}
+						
+						actionPerformed(new ActionEvent(this, 0, ACTION_COMMAND_CLOSE));
+					} catch (Exception exception) {
+						LOGGER.warn("Failed to export.", exception);
+						
+						JOptionPane.showMessageDialog(this, i18n.string("export-dialog.dialog.error.export-error.message", exception.getLocalizedMessage()), i18n.string("export-dialog.dialog.error.export-error.title"), JOptionPane.ERROR_MESSAGE);
+					}
+				}
+				
 				break;
 			}
 			
-			case ACTION_COMMAND_CANCEL: {
+			case ACTION_COMMAND_CANCEL:
+			case ACTION_COMMAND_CLOSE: {
 				setVisible(false);
 				break;
 			}

@@ -14,11 +14,8 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 
-import caceresenzo.apps.itemlogger.configuration.Config;
-import caceresenzo.apps.itemlogger.configuration.Language;
 import caceresenzo.apps.itemlogger.export.DataExporter;
 import caceresenzo.apps.itemlogger.managers.DataManager;
-import caceresenzo.apps.itemlogger.managers.ItemLoggerManager;
 import caceresenzo.apps.itemlogger.utils.Utils;
 import caceresenzo.frameworks.assets.FrameworkAssets;
 import caceresenzo.frameworks.database.binder.BindableColumn;
@@ -42,20 +39,6 @@ public class PdfDataExporter implements DataExporter {
 	private PDFont font;
 	private PDPage lastestPage;
 	
-	public static void main(String[] args) throws Exception {
-		Config.get();
-		Language.get().initialize();
-		ItemLoggerManager.get().initialize();
-		
-		// for (int index = 0; index < 50; index++) {
-		// Item item = new Item(0, "item-" + ((char) (index + 65)), index, 0);
-		//
-		// DataManager.get().getDatabaseSynchronizer().insert(Item.class, item);
-		// }
-		
-		new PdfDataExporter().exportToFile(null, new File("test.pdf"));
-	}
-	
 	@Override
 	public void exportToFile(List<SettingEntry<Boolean>> settingEntries, File file) throws Exception {
 		List<BindableTable> bindableTables = new ArrayList<>(DataManager.get().getTableCreator().getBindables().values());
@@ -65,6 +48,20 @@ public class PdfDataExporter implements DataExporter {
 		Iterator<BindableTable> bindableTableIterator = bindableTables.iterator();
 		while (bindableTableIterator.hasNext()) {
 			BindableTable bindableTable = bindableTableIterator.next();
+			
+			String key = Utils.formatModelClassSettingEntryKey(bindableTable.getModelClass());
+			boolean modelIsEnabled = true;
+			for (SettingEntry<Boolean> entry : settingEntries) {
+				if (entry.getKey().equals(key) && Boolean.FALSE.equals(entry.getValue())) {
+					modelIsEnabled = false;
+					break;
+				}
+			}
+			
+			if (!modelIsEnabled) {
+				continue;
+			}
+			
 			List<BindableColumn> bindableColumns = bindableTable.getBindableColumns();
 			
 			BindableColumn idBindableColumn = BindableColumn.findIdColumn(bindableColumns);
@@ -128,8 +125,7 @@ public class PdfDataExporter implements DataExporter {
 							try {
 								text = Utils.toAbsolutlySimpleString(bindableColumn.getField().get(modelInstance), true, true);
 							} catch (Exception exception) {
-								text = exception.getLocalizedMessage();
-								exception.printStackTrace();
+								throw new IllegalStateException(exception);
 							}
 							
 							if (text != null) {
@@ -194,7 +190,6 @@ public class PdfDataExporter implements DataExporter {
 		}
 		
 		finishDocument(file);
-		Runtime.getRuntime().exec("cmd /c \"" + file.getAbsolutePath() + "\"");
 	}
 	
 	/**
