@@ -2,6 +2,9 @@ package caceresenzo.apps.itemlogger.export.pdf;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -10,12 +13,16 @@ import java.util.ListIterator;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.PDPageTree;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 
+import caceresenzo.apps.itemlogger.configuration.Config;
+import caceresenzo.apps.itemlogger.configuration.Language;
 import caceresenzo.apps.itemlogger.export.DataExporter;
 import caceresenzo.apps.itemlogger.managers.DataManager;
+import caceresenzo.apps.itemlogger.managers.ItemLoggerManager;
 import caceresenzo.apps.itemlogger.utils.Utils;
 import caceresenzo.frameworks.assets.FrameworkAssets;
 import caceresenzo.frameworks.database.binder.BindableColumn;
@@ -38,6 +45,23 @@ public class PdfDataExporter implements DataExporter {
 	private PDDocument document;
 	private PDFont font;
 	private PDPage lastestPage;
+	
+	public static void main(String[] args) throws Exception {
+		Config.get();
+		Language.get().initialize();
+		ItemLoggerManager.get().initialize();
+		
+		// for (int index = 0; index < 50; index++) {
+		// Item item = new Item(0, "item-" + ((char) (index + 65)), index, 0);
+		//
+		// DataManager.get().getDatabaseSynchronizer().insert(Item.class, item);
+		// }
+		
+		File targetFile = new File("test.pdf");
+		
+		new PdfDataExporter().exportToFile(new ArrayList<>(), targetFile);
+		Runtime.getRuntime().exec("cmd /c \"" + targetFile.getAbsolutePath() + "\"");
+	}
 	
 	@Override
 	public void exportToFile(List<SettingEntry<Boolean>> settingEntries, File file) throws Exception {
@@ -128,6 +152,7 @@ public class PdfDataExporter implements DataExporter {
 								throw new IllegalStateException(exception);
 							}
 							
+							/* Handling long text on multiple lines */
 							if (text != null) {
 								String[] lines = text.split(" ");
 								List<String> fitLines = new ArrayList<>();
@@ -186,7 +211,19 @@ public class PdfDataExporter implements DataExporter {
 					printFooter(contentStream, mediaBox);
 				}
 			}
+		}
+		
+		/* Printing page count */
+		PDPageTree pageTree = document.getPages();
+		int pageCount = pageTree.getCount();
+		
+		for (int index = 0; index < pageCount; index++) {
+			PDPage page = pageTree.get(index);
+			PDRectangle mediaBox = page.getMediaBox();
 			
+			try (PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, false)) {
+				printCurrentPageNumber(contentStream, mediaBox, pageCount, index + 1);
+			}
 		}
 		
 		finishDocument(file);
@@ -257,7 +294,7 @@ public class PdfDataExporter implements DataExporter {
 	 *            Font's size to compute with.
 	 * @return A number of "unit" which correspond to the length of the string.
 	 */
-	private float computeStringWidth(String string, int fontSize) {
+	private float computeStringWidth(String string, float fontSize) {
 		return string.length() * (font.getAverageFontWidth() / 1000) * fontSize;
 	}
 	
@@ -401,8 +438,17 @@ public class PdfDataExporter implements DataExporter {
 	private void printHeader(PDPageContentStream contentStream, PDRectangle mediaBox, BindableTable bindableTable) throws IOException {
 		String tableTranslatedName = i18n.string("logger.panel.data.title.with.part." + bindableTable.getModelClass().getSimpleName().toLowerCase());
 		
-		printSimpleText(contentStream, PAGE_MARGIN_HORIZONTAL, mediaBox.getHeight() - PAGE_MARGIN_VERTICAL - FONT_SIZE, (float) (FONT_SIZE * 1.5), tableTranslatedName);
-		printSimpleHorizontalLine(contentStream, PAGE_MARGIN_HORIZONTAL, mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL, (float) (mediaBox.getHeight() - PAGE_MARGIN_VERTICAL - (FONT_SIZE * 1.4)));
+		float xStart = PAGE_MARGIN_HORIZONTAL;
+		float xEnd = mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL;
+		float y = mediaBox.getHeight() - PAGE_MARGIN_VERTICAL - FONT_SIZE;
+		
+		printSimpleText(contentStream, xStart, y, FONT_SIZE * 1.5f, tableTranslatedName);
+		printSimpleHorizontalLine(contentStream, xStart, xEnd, (float) (mediaBox.getHeight() - PAGE_MARGIN_VERTICAL - (FONT_SIZE * 1.4f)));
+		
+		String todayDate = LocalDate.now().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
+		float todayDateWidth = computeStringWidth(todayDate);
+		
+		printSimpleText(contentStream, xEnd - todayDateWidth, y, FONT_SIZE, todayDate);
 	}
 	
 	/**
@@ -416,7 +462,7 @@ public class PdfDataExporter implements DataExporter {
 	 *             If there is an error writing to the stream.
 	 */
 	private void printFooter(PDPageContentStream contentStream, PDRectangle mediaBox) throws IOException {
-		float baseY = PAGE_MARGIN_VERTICAL / 2f;
+		float baseY = PAGE_MARGIN_VERTICAL / 1.5f;
 		float fontSize = (float) (FONT_SIZE * 0.6);
 		
 		String[] lines = i18n.string("application.copyright.full").split("\n");
@@ -426,10 +472,37 @@ public class PdfDataExporter implements DataExporter {
 			/* Approximately */
 			float textWidth = line.length() * (font.getAverageFontWidth() / 1000) * fontSize;
 			float x = (mediaBox.getWidth() - textWidth) / 2f;
-			float y = (float) (baseY - (fontSize * index * 1.5));
+			float y = baseY - (fontSize * index * 1.5f);
 			
 			printSimpleText(contentStream, x, y, fontSize, line);
 		}
+	}
+	
+	/**
+	 * Print the current page out of the number of page in the footer.
+	 * 
+	 * @param contentStream
+	 *            The {@link PDPage page}'s writable steam.
+	 * @param mediaBox
+	 *            {@link PDPage Page}'s {@link PDRectangle bound}.
+	 * @param pageCount
+	 *            {@link PDDocument Document}'s total page count.
+	 * @param currentPageNumber
+	 *            Current page number.
+	 * @throws IOExceptionIf
+	 *             there is an error writing to the stream.
+	 */
+	private void printCurrentPageNumber(PDPageContentStream contentStream, PDRectangle mediaBox, int pageCount, int currentPageNumber) throws IOException {
+		float baseY = PAGE_MARGIN_VERTICAL / 1.5f;
+		float fontSize = FONT_SIZE * 1.0f;
+		
+		String pageNumber = String.format("%s/%s", currentPageNumber, pageCount);
+		
+		float textWidth = computeStringWidth(pageNumber, fontSize);
+		float x = (mediaBox.getWidth() - textWidth) - PAGE_MARGIN_HORIZONTAL;
+		float y = baseY;
+		
+		printSimpleText(contentStream, x, y, fontSize, pageNumber);
 	}
 	
 	/**
