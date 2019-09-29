@@ -1,5 +1,7 @@
 package caceresenzo.apps.itemlogger.export.pdf;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -10,6 +12,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+import javax.imageio.ImageIO;
+
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -17,15 +21,22 @@ import org.apache.pdfbox.pdmodel.PDPageTree;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
+import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
+import caceresenzo.apps.itemlogger.assets.Assets;
+import caceresenzo.apps.itemlogger.configuration.Config;
+import caceresenzo.apps.itemlogger.configuration.Language;
 import caceresenzo.apps.itemlogger.export.DataExporter;
 import caceresenzo.apps.itemlogger.managers.DataManager;
+import caceresenzo.apps.itemlogger.managers.ItemLoggerManager;
 import caceresenzo.apps.itemlogger.utils.Utils;
 import caceresenzo.frameworks.assets.FrameworkAssets;
 import caceresenzo.frameworks.database.binder.BindableColumn;
 import caceresenzo.frameworks.database.binder.BindableTable;
 import caceresenzo.frameworks.settings.SettingEntry;
 import caceresenzo.libs.internationalization.i18n;
+import caceresenzo.libs.string.StringUtils;
 
 public class PdfDataExporter implements DataExporter {
 	
@@ -43,11 +54,31 @@ public class PdfDataExporter implements DataExporter {
 	private PDFont font;
 	private PDPage lastestPage;
 	
+	public static void main(String[] args) throws Exception {
+		Config.get();
+		Language.get().initialize();
+		ItemLoggerManager.get().initialize();
+		
+		// for (int index = 0; index < 50; index++) {
+		// Item item = new Item(0, "item-" + ((char) (index + 65)), index, 0);
+		//
+		// DataManager.get().getDatabaseSynchronizer().insert(Item.class, item);
+		// }
+		
+		File targetFile = new File("test.pdf");
+		
+		new PdfDataExporter().exportToFile(new ArrayList<>(), targetFile);
+		Runtime.getRuntime().exec("cmd /c \"" + targetFile.getAbsolutePath() + "\"");
+	}
+	
 	@Override
 	public void exportToFile(List<SettingEntry<Boolean>> settingEntries, File file) throws Exception {
 		List<BindableTable> bindableTables = new ArrayList<>(DataManager.get().getTableCreator().getBindables().values());
 		
 		prepareNewDocument();
+		
+		BufferedImage logoBufferedImage = ImageIO.read(getClass().getResourceAsStream(Assets.LOGO_NEGRO));
+		PDImageXObject logoImage = LosslessFactory.createFromImage(document, logoBufferedImage);
 		
 		Iterator<BindableTable> bindableTableIterator = bindableTables.iterator();
 		while (bindableTableIterator.hasNext()) {
@@ -86,8 +117,8 @@ public class PdfDataExporter implements DataExporter {
 				currentY = (mediaBox.getHeight() - PAGE_MARGIN_VERTICAL);
 				
 				try (PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, false)) {
-					printHeader(contentStream, mediaBox, bindableTable);
-					currentY -= FONT_SIZE * 2.5f;
+					printHeader(contentStream, mediaBox, bindableTable, logoImage);
+					currentY -= FONT_SIZE * 3.5f;
 					
 					int size = bindableColumns.size();
 					float columnBarThickness = 1.2f;
@@ -382,10 +413,13 @@ public class PdfDataExporter implements DataExporter {
 	 *            Specified font size.
 	 * @param text
 	 *            Text to print.
+	 * @return How much Y unit has been consummed.
 	 * @throws IOException
 	 *             If there is an error writing to the stream.
 	 */
-	private void printSimpleText(PDPageContentStream contentStream, float x, float y, float fontSize, String text) throws IOException {
+	private int printSimpleText(PDPageContentStream contentStream, float x, float y, float fontSize, String text) throws IOException {
+		int usedY = 0;
+		
 		contentStream.beginText();
 		contentStream.setFont(font, fontSize);
 		contentStream.setLeading(fontSize);
@@ -397,38 +431,47 @@ public class PdfDataExporter implements DataExporter {
 			
 			if (index != lines.length) {
 				contentStream.newLine();
+				usedY += FONT_SIZE;
 			}
 		}
 		
 		contentStream.endText();
+		
+		return usedY;
 	}
 	
 	/**
-	 * Print the current {@link BarReference bar reference} of this page in the header. This function also add a line under the text.
+	 * Print the current {@link BarReference bar reference} of this page in the header. This function also add today's date, a logo and a line under the text.
 	 * 
 	 * @param contentStream
 	 *            The {@link PDPage page}'s writable steam.
 	 * @param mediaBox
 	 *            {@link PDPage Page}'s {@link PDRectangle bound}.
-	 * @param barReference
-	 *            Target {@link BarReference bar reference} used to print this page.
+	 * @param bindableTable
+	 *            {@link BindableTable}'s instance to get title from.
+	 * @param logo
+	 *            Logo to display at the top right of the page.
 	 * @throws IOException
 	 *             If there is an error writing to the stream.
 	 */
-	private void printHeader(PDPageContentStream contentStream, PDRectangle mediaBox, BindableTable bindableTable) throws IOException {
+	private void printHeader(PDPageContentStream contentStream, PDRectangle mediaBox, BindableTable bindableTable, PDImageXObject logo) throws IOException {
 		String tableTranslatedName = i18n.string("logger.panel.data.title.with.part." + bindableTable.getModelClass().getSimpleName().toLowerCase());
+		String todayDate = LocalDate.now().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
 		
 		float xStart = PAGE_MARGIN_HORIZONTAL;
 		float xEnd = mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL;
 		float y = mediaBox.getHeight() - PAGE_MARGIN_VERTICAL - FONT_SIZE;
 		
-		printSimpleText(contentStream, xStart, y, FONT_SIZE * 1.5f, tableTranslatedName);
-		printSimpleHorizontalLine(contentStream, xStart, xEnd, (float) (mediaBox.getHeight() - PAGE_MARGIN_VERTICAL - (FONT_SIZE * 1.4f)));
+		y -= printSimpleText(contentStream, xStart, y, FONT_SIZE * 1.5f, tableTranslatedName);
+		y -= FONT_SIZE * 0.4f;
+		printSimpleText(contentStream, xStart, y, FONT_SIZE, todayDate);
 		
-		String todayDate = LocalDate.now().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
-		float todayDateWidth = computeStringWidth(todayDate);
+		float newHeight = FONT_SIZE * 2.5f;
+		float newWidth = logo.getWidth() * (newHeight / logo.getHeight());
 		
-		printSimpleText(contentStream, xEnd - todayDateWidth, y, FONT_SIZE, todayDate);
+		contentStream.drawImage(logo, xEnd - newWidth, y, newWidth, newHeight);
+		
+		printSimpleHorizontalLine(contentStream, xStart, xEnd, y - (FONT_SIZE * 0.4f));
 	}
 	
 	/**
