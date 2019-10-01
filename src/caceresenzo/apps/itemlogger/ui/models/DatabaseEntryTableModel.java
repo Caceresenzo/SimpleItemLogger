@@ -159,10 +159,10 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 					TableColumn tableColumn = table.getColumnModel().getColumn(jndex);
 					
 					DefaultTableCellRenderer cellRenderer = new DefaultTableCellRenderer();
-					cellRenderer.setHorizontalAlignment(SwingConstants.LEFT);
+					cellRenderer.setHorizontalAlignment(SwingConstants.CENTER);
 					
 					DefaultCellEditor cellEditor = (DefaultCellEditor) table.getDefaultEditor(Integer.class);
-					((JTextField) cellEditor.getComponent()).setHorizontalAlignment(SwingConstants.LEFT);
+					((JTextField) cellEditor.getComponent()).setHorizontalAlignment(SwingConstants.CENTER);
 					
 					tableColumn.setCellRenderer(cellRenderer);
 					tableColumn.setCellEditor(cellEditor);
