@@ -58,8 +58,8 @@ public class Language {
 			
 			o("logger.table.column.id", "ID");
 			o("logger.table.column.name", "Nom");
-			o("logger.table.column.quantity", "Quantité");
-			o("logger.table.column.stock", "En Stock");
+			o("logger.table.column.quantity", "Quantité Initial");
+			o("logger.table.column.stock", "Actuellement en Stock");
 			o("logger.table.column.corporation", "Société");
 			o("logger.table.column.phone", "Numéro de Téléphone");
 			o("logger.table.column.address", "Adresse");
