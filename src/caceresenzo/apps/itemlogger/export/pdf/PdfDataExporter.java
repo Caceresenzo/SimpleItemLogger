@@ -7,9 +7,11 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 
@@ -24,11 +26,8 @@ import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
 import caceresenzo.apps.itemlogger.assets.Assets;
-import caceresenzo.apps.itemlogger.configuration.Config;
-import caceresenzo.apps.itemlogger.configuration.Language;
 import caceresenzo.apps.itemlogger.export.DataExporter;
 import caceresenzo.apps.itemlogger.managers.DataManager;
-import caceresenzo.apps.itemlogger.managers.ItemLoggerManager;
 import caceresenzo.apps.itemlogger.utils.Utils;
 import caceresenzo.frameworks.assets.FrameworkAssets;
 import caceresenzo.frameworks.database.binder.BindableColumn;
@@ -46,6 +45,9 @@ public class PdfDataExporter implements DataExporter {
 	public static final int FONT_SIZE_ROWS = (int) (FONT_SIZE * 0.9);
 	
 	public static final float PADDING_COLUMNS = 4;
+	
+	/* Settings */
+	public static final boolean SHRINK_INTEGER_COLUMN = true;
 	
 	/* Variables */
 	private PDDocument document;
@@ -91,7 +93,7 @@ public class PdfDataExporter implements DataExporter {
 			float currentY = Float.MAX_VALUE;
 			
 			while (modelInstanceListIterator.hasNext()) {
-				PDPage page = createPage();
+				PDPage page = createPage(true);
 				PDRectangle mediaBox = page.getMediaBox();
 				
 				final float maxX = mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL;
@@ -101,23 +103,26 @@ public class PdfDataExporter implements DataExporter {
 					printHeader(contentStream, mediaBox, bindableTable, logoImage);
 					currentY -= FONT_SIZE * 3.5f;
 					
-					int size = bindableColumns.size();
+					List<PdfDataExporter.Column> columns = computeColumnsWidths(bindableTable, mediaBox, FONT_SIZE);
+					
+					int size = columns.size();
 					float columnBarThickness = 1.2f;
-					float colunmWidth = (mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL * 2f) / size;
 					
 					/* Printing columns */
+					float usedX = 0.0f;
 					for (int index = 0; index < size; index++) {
-						BindableColumn bindableColumn = bindableColumns.get(index);
+						PdfDataExporter.Column column = columns.get(index);
 						boolean isLast = index == size - 1;
-						float xStart = colunmWidth * index + PAGE_MARGIN_HORIZONTAL;
-						float xEnd = xStart + colunmWidth;
+						float xStart = usedX + PAGE_MARGIN_HORIZONTAL;
+						float xEnd = xStart + column.getWidth();
 						
-						String translatedColumn = i18n.string("logger.table.column." + bindableColumn.getColumnName());
-						printSimpleText(contentStream, xStart + PADDING_COLUMNS, currentY - FONT_SIZE, FONT_SIZE, translatedColumn);
+						printSimpleText(contentStream, xStart + PADDING_COLUMNS, currentY - FONT_SIZE, FONT_SIZE, column.getTranslation());
 						
 						if (!isLast) {
 							printSimpleVerticalLine(contentStream, xEnd, currentY, minY, columnBarThickness);
 						}
+						
+						usedX += column.getWidth();
 					}
 					
 					currentY -= FONT_SIZE * 1.5f;
@@ -128,10 +133,12 @@ public class PdfDataExporter implements DataExporter {
 						Object modelInstance = modelInstanceListIterator.next();
 						float totalUsedY = 0.0f;
 						
+						usedX = 0.0f;
 						for (int index = 0; index < size; index++) {
-							BindableColumn bindableColumn = bindableColumns.get(index);
-							float xStart = colunmWidth * index + PAGE_MARGIN_HORIZONTAL;
-							float xEnd = xStart + colunmWidth;
+							PdfDataExporter.Column column = columns.get(index);
+							BindableColumn bindableColumn = column.getBindableColumn();
+							float xStart = usedX + PAGE_MARGIN_HORIZONTAL;
+							float xEnd = xStart + column.getWidth();
 							float availableWidth = xEnd - xStart;
 							
 							float usedY = FONT_SIZE;
@@ -209,6 +216,8 @@ public class PdfDataExporter implements DataExporter {
 							if (usedY > totalUsedY) {
 								totalUsedY = usedY;
 							}
+							
+							usedX += column.getWidth();
 						}
 						
 						currentY -= totalUsedY;
@@ -242,6 +251,53 @@ public class PdfDataExporter implements DataExporter {
 		}
 		
 		finishDocument(file);
+	}
+	
+	/**
+	 * Compute all {@link BindableColumn} of a {@link BindableTable} and set custom, fixed, width for some columns.<br>
+	 * For exemple, if the setting {@link #SHRINK_INTEGER_COLUMN} is set to <code>true</code>, {@link Integer}'s column will have a width set to the width of the max integer OR the width or the column's translation depending on which one is the longest.
+	 * 
+	 * @param bindableTable
+	 *            Source {@link BindableTable} to compute column width.
+	 * @param mediaBox
+	 *            {@link PDPage Page}'s {@link PDRectangle bound}.
+	 * @param fontSize
+	 *            Font size to compute the text width with.
+	 * @return A {@link List list} of {@link PdfDataExporter.Column} with optimimal width.
+	 */
+	private List<PdfDataExporter.Column> computeColumnsWidths(BindableTable bindableTable, PDRectangle mediaBox, float fontSize) {
+		List<BindableColumn> bindableColumns = bindableTable.getBindableColumns();
+		List<PdfDataExporter.Column> columns = new ArrayList<>();
+		
+		Map<BindableColumn, PdfDataExporter.Column> alreadyComputedMap = new HashMap<>();
+		float usableWidth = mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL * 2f;
+		
+		if (SHRINK_INTEGER_COLUMN) {
+			float maxIntegerWidth = computeStringWidth(String.valueOf(Integer.MAX_VALUE), fontSize);
+			
+			for (BindableColumn bindableColumn : bindableColumns) {
+				Class<?> fieldType = bindableColumn.getField().getType();
+				
+				if (Integer.class.equals(fieldType) || int.class.equals(fieldType)) {
+					float columnNameWidth = computeStringWidth(PdfDataExporter.Column.translate(bindableColumn), fontSize);
+					float columnWidth = Math.max(columnNameWidth, maxIntegerWidth) + (PADDING_COLUMNS * 2f);
+					
+					alreadyComputedMap.put(bindableColumn, new PdfDataExporter.Column(columnWidth, bindableColumn));
+					usableWidth -= columnWidth;
+				}
+			}
+		}
+		
+		int remainingColumnCount = bindableColumns.size() - alreadyComputedMap.size();
+		float columnWidth = usableWidth / remainingColumnCount;
+		
+		for (BindableColumn bindableColumn : bindableColumns) {
+			PdfDataExporter.Column column = alreadyComputedMap.getOrDefault(bindableColumn, new PdfDataExporter.Column(columnWidth, bindableColumn));
+			
+			columns.add(column);
+		}
+		
+		return columns;
 	}
 	
 	/**
@@ -280,8 +336,8 @@ public class PdfDataExporter implements DataExporter {
 	 * 
 	 * @return The {@link PDPage page} just created.
 	 */
-	private PDPage createPage() {
-		PDPage page = lastestPage = new PDPage();
+	private PDPage createPage(boolean landscape) {
+		PDPage page = lastestPage = !landscape ? new PDPage() : new PDPage(new PDRectangle(PDRectangle.A4.getHeight(), PDRectangle.A4.getWidth()));
 		document.addPage(page);
 		
 		return page;
@@ -543,6 +599,49 @@ public class PdfDataExporter implements DataExporter {
 	private void finishDocument(File file) throws IOException {
 		document.save(file);
 		document.close();
+	}
+	
+	private static final class Column {
+		
+		/* Variables */
+		private float width;
+		private BindableColumn bindableColumn;
+		
+		/* Constructor */
+		public Column(float width, BindableColumn bindableColumn) {
+			this.width = width;
+			this.bindableColumn = bindableColumn;
+		}
+		
+		/** @return Column's width. */
+		public float getWidth() {
+			return width;
+		}
+		
+		/** @return Column's original {@link BindableColumn}. */
+		public BindableColumn getBindableColumn() {
+			return bindableColumn;
+		}
+		
+		/**
+		 * @return The column translation.
+		 * @see PdfDataExporter.Column#translate(BindableColumn) Get a column translation.
+		 */
+		public String getTranslation() {
+			return translate(bindableColumn);
+		}
+		
+		/**
+		 * Get a column's translation.
+		 * 
+		 * @param bindableColumn
+		 *            Target {@link BindableColumn} to get translation with.
+		 * @return Column's translation.
+		 */
+		public static final String translate(BindableColumn bindableColumn) {
+			return i18n.string("logger.table.column." + bindableColumn.getColumnName());
+		}
+		
 	}
 	
 }
