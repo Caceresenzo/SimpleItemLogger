@@ -17,7 +17,7 @@ public class Item implements IDatabaseEntry {
 	
 	/* Database Fields */
 	public static final String COLUMN_NAME = "name";
-	public static final String COLUMN_QUANTITY = "quantity";
+	public static final String COLUMN_INITIAL_QUANTITY = "initial_quantity";
 	public static final String COLUMN_STOCK = "stock";
 	
 	/* Variables */
@@ -25,8 +25,8 @@ public class Item implements IDatabaseEntry {
 	private final int id;
 	@DatabaseTableColumn(COLUMN_NAME)
 	private String name;
-	@DatabaseTableColumn(COLUMN_QUANTITY)
-	private int quantity;
+	@DatabaseTableColumn(COLUMN_INITIAL_QUANTITY)
+	private int initialQuantity;
 	@DatabaseTableColumn(value = COLUMN_STOCK, automator = ItemInStockDatabaseColumnValueAutomator.class)
 	private final int stock;
 	
@@ -36,10 +36,10 @@ public class Item implements IDatabaseEntry {
 	}
 	
 	/* Constructor */
-	public Item(final int id, String name, int quantity, int stock) {
+	public Item(final int id, String name, int initialQuantity, int stock) {
 		this.id = id;
 		this.name = name;
-		this.quantity = quantity;
+		this.initialQuantity = initialQuantity;
 		this.stock = stock;
 	}
 	
@@ -53,9 +53,9 @@ public class Item implements IDatabaseEntry {
 		return name;
 	}
 	
-	/** @return Item's total quantity. */
+	/** @return Item's total initial quantity. */
 	public int getQuantity() {
-		return quantity;
+		return initialQuantity;
 	}
 	
 	/** @return Item's remaining quantity. */
@@ -65,7 +65,7 @@ public class Item implements IDatabaseEntry {
 	
 	@Override
 	public String describe() {
-		return String.format("%s (%s/%s)", name, stock, quantity);
+		return String.format("%s (%s/%s)", name, stock, initialQuantity);
 	}
 
 	@Override
@@ -75,7 +75,7 @@ public class Item implements IDatabaseEntry {
 	
 	@Override
 	public String toString() {
-		return "Item[id=" + id + ", name=" + name + ", quantity=" + quantity + ", stock=" + stock + "]";
+		return "Item[id=" + id + ", name=" + name + ", quantity=" + initialQuantity + ", stock=" + stock + "]";
 	}
 	
 	public static final class ItemInStockDatabaseColumnValueAutomator extends AbstractDatabaseColumnValueAutomator {

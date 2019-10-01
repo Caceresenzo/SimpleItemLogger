@@ -58,13 +58,14 @@ public class Language {
 			
 			o("logger.table.column.id", "ID");
 			o("logger.table.column.name", "Nom");
-			o("logger.table.column.quantity", "Quantité Initial");
+			o("logger.table.column.initial_quantity", "Quantité Initial");
 			o("logger.table.column.stock", "Actuellement en Stock");
 			o("logger.table.column.corporation", "Société");
 			o("logger.table.column.phone", "Numéro de Téléphone");
 			o("logger.table.column.address", "Adresse");
 			o("logger.table.column.item", "Objet");
 			o("logger.table.column.person", "À");
+			o("logger.table.column.quantity", "Quantité");
 			o("logger.table.column.construction_site", "Chantier");
 			o("logger.table.column.lend", "Prêt");
 			o("logger.table.column.return", "Retour");
