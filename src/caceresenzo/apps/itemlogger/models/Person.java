@@ -8,17 +8,17 @@ import caceresenzo.frameworks.database.annotations.DatabaseTableColumn;
 public class Person implements IDatabaseEntry {
 	
 	/* Database Fields */
-	public static final String COLUMN_LASTNAME = "lastname";
-	public static final String COLUMN_FIRSTNAME = "firstname";
+	public static final String COLUMN_NAME = "name";
+	public static final String COLUMN_CORPORATION = "corporation";
 	public static final String COLUMN_PHONE = "phone";
 	
 	/* Variables */
 	@DatabaseTableColumn(DatabaseTableColumn.COLUMN_ID)
 	private final int id;
-	@DatabaseTableColumn(COLUMN_LASTNAME)
-	private String lastname;
-	@DatabaseTableColumn(COLUMN_FIRSTNAME)
-	private String firstname;
+	@DatabaseTableColumn(COLUMN_NAME)
+	private String name;
+	@DatabaseTableColumn(COLUMN_CORPORATION)
+	private String corporation;
 	@DatabaseTableColumn(COLUMN_PHONE)
 	private String phone;
 	
@@ -28,10 +28,10 @@ public class Person implements IDatabaseEntry {
 	}
 	
 	/* Constructor */
-	public Person(int id, String lastname, String firstname, String phone) {
+	public Person(int id, String name, String corporation, String phone) {
 		this.id = id;
-		this.lastname = lastname;
-		this.firstname = firstname;
+		this.name = name;
+		this.corporation = corporation;
 		this.phone = phone;
 	}
 	
@@ -40,14 +40,14 @@ public class Person implements IDatabaseEntry {
 		return id;
 	}
 	
-	/** @return Person's first name. */
-	public String getFirstname() {
-		return firstname;
+	/** @return Person's name. */
+	public String getName() {
+		return name;
 	}
 	
-	/** @return Person's last name. */
-	public String getLastname() {
-		return lastname;
+	/** @return Person's corporation. */
+	public String getCorporation() {
+		return corporation;
 	}
 	
 	/** @return Person's phone. */
@@ -57,17 +57,17 @@ public class Person implements IDatabaseEntry {
 	
 	@Override
 	public String describe() {
-		return String.format("%S %s (%s)", lastname, firstname, phone);
+		return String.format("%s (%s)", name, corporation);
 	}
 	
 	@Override
 	public String describeSimply() {
-		return String.format("%S %s", lastname, firstname);
+		return String.format("%s", name);
 	}
 	
 	@Override
 	public String toString() {
-		return "Person[id=" + id + ", lastname=" + lastname + ", firstname=" + firstname + ", phone=" + phone + "]";
+		return "Person[id=" + id + ", lastname=" + name + ", firstname=" + corporation + ", phone=" + phone + "]";
 	}
 	
 }
