@@ -17,18 +17,18 @@ public class Item implements IDatabaseEntry {
 	
 	/* Database Fields */
 	public static final String COLUMN_NAME = "name";
-	public static final String COLUMN_INITIAL_QUANTITY = "initial_quantity";
-	public static final String COLUMN_STOCK = "stock";
+	public static final String COLUMN_INITIAL_STOCK = "initial_stock";
+	public static final String COLUMN_CURRENT_STOCK = "current_stock";
 	
 	/* Variables */
 	@DatabaseTableColumn(DatabaseTableColumn.COLUMN_ID)
 	private final int id;
 	@DatabaseTableColumn(COLUMN_NAME)
 	private String name;
-	@DatabaseTableColumn(COLUMN_INITIAL_QUANTITY)
-	private int initialQuantity;
-	@DatabaseTableColumn(value = COLUMN_STOCK, automator = ItemInStockDatabaseColumnValueAutomator.class)
-	private final int stock;
+	@DatabaseTableColumn(COLUMN_INITIAL_STOCK)
+	private int initialStock;
+	@DatabaseTableColumn(value = COLUMN_CURRENT_STOCK, automator = ItemCurrentStockDatabaseColumnValueAutomator.class)
+	private final int currentStock;
 	
 	/* Constructor */
 	public Item() {
@@ -36,11 +36,11 @@ public class Item implements IDatabaseEntry {
 	}
 	
 	/* Constructor */
-	public Item(final int id, String name, int initialQuantity, int stock) {
+	public Item(final int id, String name, int initialStock, int currentStock) {
 		this.id = id;
 		this.name = name;
-		this.initialQuantity = initialQuantity;
-		this.stock = stock;
+		this.initialStock = initialStock;
+		this.currentStock = currentStock;
 	}
 	
 	@Override
@@ -53,21 +53,21 @@ public class Item implements IDatabaseEntry {
 		return name;
 	}
 	
-	/** @return Item's total initial quantity. */
-	public int getQuantity() {
-		return initialQuantity;
+	/** @return Item's initial stock. */
+	public int getInitialStock() {
+		return initialStock;
 	}
 	
-	/** @return Item's remaining quantity. */
-	public int getStock() {
-		return stock;
+	/** @return Item's current (remaining) stock. */
+	public int getCurrentStock() {
+		return currentStock;
 	}
 	
 	@Override
 	public String describe() {
-		return String.format("%s (%s/%s)", name, stock, initialQuantity);
+		return String.format("%s (%s/%s)", name, currentStock, initialStock);
 	}
-
+	
 	@Override
 	public String describeSimply() {
 		return name;
@@ -75,10 +75,10 @@ public class Item implements IDatabaseEntry {
 	
 	@Override
 	public String toString() {
-		return "Item[id=" + id + ", name=" + name + ", quantity=" + initialQuantity + ", stock=" + stock + "]";
+		return "Item[id=" + id + ", name=" + name + ", initialStock=" + initialStock + ", currentStock=" + currentStock + "]";
 	}
 	
-	public static final class ItemInStockDatabaseColumnValueAutomator extends AbstractDatabaseColumnValueAutomator {
+	public static final class ItemCurrentStockDatabaseColumnValueAutomator extends AbstractDatabaseColumnValueAutomator {
 		
 		@Override
 		public void automate(Class<?> forModelClass, Class<?> columnClass, Field field, Object instance) {
@@ -102,7 +102,7 @@ public class Item implements IDatabaseEntry {
 				PreparedStatement statement = DataManager.get().getDatabaseConnection().prepareStatement(stringBuilder.toString());
 				statement.setInt(1, item.getId());
 				
-				int inStock = item.getQuantity();
+				int inStock = item.getInitialStock();
 				
 				try (ResultSet resultSet = statement.executeQuery()) {
 					while (resultSet.next()) {

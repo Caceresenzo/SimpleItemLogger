@@ -67,7 +67,7 @@ public class Person implements IDatabaseEntry {
 	
 	@Override
 	public String toString() {
-		return "Person[id=" + id + ", lastname=" + name + ", firstname=" + corporation + ", phone=" + phone + "]";
+		return "Person[id=" + id + ", name=" + name + ", corporation=" + corporation + ", phone=" + phone + "]";
 	}
 	
 }
