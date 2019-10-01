@@ -68,6 +68,7 @@ public class Language {
 			o("logger.table.column.construction_site", "Chantier");
 			o("logger.table.column.lend", "Prêt");
 			o("logger.table.column.return", "Retour");
+			o("logger.table.column.extra", "Commentaire(s)");
 			o("logger.table.column.actions", "Actions");
 			o("logger.table.column.actions.button.remove", "SUPPRIMER");
 			o("logger.table.column.actions.button.remove.confirm-dialog.title", "Confirmation de suppression");

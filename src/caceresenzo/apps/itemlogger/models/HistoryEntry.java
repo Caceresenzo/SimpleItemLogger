@@ -17,6 +17,7 @@ public class HistoryEntry implements IDatabaseEntry {
 	public static final String COLUMN_LEND_CONSTRUCTION_SITE = "construction_site";
 	public static final String COLUMN_LEND_DATE = "lend";
 	public static final String COLUMN_RETURN_DATE = "return";
+	public static final String COLUMN_EXTRA = "extra";
 	
 	/* Variables */
 	@DatabaseTableColumn(DatabaseTableColumn.COLUMN_ID)
@@ -33,20 +34,23 @@ public class HistoryEntry implements IDatabaseEntry {
 	private LocalDate lendDate;
 	@DatabaseTableColumn(value = COLUMN_RETURN_DATE, flags = SqlTableBuilder.FLAG_NULL)
 	private LocalDate returnDate;
+	@DatabaseTableColumn(value = COLUMN_EXTRA, flags = SqlTableBuilder.FLAG_NULL)
+	private String extra;
 	
 	/* Constructor */
 	public HistoryEntry() {
-		this(0, null, null, null, null, null);
+		this(0, null, null, null, null, null, null);
 	}
 	
 	/* Constructor */
-	public HistoryEntry(int id, Person person, Item item, ConstructionSite constructionSite, LocalDate lendDate, LocalDate returnDate) {
+	public HistoryEntry(int id, Person person, Item item, ConstructionSite constructionSite, LocalDate lendDate, LocalDate returnDate, String extra) {
 		this.id = id;
 		this.person = person;
 		this.item = item;
 		this.constructionSite = constructionSite;
 		this.lendDate = lendDate;
 		this.returnDate = returnDate;
+		this.extra = extra;
 	}
 	
 	@Override
@@ -63,7 +67,7 @@ public class HistoryEntry implements IDatabaseEntry {
 	public Item getItem() {
 		return item;
 	}
-
+	
 	/** @return History entry's target construction site. */
 	public ConstructionSite getConstructionSite() {
 		return constructionSite;
@@ -79,11 +83,16 @@ public class HistoryEntry implements IDatabaseEntry {
 		return returnDate;
 	}
 	
+	/** @return History entry's extra user data. */
+	public String getExtra() {
+		return extra;
+	}
+	
 	@Override
 	public String describe() {
 		throw new UnsupportedOperationException();
 	}
-
+	
 	@Override
 	public String describeSimply() {
 		throw new UnsupportedOperationException();
