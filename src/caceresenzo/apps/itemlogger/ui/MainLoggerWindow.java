@@ -1,6 +1,7 @@
 package caceresenzo.apps.itemlogger.ui;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -57,7 +58,7 @@ public class MainLoggerWindow implements ActionListener {
 	
 	/* UI */
 	private JFrame frame;
-	private JPanel searchPanel, actionContainerPanel, actionPanel, dataPanel;
+	private JPanel searchPanel, actionContainerPanel, modelActionPanel, dataPanel;
 	private JScrollPane dataScrollPane;
 	private JTable dataTable;
 	private JTextField searchBarTextField;
@@ -65,6 +66,7 @@ public class MainLoggerWindow implements ActionListener {
 	
 	/* Variables */
 	private Class<?> currentDisplayedModelClass;
+	private JPanel actionPanel;
 	
 	/* Constructor */
 	public MainLoggerWindow() {
@@ -94,9 +96,9 @@ public class MainLoggerWindow implements ActionListener {
 						.addGroup(groupLayout.createSequentialGroup()
 								.addContainerGap()
 								.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-										.addComponent(dataPanel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 764, Short.MAX_VALUE)
-										.addComponent(searchPanel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-										.addComponent(actionContainerPanel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 764, Short.MAX_VALUE))
+										.addComponent(dataPanel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 864, Short.MAX_VALUE)
+										.addComponent(actionContainerPanel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 864, Short.MAX_VALUE)
+										.addComponent(searchPanel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 864, Short.MAX_VALUE))
 								.addContainerGap()));
 		groupLayout.setVerticalGroup(
 				groupLayout.createParallelGroup(Alignment.LEADING)
@@ -104,9 +106,9 @@ public class MainLoggerWindow implements ActionListener {
 								.addContainerGap()
 								.addComponent(searchPanel, GroupLayout.PREFERRED_SIZE, 75, GroupLayout.PREFERRED_SIZE)
 								.addPreferredGap(ComponentPlacement.RELATED)
-								.addComponent(actionContainerPanel, GroupLayout.PREFERRED_SIZE, 79, GroupLayout.PREFERRED_SIZE)
+								.addComponent(actionContainerPanel, GroupLayout.PREFERRED_SIZE, 119, GroupLayout.PREFERRED_SIZE)
 								.addPreferredGap(ComponentPlacement.RELATED)
-								.addComponent(dataPanel, GroupLayout.DEFAULT_SIZE, 273, Short.MAX_VALUE)
+								.addComponent(dataPanel, GroupLayout.DEFAULT_SIZE, 433, Short.MAX_VALUE)
 								.addContainerGap()));
 		
 		dataScrollPane = new JScrollPane();
@@ -138,6 +140,9 @@ public class MainLoggerWindow implements ActionListener {
 		dataScrollPane.setViewportView(dataTable);
 		dataPanel.setLayout(gl_dataPanel);
 		
+		modelActionPanel = new JPanel();
+		modelActionPanel.setBorder(null);
+		
 		actionPanel = new JPanel();
 		actionPanel.setBorder(null);
 		GroupLayout gl_actionContainerPanel = new GroupLayout(actionContainerPanel);
@@ -145,18 +150,24 @@ public class MainLoggerWindow implements ActionListener {
 				gl_actionContainerPanel.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_actionContainerPanel.createSequentialGroup()
 								.addContainerGap()
-								.addComponent(actionPanel, GroupLayout.DEFAULT_SIZE, 632, Short.MAX_VALUE)
+								.addGroup(gl_actionContainerPanel.createParallelGroup(Alignment.LEADING)
+										.addComponent(modelActionPanel, GroupLayout.DEFAULT_SIZE, 832, Short.MAX_VALUE)
+										.addComponent(actionPanel, GroupLayout.DEFAULT_SIZE, 832, Short.MAX_VALUE))
 								.addContainerGap()));
 		gl_actionContainerPanel.setVerticalGroup(
 				gl_actionContainerPanel.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_actionContainerPanel.createSequentialGroup()
 								.addContainerGap()
+								.addComponent(modelActionPanel, GroupLayout.PREFERRED_SIZE, 34, GroupLayout.PREFERRED_SIZE)
+								.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 								.addComponent(actionPanel, GroupLayout.PREFERRED_SIZE, 34, GroupLayout.PREFERRED_SIZE)
-								.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
+								.addContainerGap()));
 		actionPanel.setLayout(new BoxLayout(actionPanel, BoxLayout.X_AXIS));
+		modelActionPanel.setLayout(new BoxLayout(modelActionPanel, BoxLayout.X_AXIS));
 		actionContainerPanel.setLayout(gl_actionContainerPanel);
 		
 		getActionButtons().forEach((button) -> actionPanel.add(button));
+		getModelActionButtons().forEach((button) -> modelActionPanel.add(button));
 		
 		searchBarTextField = new JTextField();
 		
@@ -278,17 +289,39 @@ public class MainLoggerWindow implements ActionListener {
 	
 	/** @return A {@link List list} of {@link JButton button}s that will be used to fill the "Actions" section. */
 	protected List<JButton> getActionButtons() {
+		return createButtonList(Arrays.asList(
+				new MainLoggerWindow.ActionButton("add", Assets.ICON_PLUS_32PX, ACTION_COMMAND_ADD),
+				new MainLoggerWindow.ActionButton("export-printer", Assets.ICON_PRINT_32PX, ACTION_COMMAND_EXPORT_TO_PRINTER),
+				new MainLoggerWindow.ActionButton("export-pdf", Assets.ICON_FILE_PDF_32PX, ACTION_COMMAND_EXPORT_TO_PDF) //
+		));
+	}
+	
+	/** @return A {@link List list} of {@link JButton button}s that will be used to fill the "Model Actions" section. */
+	protected List<JButton> getModelActionButtons() {
+		return createButtonList(Arrays.asList(
+				new MainLoggerWindow.ActionButton("items", Assets.ICON_NEW_PRODUCT_32PX, ACTION_COMMAND_DISPLAY_ITEMS),
+				new MainLoggerWindow.ActionButton("persons", Assets.ICON_USER_MEN_32PX, ACTION_COMMAND_DISPLAY_PERSONS),
+				new MainLoggerWindow.ActionButton("construction-sites", Assets.ICON_IN_CONSTRUCTION_32PX, ACTION_COMMAND_DISPLAY_CONSTRUCTION_SITES),
+				new MainLoggerWindow.ActionButton("history", Assets.ICON_HISTORY_32PX, ACTION_COMMAND_DISPLAY_HISTORY) //
+		));
+	}
+	
+	/**
+	 * Create an {@link List list} of maximized {@link JButton} from {@link ActionButton} data.
+	 * 
+	 * @param actionButtons
+	 *            {@link List} of {@link ActionButton}.
+	 * @return A {@link List list} of maximized {@link JButton}.
+	 */
+	protected List<JButton> createButtonList(List<MainLoggerWindow.ActionButton> actionButtons) {
 		List<JButton> buttons = new ArrayList<>();
 		
-		Arrays.asList(
-				new ActionButton("add", Assets.ICON_PLUS_32PX, ACTION_COMMAND_ADD),
-				new ActionButton("items", Assets.ICON_NEW_PRODUCT_32PX, ACTION_COMMAND_DISPLAY_ITEMS),
-				new ActionButton("persons", Assets.ICON_USER_MEN_32PX, ACTION_COMMAND_DISPLAY_PERSONS),
-				new ActionButton("construction-sites", Assets.ICON_IN_CONSTRUCTION_32PX, ACTION_COMMAND_DISPLAY_CONSTRUCTION_SITES),
-				new ActionButton("history", Assets.ICON_HISTORY_32PX, ACTION_COMMAND_DISPLAY_HISTORY),
-				new ActionButton("export-printer", Assets.ICON_PRINT_32PX, ACTION_COMMAND_EXPORT_TO_PRINTER),
-				new ActionButton("export-pdf", Assets.ICON_FILE_PDF_32PX, ACTION_COMMAND_EXPORT_TO_PDF) //
-		).forEach((actionButton) -> buttons.add(actionButton.toJButton(this)));
+		actionButtons.forEach((actionButton) -> {
+			JButton jButton = actionButton.toJButton(this);
+			jButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, jButton.getMinimumSize().height));
+			
+			buttons.add(jButton);
+		});
 		
 		return buttons;
 	}
