@@ -36,6 +36,8 @@ import caceresenzo.apps.itemlogger.models.ConstructionSite;
 import caceresenzo.apps.itemlogger.models.HistoryEntry;
 import caceresenzo.apps.itemlogger.models.Item;
 import caceresenzo.apps.itemlogger.models.Person;
+import caceresenzo.apps.itemlogger.ui.export.implementations.ExportToPdfDialog;
+import caceresenzo.apps.itemlogger.ui.export.implementations.ExportToPrinterDialog;
 import caceresenzo.apps.itemlogger.ui.models.DatabaseEntryTableModel;
 import caceresenzo.libs.internationalization.i18n;
 
@@ -51,6 +53,7 @@ public class MainLoggerWindow implements ActionListener {
 	public static final String ACTION_COMMAND_DISPLAY_CONSTRUCTION_SITES = "action_display_construction_sites";
 	public static final String ACTION_COMMAND_DISPLAY_HISTORY = "action_display_history";
 	public static final String ACTION_COMMAND_EXPORT_TO_PDF = "action_export_to_pdf";
+	public static final String ACTION_COMMAND_EXPORT_TO_PRINTER = "action_export_to_printer";
 	
 	/* UI */
 	private JFrame frame;
@@ -71,7 +74,7 @@ public class MainLoggerWindow implements ActionListener {
 	/** Initialize the contents of the frame. */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setSize(800, 500);
+		frame.setSize(900, 700);
 		frame.setMinimumSize(frame.getSize());
 		frame.setLocationRelativeTo(null);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -262,6 +265,11 @@ public class MainLoggerWindow implements ActionListener {
 				break;
 			}
 			
+			case ACTION_COMMAND_EXPORT_TO_PRINTER: {
+				ExportToPrinterDialog.open(frame);
+				break;
+			}
+			
 			default: {
 				throw new IllegalStateException("Unknown action command: " + actionCommand);
 			}
@@ -278,6 +286,7 @@ public class MainLoggerWindow implements ActionListener {
 				new ActionButton("persons", Assets.ICON_USER_MEN_32PX, ACTION_COMMAND_DISPLAY_PERSONS),
 				new ActionButton("construction-sites", Assets.ICON_IN_CONSTRUCTION_32PX, ACTION_COMMAND_DISPLAY_CONSTRUCTION_SITES),
 				new ActionButton("history", Assets.ICON_HISTORY_32PX, ACTION_COMMAND_DISPLAY_HISTORY),
+				new ActionButton("export-printer", Assets.ICON_PRINT_32PX, ACTION_COMMAND_EXPORT_TO_PRINTER),
 				new ActionButton("export-pdf", Assets.ICON_FILE_PDF_32PX, ACTION_COMMAND_EXPORT_TO_PDF) //
 		).forEach((actionButton) -> buttons.add(actionButton.toJButton(this)));
 		

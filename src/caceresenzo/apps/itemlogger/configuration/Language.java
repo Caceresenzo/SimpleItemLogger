@@ -54,6 +54,7 @@ public class Language {
 			o("logger.button.action.persons", "Personnes");
 			o("logger.button.action.construction-sites", "Chantiers");
 			o("logger.button.action.history", "Historique");
+			o("logger.button.action.export-printer", "Impression");
 			o("logger.button.action.export-pdf", "Exporter en PDF");
 			
 			o("logger.table.column.id", "ID");
@@ -84,12 +85,16 @@ public class Language {
 			o("create-dialog.error.dialog.title", "Champs manquant");
 			o("create-dialog.error.dialog.message", "Certains champs sont manquants ou n'ont pas été traités correctement.\nSi vous pensez que tout est correct, et que ce n'est pas un bug, contactez le développeur.\n\nDétails:\n    - Champs : \"%s\"\n    - Erreur : %s");
 			
-			o("export-dialog.window.title", "Exporter vers un PDF");
+			o("export-dialog.pdf.window.title", "Exporter vers un PDF");
+			o("export-dialog.print.window.title", "Impression");
 			o("export-dialog.file-chooser.title", "Selectionner le fichier de destination...");
 			o("export-dialog.panel.settings.title", "Paramètres");
 			o("export-dialog.panel.file.title", "Fichier");
+			o("export-dialog.panel.print.title", "Imprimante");
 			o("export-dialog.button.browse", "Explorer...");
-			o("export-dialog.button.do-export", "Exporter");
+			o("export-dialog.button.choose", "Choisir...");
+			o("export-dialog.pdf.button.do-export", "Exporter");
+			o("export-dialog.print.button.do-export", "Imprimer");
 			o("export-dialog.button.cancel", "Annuler");
 			o("export-dialog.button.toggle.enabled", "ACTIVÉ");
 			o("export-dialog.button.toggle.disabled", "DÉSACTIVÉ");

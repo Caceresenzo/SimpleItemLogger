@@ -1,12 +1,10 @@
-package caceresenzo.apps.itemlogger.ui;
+package caceresenzo.apps.itemlogger.ui.export;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.FileDialog;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,8 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import caceresenzo.apps.itemlogger.configuration.Constants;
-import caceresenzo.apps.itemlogger.export.DataExporter;
-import caceresenzo.apps.itemlogger.export.pdf.PdfDataExporter;
 import caceresenzo.apps.itemlogger.managers.DataManager;
 import caceresenzo.apps.itemlogger.ui.part.ExportSettingPanel;
 import caceresenzo.apps.itemlogger.utils.Utils;
@@ -40,13 +36,11 @@ import caceresenzo.frameworks.database.binder.BindableTable;
 import caceresenzo.frameworks.database.setup.TableCreator;
 import caceresenzo.frameworks.settings.SettingEntry;
 import caceresenzo.libs.internationalization.i18n;
-import caceresenzo.libs.os.OS;
-import caceresenzo.libs.os.OSUtils;
 
-public class ExportToPdfDialog extends JDialog implements Constants, ActionListener {
+public abstract class AbstractExportToDialog extends JDialog implements Constants, ActionListener {
 	
 	/* Logger */
-	private static Logger LOGGER = LoggerFactory.getLogger(ExportToPdfDialog.class);
+	private static Logger LOGGER = LoggerFactory.getLogger(AbstractExportToDialog.class);
 	
 	/* Action Commands */
 	public static final String ACTION_COMMAND_BROWSE_FILE = "action_browse";
@@ -55,24 +49,21 @@ public class ExportToPdfDialog extends JDialog implements Constants, ActionListe
 	public static final String ACTION_COMMAND_CLOSE = "action_close";
 	
 	/* UI */
-	private final JPanel contentPanel;
-	private JPanel settingListPanel, filePanel, buttonPane;
-	private JScrollPane settingListScrollPane;
-	private JTextField filePathTextField;
-	private JButton browseButton, doExportButton, cancelButton;
-	
-	/* Variables */
-	private File targetFile;
+	protected final JPanel contentPanel;
+	protected JPanel settingListPanel, filePanel, buttonPane;
+	protected JScrollPane settingListScrollPane;
+	protected JTextField exportPathTextField;
+	protected JButton browseButton, doExportButton, cancelButton;
 	
 	/* Constructor */
-	public ExportToPdfDialog(JFrame parent) {
+	public AbstractExportToDialog(JFrame parent, AbstractExportToDialog.ExportMode exportMode) {
 		super(parent);
 		
 		this.contentPanel = new JPanel();
 		
 		setSize(700, 500);
 		setModal(true);
-		setTitle(i18n.string("export-dialog.window.title"));
+		setTitle(i18n.string(exportMode.getWindowTitleKey()));
 		setMinimumSize(getSize());
 		setLocationRelativeTo(null);
 		setResizable(true);
@@ -83,7 +74,7 @@ public class ExportToPdfDialog extends JDialog implements Constants, ActionListe
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		
 		filePanel = new JPanel();
-		filePanel.setBorder(new TitledBorder(null, i18n.string("export-dialog.panel.file.title"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		filePanel.setBorder(new TitledBorder(null, i18n.string(exportMode.getPathPanelKey()), TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
 		settingListScrollPane = new JScrollPane();
 		settingListScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -113,17 +104,17 @@ public class ExportToPdfDialog extends JDialog implements Constants, ActionListe
 		settingListScrollPane.setViewportView(settingListPanel);
 		settingListPanel.setLayout(new BoxLayout(settingListPanel, BoxLayout.Y_AXIS));
 		
-		filePathTextField = new JTextField();
-		filePathTextField.setEditable(false);
+		exportPathTextField = new JTextField();
+		exportPathTextField.setEditable(false);
 		
-		browseButton = new JButton(i18n.string("export-dialog.button.browse"));
+		browseButton = new JButton(i18n.string(exportMode.getBrowseKey()));
 		browseButton.setActionCommand(ACTION_COMMAND_BROWSE_FILE);
 		GroupLayout gl_filePanel = new GroupLayout(filePanel);
 		gl_filePanel.setHorizontalGroup(
 				gl_filePanel.createParallelGroup(Alignment.LEADING)
 						.addGroup(Alignment.TRAILING, gl_filePanel.createSequentialGroup()
 								.addContainerGap()
-								.addComponent(filePathTextField, GroupLayout.DEFAULT_SIZE, 508, Short.MAX_VALUE)
+								.addComponent(exportPathTextField, GroupLayout.DEFAULT_SIZE, 508, Short.MAX_VALUE)
 								.addPreferredGap(ComponentPlacement.RELATED)
 								.addComponent(browseButton, GroupLayout.PREFERRED_SIZE, 108, GroupLayout.PREFERRED_SIZE)
 								.addContainerGap()));
@@ -132,7 +123,7 @@ public class ExportToPdfDialog extends JDialog implements Constants, ActionListe
 						.addGroup(Alignment.TRAILING, gl_filePanel.createSequentialGroup()
 								.addContainerGap()
 								.addGroup(gl_filePanel.createParallelGroup(Alignment.BASELINE)
-										.addComponent(filePathTextField, GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
+										.addComponent(exportPathTextField, GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
 										.addComponent(browseButton, GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE))
 								.addContainerGap()));
 		filePanel.setLayout(gl_filePanel);
@@ -143,7 +134,7 @@ public class ExportToPdfDialog extends JDialog implements Constants, ActionListe
 		buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		getContentPane().add(buttonPane, BorderLayout.SOUTH);
 		
-		doExportButton = new JButton(i18n.string("export-dialog.button.do-export"));
+		doExportButton = new JButton(i18n.string(exportMode.getDoExportKey()));
 		doExportButton.setEnabled(false);
 		doExportButton.setActionCommand(ACTION_COMMAND_DO_EXPORT);
 		
@@ -174,25 +165,29 @@ public class ExportToPdfDialog extends JDialog implements Constants, ActionListe
 		});
 	}
 	
-	/** Open the file selector and update the file path text field's text with the selected file's path. */
-	private void openFileSelector() {
-		FileDialog fileDialog = new FileDialog(this, i18n.string("export-dialog.file-chooser.title"), FileDialog.SAVE);
-		fileDialog.setLocationRelativeTo(null);
-		fileDialog.setFile("*." + PDF_EXTENSION);
-		fileDialog.setVisible(true);
-		
-		String directory = fileDialog.getDirectory();
-		String filename = fileDialog.getFile();
-		if (directory != null && filename != null) {
-			if (!filename.endsWith("." + PDF_EXTENSION)) {
-				filename += "." + PDF_EXTENSION;
-			}
-			
-			targetFile = new File(directory, filename);
-			filePathTextField.setText(targetFile.getAbsolutePath());
-			doExportButton.setEnabled(true);
-			browseButton.transferFocus();
-		}
+	/** Called when the "browse" button has been clicked. */
+	protected abstract void handleBrowse();
+	
+	/**
+	 * Called when the user want to do the export.
+	 * 
+	 * @param settingEntries
+	 *            Settings for the export.
+	 * @throws Exception
+	 *             If anything goes wrong.
+	 */
+	protected abstract void handleExport(List<SettingEntry<Boolean>> settingEntries) throws Exception;
+	
+	/**
+	 * Update the path text field and transfer the focus to the do export button.
+	 * 
+	 * @param text
+	 *            Text to set to the path text field.
+	 */
+	protected void updatePathTextField(String text) {
+		exportPathTextField.setText(text);
+		doExportButton.setEnabled(true);
+		browseButton.transferFocus();
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -202,13 +197,11 @@ public class ExportToPdfDialog extends JDialog implements Constants, ActionListe
 		
 		switch (actionCommand) {
 			case ACTION_COMMAND_BROWSE_FILE: {
-				openFileSelector();
+				handleBrowse();
 				break;
 			}
 			
 			case ACTION_COMMAND_DO_EXPORT: {
-				DataExporter dataExporter = new PdfDataExporter();
-				
 				List<SettingEntry<Boolean>> settingEntries = new ArrayList<>();
 				int enabledCount = 0;
 				
@@ -229,16 +222,7 @@ public class ExportToPdfDialog extends JDialog implements Constants, ActionListe
 					JOptionPane.showMessageDialog(this, i18n.string("export-dialog.dialog.error.nothing-enabled.message"), i18n.string("export-dialog.dialog.error.nothing-enabled.title"), JOptionPane.ERROR_MESSAGE);
 				} else {
 					try {
-						dataExporter.exportToFile(settingEntries, targetFile);
-						
-						if (OSUtils.checkOSType().equals(OS.WINDOWS)) {
-							String absolutePath = targetFile.getAbsolutePath();
-							int reply = JOptionPane.showConfirmDialog(this, i18n.string("export-dialog.dialog.open-file.message", absolutePath), i18n.string("export-dialog.dialog.open-file.title"), JOptionPane.YES_NO_OPTION);
-							
-							if (reply == JOptionPane.YES_OPTION) {
-								Runtime.getRuntime().exec("cmd /c \"" + absolutePath + "\"");
-							}
-						}
+						handleExport(settingEntries);
 						
 						actionPerformed(new ActionEvent(this, 0, ACTION_COMMAND_CLOSE));
 					} catch (Exception exception) {
@@ -263,16 +247,42 @@ public class ExportToPdfDialog extends JDialog implements Constants, ActionListe
 		}
 	}
 	
-	/**
-	 * Open a new {@link ExportToPdfDialog} instance.
-	 * 
-	 * @param parent
-	 *            Parent {@link JFrame}.
-	 */
-	public static void open(JFrame parent) {
-		ExportToPdfDialog dialog = new ExportToPdfDialog(parent);
+	public enum ExportMode {
 		
-		dialog.setVisible(true);
+		PDF("export-dialog.pdf.window.title", "export-dialog.panel.file.title", "export-dialog.button.browse", "export-dialog.pdf.button.do-export"), //
+		PRINTER("export-dialog.print.window.title", "export-dialog.panel.print.title", "export-dialog.button.choose", "export-dialog.print.button.do-export");
+		
+		/* Translations */
+		private final String windowTitleKey, pathPanelKey, browseKey, doExportKey;
+		
+		/* Constructor */
+		private ExportMode(String windowTitleKey, String pathPanelKey, String browseKey, String doExportKey) {
+			this.windowTitleKey = windowTitleKey;
+			this.pathPanelKey = pathPanelKey;
+			this.browseKey = browseKey;
+			this.doExportKey = doExportKey;
+		}
+		
+		/** @return Translation's key for the window's title of this {@link ExportMode}. */
+		public String getWindowTitleKey() {
+			return windowTitleKey;
+		}
+		
+		/** @return Translation's key for the path panel of this {@link ExportMode}. */
+		public String getPathPanelKey() {
+			return pathPanelKey;
+		}
+		
+		/** @return Translation's key for the browse button of this {@link ExportMode}. */
+		public String getBrowseKey() {
+			return browseKey;
+		}
+		
+		/** @return Translation's key for the do export button of this {@link ExportMode}. */
+		public String getDoExportKey() {
+			return doExportKey;
+		}
+		
 	}
 	
 }
