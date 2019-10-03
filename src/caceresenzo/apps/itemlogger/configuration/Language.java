@@ -75,6 +75,7 @@ public class Language {
 			o("logger.table.column.actions.button.remove", "SUPPRIMER");
 			o("logger.table.column.actions.button.remove.confirm-dialog.title", "Confirmation de suppression");
 			o("logger.table.column.actions.button.remove.confirm-dialog.message", "Attention : Cette action n'est pas reversible !\nÊtes-vous sur de vouloir supprimer cette ligne ?");
+			o("logger.table.column.actions.button.history-entry.return", "RETOURNER");
 			
 			o("create-dialog.window.title", "Ajout d'une ligne");
 			o("create-dialog.frame.new-line-part", "Nouvelle ligne — %s");
@@ -84,6 +85,16 @@ public class Language {
 			o("create-dialog.combobox.default.select-an-item", "Selectionner un élément");
 			o("create-dialog.error.dialog.title", "Champs manquant");
 			o("create-dialog.error.dialog.message", "Certains champs sont manquants ou n'ont pas été traités correctement.\nSi vous pensez que tout est correct, et que ce n'est pas un bug, contactez le développeur.\n\nDétails:\n    - Champs : \"%s\"\n    - Erreur : %s");
+
+			o("history-return-dialog.window.title", "Édition d'un retour");
+			o("history-return-dialog.panel.return", "Retour");
+			o("history-return-dialog.panel.quantity", "Quantité");
+			o("history-return-dialog.panel.date", "Date");
+			o("history-return-dialog.panel.settings", "Paramètres");
+			o("history-return-dialog.button.validate", "Valider");
+			o("history-return-dialog.button.cancel", "Annuler");
+			o("history-return-dialog.checkbox.add-default-extra-message", "Ajouter un commentaire par défaut.");
+			o("history-return-dialog.devise.extra.message", "Reste a rendre d'un autre");
 			
 			o("export-dialog.pdf.window.title", "Exporter vers un PDF");
 			o("export-dialog.print.window.title", "Impression");

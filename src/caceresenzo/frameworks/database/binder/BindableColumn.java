@@ -54,15 +54,19 @@ public class BindableColumn {
 	 * @return Found {@link BindableColumn} or <code>null</code> if not found.
 	 */
 	public static BindableColumn findIdColumn(List<BindableColumn> bindableColumns) {
+		return findColumn(bindableColumns, DatabaseTableColumn.COLUMN_ID);
+	}
+	
+	public static BindableColumn findColumn(List<BindableColumn> bindableColumns, String columnName) {
 		for (BindableColumn bindableColumn : bindableColumns) {
-			if (bindableColumn.getColumnName().equals(DatabaseTableColumn.COLUMN_ID)) {
+			if (bindableColumn.getColumnName().equals(columnName)) {
 				return bindableColumn;
 			}
 		}
 		
 		return null;
 	}
-
+	
 	public static void removeAutomatable(List<BindableColumn> bindableColumns) {
 		Iterator<BindableColumn> iterator = bindableColumns.listIterator();
 		

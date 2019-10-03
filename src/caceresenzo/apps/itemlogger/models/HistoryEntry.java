@@ -14,7 +14,7 @@ public class HistoryEntry implements IDatabaseEntry {
 	public static final String COLUMN_PERSON = "person";
 	public static final String COLUMN_ITEM = "item";
 	public static final String COLUMN_QUANTITY = "quantity";
-	public static final String COLUMN_LEND_CONSTRUCTION_SITE = "construction_site";
+	public static final String COLUMN_CONSTRUCTION_SITE = "construction_site";
 	public static final String COLUMN_LEND_DATE = "lend";
 	public static final String COLUMN_RETURN_DATE = "return";
 	public static final String COLUMN_EXTRA = "extra";
@@ -28,7 +28,7 @@ public class HistoryEntry implements IDatabaseEntry {
 	private Person person;
 	@DatabaseTableColumn(COLUMN_QUANTITY)
 	private int quantity;
-	@DatabaseTableColumn(value = COLUMN_LEND_CONSTRUCTION_SITE, isReference = true)
+	@DatabaseTableColumn(value = COLUMN_CONSTRUCTION_SITE, isReference = true)
 	private ConstructionSite constructionSite;
 	@DatabaseTableColumn(COLUMN_LEND_DATE)
 	private LocalDate lendDate;
@@ -39,14 +39,15 @@ public class HistoryEntry implements IDatabaseEntry {
 	
 	/* Constructor */
 	public HistoryEntry() {
-		this(0, null, null, null, null, null, null);
+		this(0, null, null, 0, null, null, null, null);
 	}
 	
 	/* Constructor */
-	public HistoryEntry(int id, Person person, Item item, ConstructionSite constructionSite, LocalDate lendDate, LocalDate returnDate, String extra) {
+	public HistoryEntry(int id, Item item, Person person, int quantity, ConstructionSite constructionSite, LocalDate lendDate, LocalDate returnDate, String extra) {
 		this.id = id;
-		this.person = person;
 		this.item = item;
+		this.person = person;
+		this.quantity = quantity;
 		this.constructionSite = constructionSite;
 		this.lendDate = lendDate;
 		this.returnDate = returnDate;
@@ -58,14 +59,19 @@ public class HistoryEntry implements IDatabaseEntry {
 		return id;
 	}
 	
+	/** @return History entry's target item. */
+	public Item getItem() {
+		return item;
+	}
+	
 	/** @return History entry's target person. */
 	public Person getPerson() {
 		return person;
 	}
 	
-	/** @return History entry's target item. */
-	public Item getItem() {
-		return item;
+	/** @return How much of {@link #getItem() item} has been borrow in this history entry. */
+	public int getQuantity() {
+		return quantity;
 	}
 	
 	/** @return History entry's target construction site. */
@@ -96,6 +102,19 @@ public class HistoryEntry implements IDatabaseEntry {
 	@Override
 	public String describeSimply() {
 		throw new UnsupportedOperationException();
+	}
+	
+	public HistoryEntry devise(int quantityToRemove) {
+		quantityToRemove = Math.min(Math.max(quantityToRemove, 0), quantity);
+		
+		if (quantity != quantityToRemove) {
+			int remaining = quantity - quantityToRemove;
+			quantity = quantityToRemove;
+			
+			return new HistoryEntry(id, item, person, remaining, constructionSite, lendDate, returnDate, extra);
+		}
+		
+		return null;
 	}
 	
 	@Override

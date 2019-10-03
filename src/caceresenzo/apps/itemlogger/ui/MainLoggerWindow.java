@@ -39,10 +39,13 @@ import caceresenzo.apps.itemlogger.models.Item;
 import caceresenzo.apps.itemlogger.models.Person;
 import caceresenzo.apps.itemlogger.ui.export.implementations.ExportToPdfDialog;
 import caceresenzo.apps.itemlogger.ui.export.implementations.ExportToPrinterDialog;
+import caceresenzo.apps.itemlogger.ui.history.HistoryReturnDialog;
 import caceresenzo.apps.itemlogger.ui.models.DatabaseEntryTableModel;
+import caceresenzo.frameworks.database.IDatabaseEntry;
+import caceresenzo.frameworks.database.synchronization.DatabaseSynchronizer;
 import caceresenzo.libs.internationalization.i18n;
 
-public class MainLoggerWindow implements ActionListener {
+public class MainLoggerWindow implements ActionListener, DatabaseEntryTableModel.Callback<IDatabaseEntry>, HistoryReturnDialog.Callback {
 	
 	/* Logger */
 	private static Logger LOGGER = LoggerFactory.getLogger(MainLoggerWindow.class);
@@ -55,6 +58,7 @@ public class MainLoggerWindow implements ActionListener {
 	public static final String ACTION_COMMAND_DISPLAY_HISTORY = "action_display_history";
 	public static final String ACTION_COMMAND_EXPORT_TO_PDF = "action_export_to_pdf";
 	public static final String ACTION_COMMAND_EXPORT_TO_PRINTER = "action_export_to_printer";
+	public static final String ACTION_COMMAND_TABLE_ACTION_RETURN_ITEM = "action_table_action_return_item";
 	
 	/* UI */
 	private JFrame frame;
@@ -214,7 +218,7 @@ public class MainLoggerWindow implements ActionListener {
 	private void changeModel(Class<?> newClassModel, List<JButton> rowActionButtons) {
 		SearchManager.get().clearSearch(false);
 		
-		DatabaseEntryTableModel model = new DatabaseEntryTableModel(dataTable, currentDisplayedModelClass = newClassModel, new ArrayList<>(), rowActionButtons);
+		DatabaseEntryTableModel model = new DatabaseEntryTableModel(dataTable, currentDisplayedModelClass = newClassModel, new ArrayList<>(), rowActionButtons, this);
 		
 		((TitledBorder) dataPanel.getBorder()).setTitle(i18n.string("logger.panel.data.title.with", i18n.string(String.format("logger.panel.data.title.with.part.%s", newClassModel.getSimpleName().toLowerCase()))));
 		dataPanel.repaint();
@@ -243,6 +247,7 @@ public class MainLoggerWindow implements ActionListener {
 			case ACTION_COMMAND_DISPLAY_CONSTRUCTION_SITES:
 			case ACTION_COMMAND_DISPLAY_HISTORY: {
 				Class<?> newModelClass;
+				List<JButton> tableActionButtons = null;
 				
 				switch (actionCommand) {
 					case ACTION_COMMAND_DISPLAY_ITEMS:
@@ -263,11 +268,16 @@ public class MainLoggerWindow implements ActionListener {
 					
 					case ACTION_COMMAND_DISPLAY_HISTORY: {
 						newModelClass = HistoryEntry.class;
+						
+						JButton button = new JButton(i18n.string("logger.table.column.actions.button.history-entry.return"));
+						button.setActionCommand(ACTION_COMMAND_TABLE_ACTION_RETURN_ITEM);
+						
+						tableActionButtons = Arrays.asList(button);
 						break;
 					}
 				}
 				
-				changeModel(newModelClass, null);
+				changeModel(newModelClass, tableActionButtons);
 				break;
 			}
 			
@@ -285,6 +295,39 @@ public class MainLoggerWindow implements ActionListener {
 				throw new IllegalStateException("Unknown action command: " + actionCommand);
 			}
 		}
+	}
+	
+	@Override
+	public void onTableActionClick(JTable table, DatabaseEntryTableModel<IDatabaseEntry> tableClass, List<IDatabaseEntry> entries, int row, String action) {
+		switch (action) {
+			case ACTION_COMMAND_TABLE_ACTION_RETURN_ITEM: {
+				if (!HistoryEntry.class.equals(currentDisplayedModelClass)) {
+					throw new IllegalArgumentException("Cannot handle the return item action with a different model class than " + HistoryEntry.class.getSimpleName() + ".");
+				}
+				
+				HistoryEntry historyEntry = (HistoryEntry) entries.get(row);
+				
+				HistoryReturnDialog.open(frame, historyEntry, this);
+				break;
+			}
+			
+			default: {
+				throw new IllegalStateException("Unknown table action: " + action);
+			}
+		}
+	}
+	
+	@Override
+	public void onValidatedHistoryItem(HistoryEntry originalHistoryEntry, HistoryEntry remainingHistoryEntry) {
+		DatabaseSynchronizer databaseSynchronizer = DataManager.get().getDatabaseSynchronizer();
+		
+		databaseSynchronizer.update(HistoryEntry.class, originalHistoryEntry);
+		
+		if (remainingHistoryEntry != null) {
+			databaseSynchronizer.insert(HistoryEntry.class, remainingHistoryEntry);
+		}
+		
+		((DatabaseEntryTableModel<?>) dataTable.getModel()).synchronize();
 	}
 	
 	/** @return A {@link List list} of {@link JButton button}s that will be used to fill the "Actions" section. */

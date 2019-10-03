@@ -52,7 +52,7 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 	private final Class<T> modelClass;
 	private final List<T> entries;
 	private final List<JButton> rowActionButtons;
-	private Callback<T> actionCallback;
+	private DatabaseEntryTableModel.Callback<T> actionCallback;
 	
 	/* Update */
 	private DatabaseSynchronizer synchronizer;
@@ -65,15 +65,16 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 	
 	/* Constructor */
 	public DatabaseEntryTableModel(JTable table, Class<T> modelClass, List<T> databaseEntries) {
-		this(table, modelClass, databaseEntries, null);
+		this(table, modelClass, databaseEntries, null, null);
 	}
 	
 	/* Constructor */
-	public DatabaseEntryTableModel(JTable table, Class<T> modelClass, List<T> databaseEntries, List<JButton> rowActionButtons) {
+	public DatabaseEntryTableModel(JTable table, Class<T> modelClass, List<T> databaseEntries, List<JButton> rowActionButtons, DatabaseEntryTableModel.Callback<T> actionCallback) {
 		this.table = table;
 		this.modelClass = modelClass;
 		this.entries = databaseEntries;
-		this.rowActionButtons = rowActionButtons == null ? new ArrayList<>() : rowActionButtons;
+		this.rowActionButtons = rowActionButtons == null ? new ArrayList<>() : new ArrayList<>(rowActionButtons);
+		this.actionCallback = actionCallback;
 		
 		this.synchronizer = DataManager.get().getDatabaseSynchronizer();
 		
@@ -94,9 +95,9 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 			rowActionButtons.add(removeRowButton);
 			
 			final Callback<T> oldActionCallback = actionCallback;
-			actionCallback = new Callback<T>() {
+			actionCallback = new DatabaseEntryTableModel.Callback<T>() {
 				@Override
-				public void openActionClick(JTable table, DatabaseEntryTableModel<T> tableModel, List<T> entries, int row, String action) {
+				public void onTableActionClick(JTable table, DatabaseEntryTableModel<T> tableModel, List<T> entries, int row, String action) {
 					switch (action) {
 						case ACTION_COMMAND_REMOVE_ROW: {
 							int reply = JOptionPane.showConfirmDialog(table, i18n.string("logger.table.column.actions.button.remove.confirm-dialog.message"), i18n.string("logger.table.column.actions.button.remove.confirm-dialog.title"), JOptionPane.YES_NO_OPTION);
@@ -114,7 +115,7 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 						
 						default: {
 							if (oldActionCallback != null) {
-								oldActionCallback.openActionClick(table, tableModel, entries, row, action);
+								oldActionCallback.onTableActionClick(table, tableModel, entries, row, action);
 							}
 						}
 					}
@@ -316,7 +317,7 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
 		if (isActionColumn(columnIndex)) {
 			if (actionCallback != null) {
-				actionCallback.openActionClick(table, this, entries, rowIndex, (String) aValue);
+				actionCallback.onTableActionClick(table, this, entries, rowIndex, (String) aValue);
 			}
 		} else {
 			T row = entries.get(rowIndex);
@@ -351,16 +352,6 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 		return index == getActionColumnIndex();
 	}
 	
-	/**
-	 * Set the action callback.
-	 * 
-	 * @param actionCallback
-	 *            Callback instance.
-	 */
-	public void setActionCallback(Callback<T> actionCallback) {
-		this.actionCallback = actionCallback;
-	}
-	
 	/** @return Source {@link JTable}. */
 	public JTable getTable() {
 		return table;
@@ -387,7 +378,7 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 		 * @param action
 		 *            {@link JButton} action command.
 		 */
-		void openActionClick(JTable table, DatabaseEntryTableModel<T> tableClass, List<T> entries, int row, String action);
+		void onTableActionClick(JTable table, DatabaseEntryTableModel<T> tableClass, List<T> entries, int row, String action);
 		
 	}
 	
