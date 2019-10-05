@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.DefaultCellEditor;
@@ -22,6 +23,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
+import caceresenzo.apps.itemlogger.configuration.Config;
 import caceresenzo.apps.itemlogger.managers.DataManager;
 import caceresenzo.apps.itemlogger.ui.models.combobox.DatabaseEntryComboBoxCellEditor;
 import caceresenzo.apps.itemlogger.ui.models.combobox.DatabaseEntryComboBoxCellRenderer;
@@ -214,6 +216,10 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 		SwingUtilities.invokeLater(() -> {
 			this.entries.clear();
 			this.entries.addAll(synchronizer.load(modelClass));
+			
+			if (Config.TABLE_DATE_REVERSE) {
+				Collections.reverse(this.entries);
+			}
 			
 			fireTableDataChanged();
 		});

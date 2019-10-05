@@ -18,6 +18,9 @@ public class Config extends Configuration {
 	@ConfigProperty(defaultValue = "itemlogger.db", type = ConfigProperty.PropertyType.STRING, file = "config", key = "database.file")
 	public static String SQLITE_PATH;
 	
+	@ConfigProperty(defaultValue = "true", type = ConfigProperty.PropertyType.BOOLEAN, file = "config", key = "table.data.reverse")
+	public static boolean TABLE_DATE_REVERSE;
+	
 	/** @return Config's singleton instance. */
 	public static final Config get() {
 		if (INSTANCE == null) {
