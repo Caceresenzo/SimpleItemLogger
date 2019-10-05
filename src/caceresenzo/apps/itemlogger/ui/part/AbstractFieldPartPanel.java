@@ -17,7 +17,7 @@ import javax.swing.border.TitledBorder;
 import caceresenzo.apps.itemlogger.ui.part.implementations.LocalDateFieldPartPanel;
 import caceresenzo.apps.itemlogger.ui.part.implementations.ModelSelectionFieldPartPanel;
 import caceresenzo.apps.itemlogger.ui.part.implementations.NumberFieldPartPanel;
-import caceresenzo.apps.itemlogger.ui.part.implementations.TextFieldPartPanel;
+import caceresenzo.apps.itemlogger.ui.part.implementations.StringFieldPartPanel;
 import caceresenzo.frameworks.database.IDatabaseEntry;
 import caceresenzo.frameworks.database.annotations.DatabaseTableColumn;
 import caceresenzo.frameworks.database.binder.BindableColumn;
@@ -126,7 +126,7 @@ public abstract class AbstractFieldPartPanel<T> extends JPanel {
 		Class<? extends AbstractFieldPartPanel<?>> clazz;
 		
 		if (columnClass == String.class) {
-			clazz = TextFieldPartPanel.class;
+			clazz = StringFieldPartPanel.class;
 		} else if (columnClass == int.class || columnClass == Integer.class) {
 			clazz = NumberFieldPartPanel.class;
 		} else if (columnClass == LocalDate.class) {

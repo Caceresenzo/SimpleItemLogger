@@ -19,6 +19,7 @@ import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -242,7 +243,7 @@ public class HistoryReturnDialog extends JDialog implements ActionListener, Care
 					try {
 						returnBindableColumn.getField().set(historyEntry, returnedDateDatePicker.getDate());
 						
-						remainingHistoryEntry = historyEntry.devise((int) returnedQuantityTextField.getValue());
+						remainingHistoryEntry = historyEntry.split((int) returnedQuantityTextField.getValue());
 						
 						if (remainingHistoryEntry != null) {
 							returnBindableColumn.getField().set(remainingHistoryEntry, (LocalDate) null);
@@ -296,7 +297,8 @@ public class HistoryReturnDialog extends JDialog implements ActionListener, Care
 	}
 	
 	/**
-	 * Open a new {@link HistoryReturnDialog} instance.
+	 * Open a new {@link HistoryReturnDialog} instance.<br>
+	 * But if the {@link HistoryEntry} has already been returned, a dialog will ask to confirm that the user want to do the return.
 	 * 
 	 * @param parent
 	 *            Parent {@link JFrame}.
@@ -306,6 +308,14 @@ public class HistoryReturnDialog extends JDialog implements ActionListener, Care
 	 *            Callback to do action when the dialog is validated.
 	 */
 	public static void open(JFrame parent, HistoryEntry historyEntry, HistoryReturnDialog.Callback callback) {
+		if (historyEntry.getReturnDate() != null) {
+			int reply = JOptionPane.showConfirmDialog(parent, i18n.string("history-return-dialog.dialog.warning-already-return.message"), i18n.string("history-return-dialog.dialog.warning-already-return.title"), JOptionPane.YES_NO_OPTION);
+			
+			if (reply == JOptionPane.NO_OPTION) {
+				return;
+			}
+		}
+		
 		HistoryReturnDialog dialog = new HistoryReturnDialog(parent, historyEntry, callback);
 		
 		dialog.setVisible(true);
@@ -313,11 +323,17 @@ public class HistoryReturnDialog extends JDialog implements ActionListener, Care
 	
 	public interface Callback {
 		
+		/**
+		 * Called when the {@link HistoryReturnDialog} has been validated.
+		 * 
+		 * @param originalHistoryEntry
+		 *            The original {@link HistoryEntry} that has been use to the start the dialog.
+		 * @param remainingHistoryEntry
+		 *            Splited {@link HistoryEntry} created if the returned quantity is not equal to the lend quantity, can be <code>null</code>.
+		 * @see HistoryEntry#split(int) Spliting an HistoryEntry.
+		 */
 		void onValidatedHistoryItem(HistoryEntry originalHistoryEntry, HistoryEntry remainingHistoryEntry);
 		
 	}
 	
-	public JCheckBox getCheckBox() {
-		return addDefaultExtraCheckBox;
-	}
 }

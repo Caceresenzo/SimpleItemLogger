@@ -104,7 +104,16 @@ public class HistoryEntry implements IDatabaseEntry {
 		throw new UnsupportedOperationException();
 	}
 	
-	public HistoryEntry devise(int quantityToRemove) {
+	/**
+	 * "Split" ths history entry to two instance if necessary.<br>
+	 * It means that if the quantity to remove is not equals to the {@link HistoryEntry}'s quantity, then another {@link HistoryEntry} will be created with the difference quantity between the current quantity and the quantity to remove (also call the remaining).<br>
+	 * Otherwise, a <code>null</code> object will be returned.
+	 * 
+	 * @param quantityToRemove
+	 *            Quantity to remove to this {@link HistoryEntry}.
+	 * @return Splited {@link HistoryEntry} or <code>null</code> if there is no need to split.
+	 */
+	public HistoryEntry split(int quantityToRemove) {
 		quantityToRemove = Math.min(Math.max(quantityToRemove, 0), quantity);
 		
 		if (quantity != quantityToRemove) {
@@ -119,7 +128,7 @@ public class HistoryEntry implements IDatabaseEntry {
 	
 	@Override
 	public String toString() {
-		return "HistoryEntry[id=" + id + ", person=" + person + ", item=" + item + ", lendDate=" + lendDate + ", returnDate=" + returnDate + "]";
+		return "HistoryEntry[id=" + id + ", item=" + item + ", person=" + person + ", quantity=" + quantity + ", constructionSite=" + constructionSite + ", lendDate=" + lendDate + ", returnDate=" + returnDate + ", extra=" + extra + "]";
 	}
 	
 }

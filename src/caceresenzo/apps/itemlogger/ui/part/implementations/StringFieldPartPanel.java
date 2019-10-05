@@ -8,10 +8,10 @@ import javax.swing.text.DefaultFormatterFactory;
 import caceresenzo.apps.itemlogger.ui.part.AbstractFormattedFieldPartPanel;
 import caceresenzo.frameworks.database.binder.BindableColumn;
 
-public class TextFieldPartPanel extends AbstractFormattedFieldPartPanel<String> {
+public class StringFieldPartPanel extends AbstractFormattedFieldPartPanel<String> {
 	
 	/* Constructor */
-	public TextFieldPartPanel(Class<?> modelClass, BindableColumn bindableColumn, KeyListener keyListener) {
+	public StringFieldPartPanel(Class<?> modelClass, BindableColumn bindableColumn, KeyListener keyListener) {
 		super(modelClass, bindableColumn, keyListener);
 	}
 	

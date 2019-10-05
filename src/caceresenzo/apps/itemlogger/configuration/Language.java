@@ -95,6 +95,8 @@ public class Language {
 			o("history-return-dialog.button.cancel", "Annuler");
 			o("history-return-dialog.checkbox.add-default-extra-message", "Ajouter un commentaire par défaut.");
 			o("history-return-dialog.devise.extra.message", "Reste a rendre d'un autre");
+			o("history-return-dialog.dialog.warning-already-return.title", "Élément déjà retourné");
+			o("history-return-dialog.dialog.warning-already-return.message", "Cette élément à déjà été retourné, voulez vous quand même enregistrer un retour ?");
 			
 			o("export-dialog.pdf.window.title", "Exporter vers un PDF");
 			o("export-dialog.print.window.title", "Impression");
