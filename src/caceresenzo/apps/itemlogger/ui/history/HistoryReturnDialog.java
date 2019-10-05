@@ -311,7 +311,7 @@ public class HistoryReturnDialog extends JDialog implements ActionListener, Care
 		if (historyEntry.getReturnDate() != null) {
 			int reply = JOptionPane.showConfirmDialog(parent, i18n.string("history-return-dialog.dialog.warning-already-return.message"), i18n.string("history-return-dialog.dialog.warning-already-return.title"), JOptionPane.YES_NO_OPTION);
 			
-			if (reply == JOptionPane.NO_OPTION) {
+			if (reply == JOptionPane.NO_OPTION || reply == JOptionPane.CLOSED_OPTION) {
 				return;
 			}
 		}
