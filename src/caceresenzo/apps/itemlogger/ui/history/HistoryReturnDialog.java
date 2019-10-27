@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 import com.github.lgooddatepicker.components.DatePicker;
 import com.github.lgooddatepicker.components.DatePickerSettings;
 
-import caceresenzo.apps.itemlogger.models.HistoryEntry;
+import caceresenzo.apps.itemlogger.models.LendEntry;
 import caceresenzo.frameworks.database.binder.BindableColumn;
 import caceresenzo.frameworks.database.setup.TableAnalizer;
 import caceresenzo.libs.internationalization.i18n;
@@ -61,12 +61,12 @@ public class HistoryReturnDialog extends JDialog implements ActionListener, Care
 	private JButton validateButton, cancelButton;
 	
 	/* Variables */
-	private final HistoryEntry historyEntry;
+	private final LendEntry historyEntry;
 	private final HistoryReturnDialog.Callback callback;
 	private JCheckBox addDefaultExtraCheckBox;
 	
 	/* Constructor */
-	public HistoryReturnDialog(JFrame parent, HistoryEntry historyEntry, HistoryReturnDialog.Callback callback) {
+	public HistoryReturnDialog(JFrame parent, LendEntry historyEntry, HistoryReturnDialog.Callback callback) {
 		super(parent);
 		
 		this.historyEntry = historyEntry;
@@ -234,12 +234,12 @@ public class HistoryReturnDialog extends JDialog implements ActionListener, Care
 		switch (actionCommand) {
 			case ACTION_COMMAND_VALIDATE: {
 				if (callback != null) {
-					List<BindableColumn> bindableColumns = TableAnalizer.get().analizeColumns(HistoryEntry.class);
+					List<BindableColumn> bindableColumns = TableAnalizer.get().analizeColumns(LendEntry.class);
 					
-					BindableColumn returnBindableColumn = BindableColumn.findColumn(bindableColumns, HistoryEntry.COLUMN_RETURN_DATE);
-					BindableColumn extraBindableColumn = BindableColumn.findColumn(bindableColumns, HistoryEntry.COLUMN_EXTRA);
+					BindableColumn returnBindableColumn = BindableColumn.findColumn(bindableColumns, LendEntry.COLUMN_RETURN_DATE);
+					BindableColumn extraBindableColumn = BindableColumn.findColumn(bindableColumns, LendEntry.COLUMN_EXTRA);
 					
-					HistoryEntry remainingHistoryEntry = null;
+					LendEntry remainingHistoryEntry = null;
 					try {
 						returnBindableColumn.getField().set(historyEntry, returnedDateDatePicker.getDate());
 						
@@ -298,16 +298,16 @@ public class HistoryReturnDialog extends JDialog implements ActionListener, Care
 	
 	/**
 	 * Open a new {@link HistoryReturnDialog} instance.<br>
-	 * But if the {@link HistoryEntry} has already been returned, a dialog will ask to confirm that the user want to do the return.
+	 * But if the {@link LendEntry} has already been returned, a dialog will ask to confirm that the user want to do the return.
 	 * 
 	 * @param parent
 	 *            Parent {@link JFrame}.
 	 * @param historyEntry
-	 *            {@link HistoryEntry} to start with.
+	 *            {@link LendEntry} to start with.
 	 * @param callback
 	 *            Callback to do action when the dialog is validated.
 	 */
-	public static void open(JFrame parent, HistoryEntry historyEntry, HistoryReturnDialog.Callback callback) {
+	public static void open(JFrame parent, LendEntry historyEntry, HistoryReturnDialog.Callback callback) {
 		if (historyEntry.getReturnDate() != null) {
 			int reply = JOptionPane.showConfirmDialog(parent, i18n.string("history-return-dialog.dialog.warning-already-return.message"), i18n.string("history-return-dialog.dialog.warning-already-return.title"), JOptionPane.YES_NO_OPTION);
 			
@@ -327,12 +327,12 @@ public class HistoryReturnDialog extends JDialog implements ActionListener, Care
 		 * Called when the {@link HistoryReturnDialog} has been validated.
 		 * 
 		 * @param originalHistoryEntry
-		 *            The original {@link HistoryEntry} that has been use to the start the dialog.
+		 *            The original {@link LendEntry} that has been use to the start the dialog.
 		 * @param remainingHistoryEntry
-		 *            Splited {@link HistoryEntry} created if the returned quantity is not equal to the lend quantity, can be <code>null</code>.
-		 * @see HistoryEntry#split(int) Spliting an HistoryEntry.
+		 *            Splited {@link LendEntry} created if the returned quantity is not equal to the lend quantity, can be <code>null</code>.
+		 * @see LendEntry#split(int) Spliting an HistoryEntry.
 		 */
-		void onValidatedHistoryItem(HistoryEntry originalHistoryEntry, HistoryEntry remainingHistoryEntry);
+		void onValidatedHistoryItem(LendEntry originalHistoryEntry, LendEntry remainingHistoryEntry);
 		
 	}
 	

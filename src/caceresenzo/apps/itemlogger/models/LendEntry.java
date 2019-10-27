@@ -7,8 +7,8 @@ import caceresenzo.frameworks.database.annotations.DatabaseTable;
 import caceresenzo.frameworks.database.annotations.DatabaseTableColumn;
 import caceresenzo.frameworks.database.setup.sql.SqlTableBuilder;
 
-@DatabaseTable(value = "history_entries", removable = true)
-public class HistoryEntry implements IDatabaseEntry {
+@DatabaseTable("history_entries")
+public class LendEntry implements IDatabaseEntry {
 	
 	/* Database Fields */
 	public static final String COLUMN_PERSON = "person";
@@ -30,20 +30,20 @@ public class HistoryEntry implements IDatabaseEntry {
 	private int quantity;
 	@DatabaseTableColumn(value = COLUMN_CONSTRUCTION_SITE, isReference = true)
 	private ConstructionSite constructionSite;
-	@DatabaseTableColumn(COLUMN_LEND_DATE)
+	@DatabaseTableColumn(value = COLUMN_LEND_DATE, isVisible = false)
 	private LocalDate lendDate;
-	@DatabaseTableColumn(value = COLUMN_RETURN_DATE, flags = SqlTableBuilder.FLAG_NULL)
+	@DatabaseTableColumn(value = COLUMN_RETURN_DATE, flags = SqlTableBuilder.FLAG_NULL, isVisible = false)
 	private LocalDate returnDate;
-	@DatabaseTableColumn(value = COLUMN_EXTRA, flags = SqlTableBuilder.FLAG_NULL)
+	@DatabaseTableColumn(value = COLUMN_EXTRA, flags = SqlTableBuilder.FLAG_NULL, isVisible = false)
 	private String extra;
 	
 	/* Constructor */
-	public HistoryEntry() {
+	public LendEntry() {
 		this(0, null, null, 0, null, null, null, null);
 	}
 	
 	/* Constructor */
-	public HistoryEntry(int id, Item item, Person person, int quantity, ConstructionSite constructionSite, LocalDate lendDate, LocalDate returnDate, String extra) {
+	public LendEntry(int id, Item item, Person person, int quantity, ConstructionSite constructionSite, LocalDate lendDate, LocalDate returnDate, String extra) {
 		this.id = id;
 		this.item = item;
 		this.person = person;
@@ -106,21 +106,21 @@ public class HistoryEntry implements IDatabaseEntry {
 	
 	/**
 	 * "Split" ths history entry to two instance if necessary.<br>
-	 * It means that if the quantity to remove is not equals to the {@link HistoryEntry}'s quantity, then another {@link HistoryEntry} will be created with the difference quantity between the current quantity and the quantity to remove (also call the remaining).<br>
+	 * It means that if the quantity to remove is not equals to the {@link LendEntry}'s quantity, then another {@link LendEntry} will be created with the difference quantity between the current quantity and the quantity to remove (also call the remaining).<br>
 	 * Otherwise, a <code>null</code> object will be returned.
 	 * 
 	 * @param quantityToRemove
-	 *            Quantity to remove to this {@link HistoryEntry}.
-	 * @return Splited {@link HistoryEntry} or <code>null</code> if there is no need to split.
+	 *            Quantity to remove to this {@link LendEntry}.
+	 * @return Splited {@link LendEntry} or <code>null</code> if there is no need to split.
 	 */
-	public HistoryEntry split(int quantityToRemove) {
+	public LendEntry split(int quantityToRemove) {
 		quantityToRemove = Math.min(Math.max(quantityToRemove, 0), quantity);
 		
 		if (quantity != quantityToRemove) {
 			int remaining = quantity - quantityToRemove;
 			quantity = quantityToRemove;
 			
-			return new HistoryEntry(id, item, person, remaining, constructionSite, lendDate, returnDate, extra);
+			return new LendEntry(id, item, person, remaining, constructionSite, lendDate, returnDate, extra);
 		}
 		
 		return null;

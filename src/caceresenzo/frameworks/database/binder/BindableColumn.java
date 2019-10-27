@@ -29,11 +29,15 @@ public class BindableColumn {
 	
 	/** @return Weather or not this column is a reference to another table entry. */
 	public boolean isReference() {
-		return this.annotation.isReference();
+		return getAnnotation().isReference();
 	}
 	
 	public boolean isAutomatable() {
-		return !this.annotation.automator().equals(AbstractDatabaseColumnValueAutomator.class);
+		return !getAnnotation().automator().equals(AbstractDatabaseColumnValueAutomator.class);
+	}
+
+	public boolean isVisible() {
+		return getAnnotation().isVisible();
 	}
 	
 	/** @return Field's {@link DatabaseTableColumn} annotation. */

@@ -89,15 +89,15 @@ public class Item implements IDatabaseEntry {
 			Item item = ((Item) instance);
 			
 			try {
-				BindableTable historyEntryBindableTable = TableAnalizer.get().analizeTable(HistoryEntry.class);
+				BindableTable historyEntryBindableTable = TableAnalizer.get().analizeTable(LendEntry.class);
 				StringBuilder stringBuilder = new StringBuilder();
 				
 				stringBuilder
-						.append("SELECT ").append(HistoryEntry.COLUMN_QUANTITY)
+						.append("SELECT ").append(LendEntry.COLUMN_QUANTITY)
 						.append(" FROM ").append(historyEntryBindableTable.getTableName())
 						.append(" WHERE ")
-						.append(HistoryEntry.COLUMN_ITEM).append(" = ? AND ")
-						.append(HistoryEntry.COLUMN_RETURN_DATE).append(" IS NULL;");
+						.append(LendEntry.COLUMN_ITEM).append(" = ? AND ")
+						.append(LendEntry.COLUMN_RETURN_DATE).append(" IS NULL;");
 				
 				PreparedStatement statement = DataManager.get().getDatabaseConnection().prepareStatement(stringBuilder.toString());
 				statement.setInt(1, item.getId());
@@ -106,7 +106,7 @@ public class Item implements IDatabaseEntry {
 				
 				try (ResultSet resultSet = statement.executeQuery()) {
 					while (resultSet.next()) {
-						int quantity = resultSet.getInt(HistoryEntry.COLUMN_QUANTITY);
+						int quantity = resultSet.getInt(LendEntry.COLUMN_QUANTITY);
 						
 						inStock -= quantity;
 					}

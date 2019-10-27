@@ -61,7 +61,7 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 	
 	/* Table Model */
 	private BindableTable bindableTable;
-	private List<BindableColumn> columns;
+	private List<BindableColumn> columns, visibleColumns;
 	private String[] columnNames;
 	private Class<?>[] columnClass;
 	
@@ -131,14 +131,17 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 		columns = bindableTable.getBindableColumns();
 		columns.remove(BindableColumn.findIdColumn(columns));
 		
+		visibleColumns = new ArrayList<>(columns);
+		visibleColumns.removeIf((bindableColumn) -> !bindableColumn.isVisible());
+		
 		int actionColumnSize = rowActionButtons.isEmpty() ? 0 : 1;
 		
-		columnNames = new String[columns.size() + actionColumnSize];
-		columnClass = new Class[columns.size() + actionColumnSize];
+		columnNames = new String[visibleColumns.size() + actionColumnSize];
+		columnClass = new Class[visibleColumns.size() + actionColumnSize];
 		
 		int index = 0;
-		for (; index < columns.size(); index++) {
-			BindableColumn bindableColumn = columns.get(index);
+		for (; index < visibleColumns.size(); index++) {
+			BindableColumn bindableColumn = visibleColumns.get(index);
 			
 			columnNames[index] = i18n.string("logger.table.column." + bindableColumn.getColumnName());
 			
@@ -157,7 +160,7 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 		}
 		
 		SwingUtilities.invokeLater(() -> {
-			for (int jndex = 0; jndex < columns.size(); jndex++) {
+			for (int jndex = 0; jndex < visibleColumns.size(); jndex++) {
 				if (columnClass[jndex] == Integer.class) {
 					TableColumn tableColumn = table.getColumnModel().getColumn(jndex);
 					
@@ -178,8 +181,8 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 	@SuppressWarnings("unchecked")
 	private void initializeComboBoxRenderer() {
 		SwingUtilities.invokeLater(() -> {
-			for (int index = 0; index < columns.size(); index++) {
-				BindableColumn bindableColumn = columns.get(index);
+			for (int index = 0; index < visibleColumns.size(); index++) {
+				BindableColumn bindableColumn = visibleColumns.get(index);
 				
 				if (bindableColumn.isReference()) {
 					JComboBox<?> comboBox = new JComboBox<>(synchronizer.load(bindableColumn.getField().getType()).toArray());
@@ -298,7 +301,7 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 		}
 		
 		try {
-			return columns.get(columnIndex).getField().get(row);
+			return visibleColumns.get(columnIndex).getField().get(row);
 		} catch (IllegalArgumentException | IllegalAccessException exception) {
 			throw new RuntimeException(exception);
 		}
@@ -310,7 +313,7 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 			return true;
 		}
 		
-		BindableColumn bindableColumn = columns.get(columnIndex);
+		BindableColumn bindableColumn = visibleColumns.get(columnIndex);
 		
 		if (bindableColumn.isAutomatable()) {
 			return false;
@@ -329,7 +332,7 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 			T row = entries.get(rowIndex);
 			
 			try {
-				columns.get(columnIndex).getField().set(row, aValue);
+				visibleColumns.get(columnIndex).getField().set(row, aValue);
 				
 				if (synchronizer != null) {
 					if (!synchronizer.update(modelClass, row)) {
@@ -344,7 +347,7 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 	
 	/** @return The index of the action's column. */
 	public int getActionColumnIndex() {
-		return columns.size();
+		return visibleColumns.size();
 	}
 	
 	/**

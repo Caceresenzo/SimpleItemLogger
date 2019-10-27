@@ -31,6 +31,9 @@ public @interface DatabaseTableColumn {
 	/** @return Weather or not the column can be edited. */
 	public boolean editable() default true;
 	
+	/** @return Weather or not the column is directly visible in a table. */
+	public boolean isVisible() default true;
+	
 	/** @return An {@link AbstractDatabaseColumnValueAutomator} class to do more code when {@link DatabaseSynchronizer#load(Class) database synchronization loading} on an instance. */
 	public Class<? extends AbstractDatabaseColumnValueAutomator> automator() default AbstractDatabaseColumnValueAutomator.class;
 	

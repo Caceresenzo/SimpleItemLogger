@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import caceresenzo.apps.itemlogger.configuration.Config;
 import caceresenzo.apps.itemlogger.models.ConstructionSite;
-import caceresenzo.apps.itemlogger.models.HistoryEntry;
+import caceresenzo.apps.itemlogger.models.LendEntry;
 import caceresenzo.apps.itemlogger.models.Item;
 import caceresenzo.apps.itemlogger.models.Person;
 import caceresenzo.frameworks.database.connections.AbstractDatabaseConnection;
@@ -39,7 +39,7 @@ public class DataManager extends AbstractManager {
 				.with(Person.class)
 				.with(Item.class)
 				.with(ConstructionSite.class)
-				.with(HistoryEntry.class);
+				.with(LendEntry.class);
 	}
 	
 	@Override

@@ -34,7 +34,7 @@ import caceresenzo.apps.itemlogger.assets.Assets;
 import caceresenzo.apps.itemlogger.managers.DataManager;
 import caceresenzo.apps.itemlogger.managers.SearchManager;
 import caceresenzo.apps.itemlogger.models.ConstructionSite;
-import caceresenzo.apps.itemlogger.models.HistoryEntry;
+import caceresenzo.apps.itemlogger.models.LendEntry;
 import caceresenzo.apps.itemlogger.models.Item;
 import caceresenzo.apps.itemlogger.models.Person;
 import caceresenzo.apps.itemlogger.ui.export.implementations.ExportToPdfDialog;
@@ -267,7 +267,7 @@ public class MainLoggerWindow implements ActionListener, DatabaseEntryTableModel
 					}
 					
 					case ACTION_COMMAND_DISPLAY_HISTORY: {
-						newModelClass = HistoryEntry.class;
+						newModelClass = LendEntry.class;
 						
 						JButton button = new JButton(i18n.string("logger.table.column.actions.button.history-entry.return"));
 						button.setActionCommand(ACTION_COMMAND_TABLE_ACTION_RETURN_ITEM);
@@ -301,11 +301,11 @@ public class MainLoggerWindow implements ActionListener, DatabaseEntryTableModel
 	public void onTableActionClick(JTable table, DatabaseEntryTableModel<IDatabaseEntry> tableClass, List<IDatabaseEntry> entries, int row, String action) {
 		switch (action) {
 			case ACTION_COMMAND_TABLE_ACTION_RETURN_ITEM: {
-				if (!HistoryEntry.class.equals(currentDisplayedModelClass)) {
-					throw new IllegalArgumentException("Cannot handle the return item action with a different model class than " + HistoryEntry.class.getSimpleName() + ".");
+				if (!LendEntry.class.equals(currentDisplayedModelClass)) {
+					throw new IllegalArgumentException("Cannot handle the return item action with a different model class than " + LendEntry.class.getSimpleName() + ".");
 				}
 				
-				HistoryEntry historyEntry = (HistoryEntry) entries.get(row);
+				LendEntry historyEntry = (LendEntry) entries.get(row);
 				
 				HistoryReturnDialog.open(frame, historyEntry, this);
 				break;
@@ -318,13 +318,13 @@ public class MainLoggerWindow implements ActionListener, DatabaseEntryTableModel
 	}
 	
 	@Override
-	public void onValidatedHistoryItem(HistoryEntry originalHistoryEntry, HistoryEntry remainingHistoryEntry) {
+	public void onValidatedHistoryItem(LendEntry originalHistoryEntry, LendEntry remainingHistoryEntry) {
 		DatabaseSynchronizer databaseSynchronizer = DataManager.get().getDatabaseSynchronizer();
 		
-		databaseSynchronizer.update(HistoryEntry.class, originalHistoryEntry);
+		databaseSynchronizer.update(LendEntry.class, originalHistoryEntry);
 		
 		if (remainingHistoryEntry != null) {
-			databaseSynchronizer.insert(HistoryEntry.class, remainingHistoryEntry);
+			databaseSynchronizer.insert(LendEntry.class, remainingHistoryEntry);
 		}
 		
 		((DatabaseEntryTableModel<?>) dataTable.getModel()).synchronize();
