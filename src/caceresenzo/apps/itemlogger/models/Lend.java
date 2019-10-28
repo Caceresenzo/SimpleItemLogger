@@ -28,19 +28,19 @@ public class Lend implements IDatabaseEntry {
 	/* Variables */
 	@DatabaseTableColumn(DatabaseTableColumn.COLUMN_ID)
 	private final int id;
-	@DatabaseTableColumn(value = COLUMN_ITEM, isReference = true)
+	@DatabaseTableColumn(value = COLUMN_ITEM, isReference = true, isEditable = false)
 	private Item item;
-	@DatabaseTableColumn(value = COLUMN_PERSON, isReference = true)
+	@DatabaseTableColumn(value = COLUMN_PERSON, isReference = true, isEditable = false)
 	private Person person;
-	@DatabaseTableColumn(value = COLUMN_CONSTRUCTION_SITE, isReference = true)
+	@DatabaseTableColumn(value = COLUMN_CONSTRUCTION_SITE, isReference = true, isEditable = false)
 	private ConstructionSite constructionSite;
-	@DatabaseTableColumn(COLUMN_QUANTITY)
+	@DatabaseTableColumn(value = COLUMN_QUANTITY, isEditable = false)
 	private int quantity;
-	@DatabaseTableColumn(value = COLUMN_WAITING_QUANTITY, automator = LendRemainingToReturnDatabaseColumnValueAutomator.class)
+	@DatabaseTableColumn(value = COLUMN_WAITING_QUANTITY, isEditable = false, automator = LendRemainingToReturnDatabaseColumnValueAutomator.class)
 	private int waitingQuantity;
-	@DatabaseTableColumn(value = COLUMN_LEND_DATE, isVisible = false)
+	@DatabaseTableColumn(value = COLUMN_LEND_DATE, isVisible = false, isEditable = false)
 	private LocalDate lendDate;
-	@DatabaseTableColumn(value = COLUMN_EXTRA, flags = SqlTableBuilder.FLAG_NULL, isVisible = false)
+	@DatabaseTableColumn(value = COLUMN_EXTRA, flags = SqlTableBuilder.FLAG_NULL, isVisible = false, isEditable = false)
 	private String extra;
 	
 	/* Constructor */
@@ -101,7 +101,7 @@ public class Lend implements IDatabaseEntry {
 	
 	@Override
 	public String describe() {
-		return String.format("Lending of %s (quantity: %s)", item.getName(), quantity); // TODO
+		throw new UnsupportedOperationException();
 	}
 	
 	@Override

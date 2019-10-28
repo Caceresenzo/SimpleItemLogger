@@ -315,7 +315,7 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 		
 		BindableColumn bindableColumn = visibleColumns.get(columnIndex);
 		
-		if (bindableColumn.isAutomatable()) {
+		if (bindableColumn.isAutomatable() || !bindableColumn.isEditable()) {
 			return false;
 		}
 		

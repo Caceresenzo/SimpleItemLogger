@@ -35,6 +35,10 @@ public class BindableColumn {
 	public boolean isAutomatable() {
 		return !getAnnotation().automator().equals(AbstractDatabaseColumnValueAutomator.class);
 	}
+	
+	public boolean isEditable() {
+		return getAnnotation().isEditable();
+	}
 
 	public boolean isVisible() {
 		return getAnnotation().isVisible();

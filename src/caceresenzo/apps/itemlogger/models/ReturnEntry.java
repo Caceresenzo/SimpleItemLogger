@@ -19,11 +19,11 @@ public class ReturnEntry implements IDatabaseEntry {
 	/* Variables */
 	@DatabaseTableColumn(DatabaseTableColumn.COLUMN_ID)
 	private final int id;
-	@DatabaseTableColumn(value = COLUMN_LEND, isReference = true, isVisible = false)
+	@DatabaseTableColumn(value = COLUMN_LEND, isReference = true, isVisible = false, isEditable = false)
 	private Lend lend;
-	@DatabaseTableColumn(COLUMN_QUANTITY)
+	@DatabaseTableColumn(value = COLUMN_QUANTITY, isEditable = false)
 	private int quantity;
-	@DatabaseTableColumn(COLUMN_RETURN_DATE)
+	@DatabaseTableColumn(value = COLUMN_RETURN_DATE, isEditable = false)
 	private LocalDate returnDate;
 	@DatabaseTableColumn(value = COLUMN_EXTRA, flags = SqlTableBuilder.FLAG_NULL)
 	private String extra;
