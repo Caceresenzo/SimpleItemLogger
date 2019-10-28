@@ -3,14 +3,16 @@ package caceresenzo.apps.itemlogger.models;
 import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 
 import caceresenzo.apps.itemlogger.managers.DataManager;
 import caceresenzo.frameworks.database.IDatabaseEntry;
 import caceresenzo.frameworks.database.annotations.DatabaseTable;
 import caceresenzo.frameworks.database.annotations.DatabaseTableColumn;
 import caceresenzo.frameworks.database.automator.AbstractDatabaseColumnValueAutomator;
-import caceresenzo.frameworks.database.binder.BindableTable;
 import caceresenzo.frameworks.database.setup.TableAnalizer;
+import caceresenzo.libs.list.ListUtils;
 
 @DatabaseTable("items")
 public class Item implements IDatabaseEntry {
@@ -80,6 +82,17 @@ public class Item implements IDatabaseEntry {
 	
 	public static final class ItemCurrentStockDatabaseColumnValueAutomator extends AbstractDatabaseColumnValueAutomator {
 		
+		/* Variables */
+		private final String lendTableName, returnEntryTableName;
+		
+		/* Constructor */
+		public ItemCurrentStockDatabaseColumnValueAutomator() {
+			super();
+			
+			this.lendTableName = TableAnalizer.get().analizeTable(Lend.class).getTableName();
+			this.returnEntryTableName = TableAnalizer.get().analizeTable(ReturnEntry.class).getTableName();
+		}
+		
 		@Override
 		public void automate(Class<?> forModelClass, Class<?> columnClass, Field field, Object instance) {
 			if (!Item.class.equals(forModelClass)) {
@@ -87,28 +100,46 @@ public class Item implements IDatabaseEntry {
 			}
 			
 			Item item = ((Item) instance);
+			int inStock = item.getInitialStock();
 			
 			try {
-				BindableTable historyEntryBindableTable = TableAnalizer.get().analizeTable(LendEntry.class);
 				StringBuilder stringBuilder = new StringBuilder();
 				
 				stringBuilder
-						.append("SELECT ").append(LendEntry.COLUMN_QUANTITY)
-						.append(" FROM ").append(historyEntryBindableTable.getTableName())
-						.append(" WHERE ")
-						.append(LendEntry.COLUMN_ITEM).append(" = ? AND ")
-						.append(LendEntry.COLUMN_RETURN_DATE).append(" IS NULL;");
+						.append("SELECT ").append(String.join(", ", DatabaseTableColumn.COLUMN_ID, Lend.COLUMN_QUANTITY))
+						.append(" FROM ").append(lendTableName)
+						.append(" WHERE ").append(Lend.COLUMN_ITEM).append(" = ?;");
 				
 				PreparedStatement statement = DataManager.get().getDatabaseConnection().prepareStatement(stringBuilder.toString());
 				statement.setInt(1, item.getId());
 				
-				int inStock = item.getInitialStock();
+				List<Integer> lendIds = new ArrayList<>();
 				
 				try (ResultSet resultSet = statement.executeQuery()) {
 					while (resultSet.next()) {
-						int quantity = resultSet.getInt(LendEntry.COLUMN_QUANTITY);
+						int id = resultSet.getInt(DatabaseTableColumn.COLUMN_ID);
+						int quantity = resultSet.getInt(Lend.COLUMN_QUANTITY);
 						
+						lendIds.add(id);
 						inStock -= quantity;
+					}
+				}
+				
+				if (!lendIds.isEmpty()) {
+					stringBuilder.setLength(0);
+					stringBuilder
+							.append("SELECT ").append(ReturnEntry.COLUMN_QUANTITY)
+							.append(" FROM ").append(returnEntryTableName)
+							.append(" WHERE ").append(ReturnEntry.COLUMN_LEND).append(" IN (").append(ListUtils.separate(lendIds, ", ", " ")).append(");");
+					
+					statement = DataManager.get().getDatabaseConnection().prepareStatement(stringBuilder.toString());
+					
+					try (ResultSet resultSet = statement.executeQuery()) {
+						while (resultSet.next()) {
+							int quantity = resultSet.getInt(ReturnEntry.COLUMN_QUANTITY);
+							
+							inStock += quantity;
+						}
 					}
 				}
 				

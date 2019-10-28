@@ -29,7 +29,7 @@ public @interface DatabaseTableColumn {
 	public boolean isReference() default false;
 	
 	/** @return Weather or not the column can be edited. */
-	public boolean editable() default true;
+	public boolean isEditable() default true;
 	
 	/** @return Weather or not the column is directly visible in a table. */
 	public boolean isVisible() default true;

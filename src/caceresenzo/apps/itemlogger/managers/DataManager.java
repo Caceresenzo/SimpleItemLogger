@@ -7,9 +7,10 @@ import org.slf4j.LoggerFactory;
 
 import caceresenzo.apps.itemlogger.configuration.Config;
 import caceresenzo.apps.itemlogger.models.ConstructionSite;
-import caceresenzo.apps.itemlogger.models.LendEntry;
+import caceresenzo.apps.itemlogger.models.Lend;
 import caceresenzo.apps.itemlogger.models.Item;
 import caceresenzo.apps.itemlogger.models.Person;
+import caceresenzo.apps.itemlogger.models.ReturnEntry;
 import caceresenzo.frameworks.database.connections.AbstractDatabaseConnection;
 import caceresenzo.frameworks.database.connections.implementations.SqliteConnection;
 import caceresenzo.frameworks.database.setup.TableCreator;
@@ -39,7 +40,8 @@ public class DataManager extends AbstractManager {
 				.with(Person.class)
 				.with(Item.class)
 				.with(ConstructionSite.class)
-				.with(LendEntry.class);
+				.with(Lend.class)
+				.with(ReturnEntry.class);
 	}
 	
 	@Override
@@ -47,7 +49,7 @@ public class DataManager extends AbstractManager {
 		super.initialize();
 		
 		try {
-			LOGGER.info("Connecting to SQLite database: " + Config.SQLITE_PATH);
+			LOGGER.info("Connecting to SQLite database: {}", Config.SQLITE_PATH);
 			databaseConnection.connect();
 		} catch (SQLException exception) {
 			LOGGER.error("Failed to connect to the database, application can't continue.", exception);

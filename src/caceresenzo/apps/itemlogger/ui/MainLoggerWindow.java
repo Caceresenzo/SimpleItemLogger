@@ -1,11 +1,9 @@
 package caceresenzo.apps.itemlogger.ui;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -28,15 +26,15 @@ import javax.swing.border.TitledBorder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.lgooddatepicker.tableeditors.DateTableEditor;
-
 import caceresenzo.apps.itemlogger.assets.Assets;
 import caceresenzo.apps.itemlogger.managers.DataManager;
 import caceresenzo.apps.itemlogger.managers.SearchManager;
 import caceresenzo.apps.itemlogger.models.ConstructionSite;
-import caceresenzo.apps.itemlogger.models.LendEntry;
 import caceresenzo.apps.itemlogger.models.Item;
+import caceresenzo.apps.itemlogger.models.Lend;
 import caceresenzo.apps.itemlogger.models.Person;
+import caceresenzo.apps.itemlogger.models.ReturnEntry;
+import caceresenzo.apps.itemlogger.ui.components.DataJTable;
 import caceresenzo.apps.itemlogger.ui.export.implementations.ExportToPdfDialog;
 import caceresenzo.apps.itemlogger.ui.export.implementations.ExportToPrinterDialog;
 import caceresenzo.apps.itemlogger.ui.history.HistoryReturnDialog;
@@ -55,7 +53,8 @@ public class MainLoggerWindow implements ActionListener, DatabaseEntryTableModel
 	public static final String ACTION_COMMAND_DISPLAY_ITEMS = "action_display_items";
 	public static final String ACTION_COMMAND_DISPLAY_PERSONS = "action_display_persons";
 	public static final String ACTION_COMMAND_DISPLAY_CONSTRUCTION_SITES = "action_display_construction_sites";
-	public static final String ACTION_COMMAND_DISPLAY_HISTORY = "action_display_history";
+	public static final String ACTION_COMMAND_DISPLAY_LEND = "action_display_lend";
+	public static final String ACTION_COMMAND_DISPLAY_RETURNS = "action_display_returns";
 	public static final String ACTION_COMMAND_EXPORT_TO_PDF = "action_export_to_pdf";
 	public static final String ACTION_COMMAND_EXPORT_TO_PRINTER = "action_export_to_printer";
 	public static final String ACTION_COMMAND_TABLE_ACTION_RETURN_ITEM = "action_table_action_return_item";
@@ -64,7 +63,7 @@ public class MainLoggerWindow implements ActionListener, DatabaseEntryTableModel
 	private JFrame frame;
 	private JPanel searchPanel, actionContainerPanel, modelActionPanel, dataPanel;
 	private JScrollPane dataScrollPane;
-	private JTable dataTable;
+	private DataJTable dataTable;
 	private JTextField searchBarTextField;
 	private JButton searchButton;
 	
@@ -133,13 +132,7 @@ public class MainLoggerWindow implements ActionListener, DatabaseEntryTableModel
 								.addComponent(dataScrollPane, GroupLayout.DEFAULT_SIZE, 198, Short.MAX_VALUE)
 								.addContainerGap()));
 		
-		dataTable = new JTable();
-		dataTable.setFillsViewportHeight(true);
-		dataTable.setSelectionForeground(Color.BLACK);
-		dataTable.setSelectionBackground(Color.decode("#D9EBF9"));
-		
-		dataTable.setDefaultRenderer(LocalDate.class, new DateTableEditor());
-		dataTable.setDefaultEditor(LocalDate.class, new DateTableEditor());
+		dataTable = new DataJTable();
 		
 		dataScrollPane.setViewportView(dataTable);
 		dataPanel.setLayout(gl_dataPanel);
@@ -245,7 +238,8 @@ public class MainLoggerWindow implements ActionListener, DatabaseEntryTableModel
 			case ACTION_COMMAND_DISPLAY_ITEMS:
 			case ACTION_COMMAND_DISPLAY_PERSONS:
 			case ACTION_COMMAND_DISPLAY_CONSTRUCTION_SITES:
-			case ACTION_COMMAND_DISPLAY_HISTORY: {
+			case ACTION_COMMAND_DISPLAY_LEND:
+			case ACTION_COMMAND_DISPLAY_RETURNS: {
 				Class<?> newModelClass;
 				List<JButton> tableActionButtons = null;
 				
@@ -266,14 +260,18 @@ public class MainLoggerWindow implements ActionListener, DatabaseEntryTableModel
 						break;
 					}
 					
-					case ACTION_COMMAND_DISPLAY_HISTORY: {
-						newModelClass = LendEntry.class;
+					case ACTION_COMMAND_DISPLAY_LEND: {
+						newModelClass = Lend.class;
 						
 						JButton button = new JButton(i18n.string("logger.table.column.actions.button.history-entry.return"));
 						button.setActionCommand(ACTION_COMMAND_TABLE_ACTION_RETURN_ITEM);
 						
 						tableActionButtons = Arrays.asList(button);
 						break;
+					}
+					
+					case ACTION_COMMAND_DISPLAY_RETURNS: {
+						newModelClass = ReturnEntry.class;
 					}
 				}
 				
@@ -301,11 +299,11 @@ public class MainLoggerWindow implements ActionListener, DatabaseEntryTableModel
 	public void onTableActionClick(JTable table, DatabaseEntryTableModel<IDatabaseEntry> tableClass, List<IDatabaseEntry> entries, int row, String action) {
 		switch (action) {
 			case ACTION_COMMAND_TABLE_ACTION_RETURN_ITEM: {
-				if (!LendEntry.class.equals(currentDisplayedModelClass)) {
-					throw new IllegalArgumentException("Cannot handle the return item action with a different model class than " + LendEntry.class.getSimpleName() + ".");
+				if (!Lend.class.equals(currentDisplayedModelClass)) {
+					throw new IllegalArgumentException("Cannot handle the return item action with a different model class than " + Lend.class.getSimpleName() + ".");
 				}
 				
-				LendEntry historyEntry = (LendEntry) entries.get(row);
+				Lend historyEntry = (Lend) entries.get(row);
 				
 				HistoryReturnDialog.open(frame, historyEntry, this);
 				break;
@@ -318,13 +316,13 @@ public class MainLoggerWindow implements ActionListener, DatabaseEntryTableModel
 	}
 	
 	@Override
-	public void onValidatedHistoryItem(LendEntry originalHistoryEntry, LendEntry remainingHistoryEntry) {
+	public void onValidatedHistoryItem(Lend originalHistoryEntry, Lend remainingHistoryEntry) {
 		DatabaseSynchronizer databaseSynchronizer = DataManager.get().getDatabaseSynchronizer();
 		
-		databaseSynchronizer.update(LendEntry.class, originalHistoryEntry);
+		databaseSynchronizer.update(Lend.class, originalHistoryEntry);
 		
 		if (remainingHistoryEntry != null) {
-			databaseSynchronizer.insert(LendEntry.class, remainingHistoryEntry);
+			databaseSynchronizer.insert(Lend.class, remainingHistoryEntry);
 		}
 		
 		((DatabaseEntryTableModel<?>) dataTable.getModel()).synchronize();
@@ -345,7 +343,8 @@ public class MainLoggerWindow implements ActionListener, DatabaseEntryTableModel
 				new MainLoggerWindow.ActionButton("items", Assets.ICON_NEW_PRODUCT_32PX, ACTION_COMMAND_DISPLAY_ITEMS),
 				new MainLoggerWindow.ActionButton("persons", Assets.ICON_USER_MEN_32PX, ACTION_COMMAND_DISPLAY_PERSONS),
 				new MainLoggerWindow.ActionButton("construction-sites", Assets.ICON_IN_CONSTRUCTION_32PX, ACTION_COMMAND_DISPLAY_CONSTRUCTION_SITES),
-				new MainLoggerWindow.ActionButton("history", Assets.ICON_HISTORY_32PX, ACTION_COMMAND_DISPLAY_HISTORY) //
+				new MainLoggerWindow.ActionButton("lend", Assets.ICON_HISTORY_32PX, ACTION_COMMAND_DISPLAY_LEND),
+				new MainLoggerWindow.ActionButton("returns", Assets.ICON_HISTORY_32PX, ACTION_COMMAND_DISPLAY_RETURNS) //
 		));
 	}
 	

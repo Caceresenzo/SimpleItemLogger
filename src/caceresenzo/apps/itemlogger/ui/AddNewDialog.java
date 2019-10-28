@@ -32,7 +32,7 @@ import caceresenzo.libs.internationalization.i18n;
 public class AddNewDialog extends JDialog implements ActionListener {
 	
 	/* Logger */
-	private static Logger LOGGER = LoggerFactory.getLogger(AddNewDialog.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(AddNewDialog.class);
 	
 	/* Action Commands */
 	public static final String ACTION_COMMAND_DONE = "action_done";
@@ -43,8 +43,8 @@ public class AddNewDialog extends JDialog implements ActionListener {
 	
 	/* Variables */
 	private final Class<?> modelClass;
-	private final Callback callback;
-	private final List<BindableColumn> bindableColumns;
+	private final transient Callback callback;
+	private final transient List<BindableColumn> bindableColumns;
 	private JPanel fieldListPanel;
 	
 	/* Constructor */

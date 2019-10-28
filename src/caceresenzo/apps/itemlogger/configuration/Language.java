@@ -53,7 +53,8 @@ public class Language {
 			o("logger.button.action.items", "Materiel");
 			o("logger.button.action.persons", "Personnes");
 			o("logger.button.action.construction-sites", "Chantiers");
-			o("logger.button.action.history", "Historique");
+			o("logger.button.action.lend", "Prêt");
+			o("logger.button.action.returns", "Retours");
 			o("logger.button.action.export-printer", "Impression");
 			o("logger.button.action.export-pdf", "Exporter en PDF");
 			
@@ -67,6 +68,7 @@ public class Language {
 			o("logger.table.column.item", "Objet");
 			o("logger.table.column.person", "À");
 			o("logger.table.column.quantity", "Quantité");
+			o("logger.table.column.waiting_quantity", "En Attente");
 			o("logger.table.column.construction_site", "Chantier");
 			o("logger.table.column.lend", "Prêt");
 			o("logger.table.column.return", "Retour");
@@ -121,7 +123,8 @@ public class Language {
 			o("model.item", "Item");
 			o("model.person", "Personne");
 			o("model.constructionsite", "Chantier");
-			o("model.historyentry", "Entrée d'Historique");
+			o("model.lend", "Prêt");
+			o("model.returnentry", "Retour");
 			
 			o("", "");
 		}

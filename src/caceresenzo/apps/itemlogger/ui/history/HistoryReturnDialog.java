@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 import com.github.lgooddatepicker.components.DatePicker;
 import com.github.lgooddatepicker.components.DatePickerSettings;
 
-import caceresenzo.apps.itemlogger.models.LendEntry;
+import caceresenzo.apps.itemlogger.models.Lend;
 import caceresenzo.frameworks.database.binder.BindableColumn;
 import caceresenzo.frameworks.database.setup.TableAnalizer;
 import caceresenzo.libs.internationalization.i18n;
@@ -61,12 +61,12 @@ public class HistoryReturnDialog extends JDialog implements ActionListener, Care
 	private JButton validateButton, cancelButton;
 	
 	/* Variables */
-	private final LendEntry historyEntry;
+	private final Lend historyEntry;
 	private final HistoryReturnDialog.Callback callback;
 	private JCheckBox addDefaultExtraCheckBox;
 	
 	/* Constructor */
-	public HistoryReturnDialog(JFrame parent, LendEntry historyEntry, HistoryReturnDialog.Callback callback) {
+	public HistoryReturnDialog(JFrame parent, Lend historyEntry, HistoryReturnDialog.Callback callback) {
 		super(parent);
 		
 		this.historyEntry = historyEntry;
@@ -234,36 +234,36 @@ public class HistoryReturnDialog extends JDialog implements ActionListener, Care
 		switch (actionCommand) {
 			case ACTION_COMMAND_VALIDATE: {
 				if (callback != null) {
-					List<BindableColumn> bindableColumns = TableAnalizer.get().analizeColumns(LendEntry.class);
+					List<BindableColumn> bindableColumns = TableAnalizer.get().analizeColumns(Lend.class);
 					
-					BindableColumn returnBindableColumn = BindableColumn.findColumn(bindableColumns, LendEntry.COLUMN_RETURN_DATE);
-					BindableColumn extraBindableColumn = BindableColumn.findColumn(bindableColumns, LendEntry.COLUMN_EXTRA);
+					// BindableColumn returnBindableColumn = BindableColumn.findColumn(bindableColumns, LendEntry.COLUMN_RETURN_DATE);
+					BindableColumn extraBindableColumn = BindableColumn.findColumn(bindableColumns, Lend.COLUMN_EXTRA);
 					
-					LendEntry remainingHistoryEntry = null;
-					try {
-						returnBindableColumn.getField().set(historyEntry, returnedDateDatePicker.getDate());
-						
-						remainingHistoryEntry = historyEntry.split((int) returnedQuantityTextField.getValue());
-						
-						if (remainingHistoryEntry != null) {
-							returnBindableColumn.getField().set(remainingHistoryEntry, (LocalDate) null);
-							
-							String defaultExtra = i18n.string("history-return-dialog.devise.extra.message");
-							String extra = (String) extraBindableColumn.getField().get(remainingHistoryEntry);
-							
-							if (addDefaultExtraCheckBox.isSelected()) {
-								extra = defaultExtra;
-							} else if (defaultExtra.equals(extra)) {
-								extra = null;
-							}
-							
-							extraBindableColumn.getField().set(remainingHistoryEntry, extra);
-						}
-					} catch (Exception exception) {
-						LOGGER.warn("An exception occured when trying to devise the history entry.", exception);
-					}
+					Lend remainingHistoryEntry = null;
+					// try {
+					// returnBindableColumn.getField().set(historyEntry, returnedDateDatePicker.getDate());
+					//
+					// remainingHistoryEntry = historyEntry.split((int) returnedQuantityTextField.getValue());
+					//
+					// if (remainingHistoryEntry != null) {
+					// returnBindableColumn.getField().set(remainingHistoryEntry, (LocalDate) null);
+					//
+					// String defaultExtra = i18n.string("history-return-dialog.devise.extra.message");
+					// String extra = (String) extraBindableColumn.getField().get(remainingHistoryEntry);
+					//
+					// if (addDefaultExtraCheckBox.isSelected()) {
+					// extra = defaultExtra;
+					// } else if (defaultExtra.equals(extra)) {
+					// extra = null;
+					// }
+					//
+					// extraBindableColumn.getField().set(remainingHistoryEntry, extra);
+					// }
+					// } catch (Exception exception) {
+					// LOGGER.warn("An exception occured when trying to devise the history entry.", exception);
+					// }
 					
-					callback.onValidatedHistoryItem(historyEntry, remainingHistoryEntry);
+					// callback.onValidatedHistoryItem(historyEntry, remainingHistoryEntry);
 				}
 				
 				setVisible(false);
@@ -279,6 +279,7 @@ public class HistoryReturnDialog extends JDialog implements ActionListener, Care
 				throw new IllegalStateException("Unknown action command: " + actionCommand);
 			}
 		}
+		
 	}
 	
 	@Override
@@ -298,23 +299,23 @@ public class HistoryReturnDialog extends JDialog implements ActionListener, Care
 	
 	/**
 	 * Open a new {@link HistoryReturnDialog} instance.<br>
-	 * But if the {@link LendEntry} has already been returned, a dialog will ask to confirm that the user want to do the return.
+	 * But if the {@link Lend} has already been returned, a dialog will ask to confirm that the user want to do the return.
 	 * 
 	 * @param parent
 	 *            Parent {@link JFrame}.
 	 * @param historyEntry
-	 *            {@link LendEntry} to start with.
+	 *            {@link Lend} to start with.
 	 * @param callback
 	 *            Callback to do action when the dialog is validated.
 	 */
-	public static void open(JFrame parent, LendEntry historyEntry, HistoryReturnDialog.Callback callback) {
-		if (historyEntry.getReturnDate() != null) {
-			int reply = JOptionPane.showConfirmDialog(parent, i18n.string("history-return-dialog.dialog.warning-already-return.message"), i18n.string("history-return-dialog.dialog.warning-already-return.title"), JOptionPane.YES_NO_OPTION);
-			
-			if (reply == JOptionPane.NO_OPTION || reply == JOptionPane.CLOSED_OPTION) {
-				return;
-			}
-		}
+	public static void open(JFrame parent, Lend historyEntry, HistoryReturnDialog.Callback callback) {
+		// if (historyEntry.getReturnDate() != null) {
+		// int reply = JOptionPane.showConfirmDialog(parent, i18n.string("history-return-dialog.dialog.warning-already-return.message"), i18n.string("history-return-dialog.dialog.warning-already-return.title"), JOptionPane.YES_NO_OPTION);
+		//
+		// if (reply == JOptionPane.NO_OPTION || reply == JOptionPane.CLOSED_OPTION) {
+		// return;
+		// }
+		// }
 		
 		HistoryReturnDialog dialog = new HistoryReturnDialog(parent, historyEntry, callback);
 		
@@ -327,12 +328,12 @@ public class HistoryReturnDialog extends JDialog implements ActionListener, Care
 		 * Called when the {@link HistoryReturnDialog} has been validated.
 		 * 
 		 * @param originalHistoryEntry
-		 *            The original {@link LendEntry} that has been use to the start the dialog.
+		 *            The original {@link Lend} that has been use to the start the dialog.
 		 * @param remainingHistoryEntry
-		 *            Splited {@link LendEntry} created if the returned quantity is not equal to the lend quantity, can be <code>null</code>.
-		 * @see LendEntry#split(int) Spliting an HistoryEntry.
+		 *            Splited {@link Lend} created if the returned quantity is not equal to the lend quantity, can be <code>null</code>.
+		 * @see Lend#split(int) Spliting an HistoryEntry.
 		 */
-		void onValidatedHistoryItem(LendEntry originalHistoryEntry, LendEntry remainingHistoryEntry);
+		void onValidatedHistoryItem(Lend originalHistoryEntry, Lend remainingHistoryEntry);
 		
 	}
 	
