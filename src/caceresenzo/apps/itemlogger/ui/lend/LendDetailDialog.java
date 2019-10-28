@@ -12,6 +12,7 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -23,46 +24,38 @@ import javax.swing.border.TitledBorder;
 import caceresenzo.apps.itemlogger.configuration.Config;
 import caceresenzo.apps.itemlogger.configuration.Language;
 import caceresenzo.apps.itemlogger.managers.ItemLoggerManager;
+import caceresenzo.apps.itemlogger.models.ConstructionSite;
+import caceresenzo.apps.itemlogger.models.Item;
+import caceresenzo.apps.itemlogger.models.Lend;
+import caceresenzo.apps.itemlogger.models.Person;
 import caceresenzo.apps.itemlogger.models.ReturnEntry;
 import caceresenzo.apps.itemlogger.ui.AddNewDialog;
 import caceresenzo.apps.itemlogger.ui.components.DataJTable;
 import caceresenzo.apps.itemlogger.ui.models.DatabaseEntryTableModel;
 import caceresenzo.frameworks.database.IDatabaseEntry;
+import caceresenzo.frameworks.database.binder.BindableColumn;
+import caceresenzo.frameworks.database.setup.TableAnalizer;
 
 public class LendDetailDialog extends JDialog {
 	
 	/* Constants */
 	public static final Class<? extends IDatabaseEntry> MODEL_CLASS = ReturnEntry.class;
 	
+	/* UI */
 	private final JPanel contentPanel = new JPanel();
 	private DataJTable table;
 	
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		Config.get();
-		Language.get().initialize();
-		ItemLoggerManager.get().initialize();
-		
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (Throwable e) {
-			e.printStackTrace();
-		}
-		try {
-			LendDetailDialog dialog = new LendDetailDialog();
-			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-			dialog.setVisible(true);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+	/* Variables */
+	private final Lend lend;
+	private final BindableColumn returnEntryLendBindableColumn;
 	
-	/**
-	 * Create the dialog.
-	 */
-	public LendDetailDialog() {
+	/* Constructor */
+	public LendDetailDialog(JFrame parent, Lend lend) {
+		super(parent);
+		
+		this.lend = lend;
+		this.returnEntryLendBindableColumn = BindableColumn.findColumn(TableAnalizer.get().analizeColumns(MODEL_CLASS), ReturnEntry.COLUMN_LEND);
+		
 		setBounds(100, 100, 660, 449);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -99,26 +92,24 @@ public class LendDetailDialog extends JDialog {
 				AddNewDialog.open(null, MODEL_CLASS, new AddNewDialog.Callback() {
 					@Override
 					public void onCreatedItem(Class<?> modelClass, Object instance) {
-						
+						System.out.println(instance);
 					}
-				});
+				}, Arrays.asList(new AddNewDialog.FullfilledEntry(returnEntryLendBindableColumn, lend)));
 			}
 		});
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
-			gl_panel.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, gl_panel.createSequentialGroup()
-					.addContainerGap(503, Short.MAX_VALUE)
-					.addComponent(button)
-					.addContainerGap())
-		);
+				gl_panel.createParallelGroup(Alignment.LEADING)
+						.addGroup(Alignment.TRAILING, gl_panel.createSequentialGroup()
+								.addContainerGap(503, Short.MAX_VALUE)
+								.addComponent(button)
+								.addContainerGap()));
 		gl_panel.setVerticalGroup(
-			gl_panel.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, gl_panel.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(button, GroupLayout.DEFAULT_SIZE, 34, Short.MAX_VALUE)
-					.addContainerGap())
-		);
+				gl_panel.createParallelGroup(Alignment.LEADING)
+						.addGroup(Alignment.TRAILING, gl_panel.createSequentialGroup()
+								.addContainerGap()
+								.addComponent(button, GroupLayout.DEFAULT_SIZE, 34, Short.MAX_VALUE)
+								.addContainerGap()));
 		panel.setLayout(gl_panel);
 		
 		table = new DataJTable();
@@ -144,4 +135,24 @@ public class LendDetailDialog extends JDialog {
 		// panel_3.add(new ReturnedLendDetailPanel());
 		// }
 	}
+	
+	public static void main(String[] args) {
+		Config.get();
+		Language.get().initialize();
+		ItemLoggerManager.get().initialize();
+		
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+		try {
+			LendDetailDialog dialog = new LendDetailDialog(null, new Lend(0, new Item(0, "Pickaxe", 10, 2), new Person(0, "Enzo", "42", "013"), 8, new ConstructionSite(0, "Tour effeil", "Paris"), LocalDate.now(), "extra comment"));
+			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+			dialog.setVisible(true);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 }

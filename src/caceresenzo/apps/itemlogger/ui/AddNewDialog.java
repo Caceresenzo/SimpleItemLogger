@@ -6,6 +6,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.BoxLayout;
@@ -40,19 +41,26 @@ public class AddNewDialog extends JDialog implements ActionListener {
 	
 	/* UI */
 	private final JPanel contentPanel = new JPanel();
+	private JPanel fieldListPanel;
 	
 	/* Variables */
 	private final Class<?> modelClass;
 	private final transient Callback callback;
 	private final transient List<BindableColumn> bindableColumns;
-	private JPanel fieldListPanel;
+	private final transient List<FullfilledEntry> fullfilledEntries;
 	
 	/* Constructor */
 	public AddNewDialog(JFrame parent, Class<?> modelClass, Callback callback) {
+		this(parent, modelClass, callback, null);
+	}
+	
+	/* Constructor */
+	public AddNewDialog(JFrame parent, Class<?> modelClass, Callback callback, List<FullfilledEntry> fullfilledEntries) {
 		super(parent);
 		
 		this.modelClass = modelClass;
 		this.callback = callback;
+		this.fullfilledEntries = fullfilledEntries == null ? new ArrayList<>() : fullfilledEntries;
 		
 		this.bindableColumns = TableAnalizer.get().analizeColumns(modelClass);
 		this.bindableColumns.remove(BindableColumn.findIdColumn(bindableColumns));
@@ -103,7 +111,18 @@ public class AddNewDialog extends JDialog implements ActionListener {
 		
 		getRootPane().setDefaultButton(doneButton);
 		
-		bindableColumns.forEach((bindableColumn) -> fieldListPanel.add(AbstractFieldPartPanel.find(modelClass, bindableColumn, null)));
+		initializePanels();
+	}
+	
+	/** Fill the main panel with all {@link AbstractFieldPartPanel}. */
+	private void initializePanels() {
+		for (BindableColumn bindableColumn : bindableColumns) {
+			FullfilledEntry fullfilledEntry = FullfilledEntry.find(fullfilledEntries, bindableColumn);
+			
+			if (fullfilledEntry == null) {
+				fieldListPanel.add(AbstractFieldPartPanel.find(modelClass, bindableColumn, null));
+			}
+		}
 	}
 	
 	@Override
@@ -165,6 +184,7 @@ public class AddNewDialog extends JDialog implements ActionListener {
 				Field field = bindableColumn.getField();
 				
 				Object value;
+				
 				try {
 					value = fieldPartPanel.getObject();
 				} catch (Exception exception) {
@@ -180,6 +200,14 @@ public class AddNewDialog extends JDialog implements ActionListener {
 			}
 		}
 		
+		for (FullfilledEntry fullfilledEntry : fullfilledEntries) {
+			BindableColumn bindableColumn = fullfilledEntry.getBindableColumn();
+			Object value = fullfilledEntry.getValue();
+			Field field = bindableColumn.getField();
+			
+			field.set(instance, value);
+		}
+		
 		return instance;
 	}
 	
@@ -192,9 +220,27 @@ public class AddNewDialog extends JDialog implements ActionListener {
 	 *            Model class of the item.
 	 * @param callback
 	 *            Callback for knowing when an item has been created.
+	 * @see AddNewDialog#open(JFrame, Class, Callback, List)
 	 */
 	public static void open(JFrame parent, Class<?> modelClass, Callback callback) {
-		AddNewDialog dialog = new AddNewDialog(parent, modelClass, callback);
+		open(parent, modelClass, callback, null);
+	}
+	
+	/**
+	 * Open a new {@link AddNewDialog} instance.
+	 * 
+	 * @param parent
+	 *            Parent {@link JFrame}.
+	 * @param modelClass
+	 *            Model class of the item.
+	 * @param callback
+	 *            Callback for knowing when an item has been created.
+	 * @param fullfilledEntries
+	 *            Already full-filled entries {@link List list}.
+	 * @see AddNewDialog#open(JFrame, Class, Callback)
+	 */
+	public static void open(JFrame parent, Class<?> modelClass, Callback callback, List<FullfilledEntry> fullfilledEntries) {
+		AddNewDialog dialog = new AddNewDialog(parent, modelClass, callback, fullfilledEntries);
 		
 		dialog.setVisible(true);
 	}
@@ -215,6 +261,49 @@ public class AddNewDialog extends JDialog implements ActionListener {
 		 *            Created instance.
 		 */
 		public void onCreatedItem(Class<?> modelClass, Object instance);
+		
+	}
+	
+	public static class FullfilledEntry {
+		
+		/* Variables */
+		private final BindableColumn bindableColumn;
+		private final Object value;
+		
+		/* Constructor */
+		public FullfilledEntry(BindableColumn bindableColumn, Object value) {
+			this.bindableColumn = bindableColumn;
+			this.value = value;
+		}
+		
+		/** @return {@link FullfilledEntry}'s {@link BindableColumn}. */
+		public BindableColumn getBindableColumn() {
+			return bindableColumn;
+		}
+		
+		/** @return {@link FullfilledEntry}'s filled value. */
+		public Object getValue() {
+			return value;
+		}
+		
+		/**
+		 * Find a {@link FullfilledEntry} instance in a {@link List list} if the {@link BindableColumn} matches.
+		 * 
+		 * @param fullfilledEntries
+		 *            {@link List} of {@link FullfilledEntry} to search into.
+		 * @param bindableColumn
+		 *            {@link BindableColumn} to match.
+		 * @return Matched {@link FullfilledEntry} or <code>null</code> if not found.
+		 */
+		public static FullfilledEntry find(List<FullfilledEntry> fullfilledEntries, BindableColumn bindableColumn) {
+			for (FullfilledEntry fullfilledEntry : fullfilledEntries) {
+				if (fullfilledEntry.getBindableColumn().equals(bindableColumn)) {
+					return fullfilledEntry;
+				}
+			}
+			
+			return null;
+		}
 		
 	}
 	
