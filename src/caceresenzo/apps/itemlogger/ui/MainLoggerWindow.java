@@ -11,7 +11,6 @@ import java.util.List;
 import javax.swing.BoxLayout;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -34,10 +33,12 @@ import caceresenzo.apps.itemlogger.models.Item;
 import caceresenzo.apps.itemlogger.models.Lend;
 import caceresenzo.apps.itemlogger.models.Person;
 import caceresenzo.apps.itemlogger.models.ReturnEntry;
+import caceresenzo.apps.itemlogger.ui.components.ActionButton;
 import caceresenzo.apps.itemlogger.ui.components.DataJTable;
 import caceresenzo.apps.itemlogger.ui.export.implementations.ExportToPdfDialog;
 import caceresenzo.apps.itemlogger.ui.export.implementations.ExportToPrinterDialog;
 import caceresenzo.apps.itemlogger.ui.history.HistoryReturnDialog;
+import caceresenzo.apps.itemlogger.ui.lend.LendDetailDialog;
 import caceresenzo.apps.itemlogger.ui.models.DatabaseEntryTableModel;
 import caceresenzo.frameworks.database.IDatabaseEntry;
 import caceresenzo.frameworks.database.synchronization.DatabaseSynchronizer;
@@ -49,15 +50,16 @@ public class MainLoggerWindow implements ActionListener, DatabaseEntryTableModel
 	private static Logger LOGGER = LoggerFactory.getLogger(MainLoggerWindow.class);
 	
 	/* Action Commands */
-	public static final String ACTION_COMMAND_ADD = "action_add";
 	public static final String ACTION_COMMAND_DISPLAY_ITEMS = "action_display_items";
 	public static final String ACTION_COMMAND_DISPLAY_PERSONS = "action_display_persons";
 	public static final String ACTION_COMMAND_DISPLAY_CONSTRUCTION_SITES = "action_display_construction_sites";
 	public static final String ACTION_COMMAND_DISPLAY_LEND = "action_display_lend";
 	public static final String ACTION_COMMAND_DISPLAY_RETURNS = "action_display_returns";
+	public static final String ACTION_COMMAND_ADD = "action_add";
 	public static final String ACTION_COMMAND_EXPORT_TO_PDF = "action_export_to_pdf";
 	public static final String ACTION_COMMAND_EXPORT_TO_PRINTER = "action_export_to_printer";
 	public static final String ACTION_COMMAND_TABLE_ACTION_RETURN_ITEM = "action_table_action_return_item";
+	public static final String ACTION_COMMAND_TABLE_ACTION_DETAILS_ITEM = "action_table_action_details_item";
 	
 	/* UI */
 	private JFrame frame;
@@ -266,7 +268,10 @@ public class MainLoggerWindow implements ActionListener, DatabaseEntryTableModel
 						JButton button = new JButton(i18n.string("logger.table.column.actions.button.history-entry.return"));
 						button.setActionCommand(ACTION_COMMAND_TABLE_ACTION_RETURN_ITEM);
 						
-						tableActionButtons = Arrays.asList(button);
+						JButton detailButton = new JButton(i18n.string("logger.table.column.actions.button.lend.details"));
+						detailButton.setActionCommand(ACTION_COMMAND_TABLE_ACTION_DETAILS_ITEM);
+						
+						tableActionButtons = Arrays.asList(button, detailButton);
 						break;
 					}
 					
@@ -309,6 +314,17 @@ public class MainLoggerWindow implements ActionListener, DatabaseEntryTableModel
 				break;
 			}
 			
+			case ACTION_COMMAND_TABLE_ACTION_DETAILS_ITEM: {
+				if (!Lend.class.equals(currentDisplayedModelClass)) {
+					throw new IllegalArgumentException("Cannot handle the return item action with a different model class than " + Lend.class.getSimpleName() + ".");
+				}
+				
+				Lend lend = (Lend) entries.get(row);
+				
+				LendDetailDialog.open(frame, lend);
+				break;
+			}
+			
 			default: {
 				throw new IllegalStateException("Unknown table action: " + action);
 			}
@@ -331,20 +347,20 @@ public class MainLoggerWindow implements ActionListener, DatabaseEntryTableModel
 	/** @return A {@link List list} of {@link JButton button}s that will be used to fill the "Actions" section. */
 	protected List<JButton> getActionButtons() {
 		return createButtonList(Arrays.asList(
-				new MainLoggerWindow.ActionButton("add", Assets.ICON_PLUS_32PX, ACTION_COMMAND_ADD),
-				new MainLoggerWindow.ActionButton("export-printer", Assets.ICON_PRINT_32PX, ACTION_COMMAND_EXPORT_TO_PRINTER),
-				new MainLoggerWindow.ActionButton("export-pdf", Assets.ICON_FILE_PDF_32PX, ACTION_COMMAND_EXPORT_TO_PDF) //
+				new ActionButton("add", Assets.ICON_PLUS_32PX, ACTION_COMMAND_ADD),
+				new ActionButton("export-printer", Assets.ICON_PRINT_32PX, ACTION_COMMAND_EXPORT_TO_PRINTER),
+				new ActionButton("export-pdf", Assets.ICON_FILE_PDF_32PX, ACTION_COMMAND_EXPORT_TO_PDF) //
 		));
 	}
 	
 	/** @return A {@link List list} of {@link JButton button}s that will be used to fill the "Model Actions" section. */
 	protected List<JButton> getModelActionButtons() {
 		return createButtonList(Arrays.asList(
-				new MainLoggerWindow.ActionButton("items", Assets.ICON_NEW_PRODUCT_32PX, ACTION_COMMAND_DISPLAY_ITEMS),
-				new MainLoggerWindow.ActionButton("persons", Assets.ICON_USER_MEN_32PX, ACTION_COMMAND_DISPLAY_PERSONS),
-				new MainLoggerWindow.ActionButton("construction-sites", Assets.ICON_IN_CONSTRUCTION_32PX, ACTION_COMMAND_DISPLAY_CONSTRUCTION_SITES),
-				new MainLoggerWindow.ActionButton("lend", Assets.ICON_HISTORY_32PX, ACTION_COMMAND_DISPLAY_LEND),
-				new MainLoggerWindow.ActionButton("returns", Assets.ICON_HISTORY_32PX, ACTION_COMMAND_DISPLAY_RETURNS) //
+				new ActionButton("items", Assets.ICON_NEW_PRODUCT_32PX, ACTION_COMMAND_DISPLAY_ITEMS),
+				new ActionButton("persons", Assets.ICON_USER_MEN_32PX, ACTION_COMMAND_DISPLAY_PERSONS),
+				new ActionButton("construction-sites", Assets.ICON_IN_CONSTRUCTION_32PX, ACTION_COMMAND_DISPLAY_CONSTRUCTION_SITES),
+				new ActionButton("lend", Assets.ICON_HISTORY_32PX, ACTION_COMMAND_DISPLAY_LEND),
+				new ActionButton("returns", Assets.ICON_HISTORY_32PX, ACTION_COMMAND_DISPLAY_RETURNS) //
 		));
 	}
 	
@@ -355,14 +371,14 @@ public class MainLoggerWindow implements ActionListener, DatabaseEntryTableModel
 	 *            {@link List} of {@link ActionButton}.
 	 * @return A {@link List list} of maximized {@link JButton}.
 	 */
-	protected List<JButton> createButtonList(List<MainLoggerWindow.ActionButton> actionButtons) {
+	protected List<JButton> createButtonList(List<ActionButton> actionButtons) {
 		List<JButton> buttons = new ArrayList<>();
 		
 		actionButtons.forEach((actionButton) -> {
-			JButton jButton = actionButton.toJButton(this);
-			jButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, jButton.getMinimumSize().height));
+			actionButton.addActionListener(this);
+			actionButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, actionButton.getMinimumSize().height));
 			
-			buttons.add(jButton);
+			buttons.add(actionButton);
 		});
 		
 		return buttons;
@@ -382,37 +398,4 @@ public class MainLoggerWindow implements ActionListener, DatabaseEntryTableModel
 		});
 	}
 	
-	private class ActionButton {
-		
-		/* Variables */
-		private final String actionKey, iconRessourcePath, actionCommand;
-		
-		/* Constructor */
-		public ActionButton(String actionKey, String iconRessourcePath, String actionCommand) {
-			this.actionKey = actionKey;
-			this.iconRessourcePath = iconRessourcePath;
-			this.actionCommand = actionCommand;
-		}
-		
-		/**
-		 * Convert this {@link ActionButton} holder class to a real {@link JButton} with provided informations.
-		 * 
-		 * @param actionListener
-		 *            Custom {@link ActionListener action listener} to add to the {@link JButton button}. Can be <code>null</code>.
-		 * @return A created {@link JButton} instance with {@link ActionButton}'s provided informations.
-		 */
-		public JButton toJButton(ActionListener actionListener) {
-			ImageIcon imageIcon = new ImageIcon(MainLoggerWindow.class.getResource(iconRessourcePath));
-			
-			JButton jButton = new JButton(i18n.string("logger.button.action." + actionKey), imageIcon);
-			jButton.setActionCommand(actionCommand);
-			
-			if (actionListener != null) {
-				jButton.addActionListener(actionListener);
-			}
-			
-			return jButton;
-		}
-		
-	}
 }

@@ -49,15 +49,6 @@ public class Language {
 			o("logger.button.search", "Rechercher");
 			o("logger.button.clear-search", "Vider la rech.");
 			
-			o("logger.button.action.add", "Ajouter");
-			o("logger.button.action.items", "Materiel");
-			o("logger.button.action.persons", "Personnes");
-			o("logger.button.action.construction-sites", "Chantiers");
-			o("logger.button.action.lend", "Prêt");
-			o("logger.button.action.returns", "Retours");
-			o("logger.button.action.export-printer", "Impression");
-			o("logger.button.action.export-pdf", "Exporter en PDF");
-			
 			o("logger.table.column.id", "ID");
 			o("logger.table.column.name", "Nom");
 			o("logger.table.column.initial_stock", "Stock Initial");
@@ -78,6 +69,7 @@ public class Language {
 			o("logger.table.column.actions.button.remove.confirm-dialog.title", "Confirmation de suppression");
 			o("logger.table.column.actions.button.remove.confirm-dialog.message", "Attention : Cette action n'est pas reversible !\nÊtes-vous sur de vouloir supprimer cette ligne ?");
 			o("logger.table.column.actions.button.history-entry.return", "RETOURNER");
+			o("logger.table.column.actions.button.lend.details", "DÉTAILS");
 			
 			o("create-dialog.window.title", "Ajout d'une ligne");
 			o("create-dialog.frame.new-line-part", "Nouvelle ligne — %s");
@@ -119,6 +111,24 @@ public class Language {
 			o("export-dialog.dialog.error.export-error.message", "L'exportation a renvoyé une erreur.\nSi vous pensez que ce n'est pas normal, contactez le developpeur.\n\nErreur : %s");
 			o("export-dialog.dialog.open-file.title", "Ouvrir le fichier");
 			o("export-dialog.dialog.open-file.message", "Voulez vous ouvrir le fichier ?\nEmplacement : %s");
+
+			o("returned-lend-details-dialog.window.title", "Détail d'un prêt");
+			o("returned-lend-details-dialog.label.item", "Objet");
+			o("returned-lend-details-dialog.label.person", "À");
+			o("returned-lend-details-dialog.label.construction-site", "Chantier");
+			o("returned-lend-details-dialog.label.quantity-and-waiting", "Quantité");
+			o("returned-lend-details-dialog.label.date", "Le");
+			o("returned-lend-details-dialog.label.extra", "Commentaire");
+			o("returned-lend-details-dialog.field.quantity-and-waiting", "%s empreinté(es), %s rendu");
+			
+			o("button.action.add", "Ajouter");
+			o("button.action.items", "Materiel");
+			o("button.action.persons", "Personnes");
+			o("button.action.construction-sites", "Chantiers");
+			o("button.action.lend", "Prêt");
+			o("button.action.returns", "Retours");
+			o("button.action.export-printer", "Impression");
+			o("button.action.export-pdf", "Exporter en PDF");
 			
 			o("model.item", "Item");
 			o("model.person", "Personne");

@@ -8,18 +8,17 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
 import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -42,12 +41,11 @@ import caceresenzo.apps.itemlogger.models.Lend;
 import caceresenzo.frameworks.database.binder.BindableColumn;
 import caceresenzo.frameworks.database.setup.TableAnalizer;
 import caceresenzo.libs.internationalization.i18n;
-import javax.swing.JCheckBox;
 
 public class HistoryReturnDialog extends JDialog implements ActionListener, CaretListener {
 	
 	/* Logger */
-	private static Logger LOGGER = LoggerFactory.getLogger(HistoryReturnDialog.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(HistoryReturnDialog.class);
 	
 	/* Action Commands */
 	public static final String ACTION_COMMAND_VALIDATE = "action_validate";

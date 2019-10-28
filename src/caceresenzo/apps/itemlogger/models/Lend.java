@@ -17,8 +17,8 @@ import caceresenzo.frameworks.database.setup.sql.SqlTableBuilder;
 public class Lend implements IDatabaseEntry {
 	
 	/* Database Fields */
-	public static final String COLUMN_PERSON = "person";
 	public static final String COLUMN_ITEM = "item";
+	public static final String COLUMN_PERSON = "person";
 	public static final String COLUMN_CONSTRUCTION_SITE = "construction_site";
 	public static final String COLUMN_QUANTITY = "quantity";
 	public static final String COLUMN_WAITING_QUANTITY = "waiting_quantity";
@@ -101,7 +101,7 @@ public class Lend implements IDatabaseEntry {
 	
 	@Override
 	public String describe() {
-		throw new UnsupportedOperationException();
+		return item.getName();
 	}
 	
 	@Override
