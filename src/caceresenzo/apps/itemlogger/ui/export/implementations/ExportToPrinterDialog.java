@@ -13,7 +13,7 @@ import org.apache.pdfbox.printing.PDFPageable;
 
 import caceresenzo.apps.itemlogger.configuration.Constants;
 import caceresenzo.apps.itemlogger.export.DataExporter;
-import caceresenzo.apps.itemlogger.export.pdf.PdfDataExporter;
+import caceresenzo.apps.itemlogger.export.implementations.pdf.PdfDataExporter;
 import caceresenzo.apps.itemlogger.ui.export.AbstractExportToDialog;
 import caceresenzo.frameworks.settings.SettingEntry;
 

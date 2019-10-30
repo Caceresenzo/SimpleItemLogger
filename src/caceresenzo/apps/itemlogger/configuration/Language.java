@@ -116,10 +116,12 @@ public class Language {
 			o("returned-lend-details-dialog.label.item", "Objet");
 			o("returned-lend-details-dialog.label.person", "À");
 			o("returned-lend-details-dialog.label.construction-site", "Chantier");
-			o("returned-lend-details-dialog.label.quantity-and-waiting", "Quantité");
+			o("returned-lend-details-dialog.label.quantity-and-returned", "Quantité");
 			o("returned-lend-details-dialog.label.date", "Le");
 			o("returned-lend-details-dialog.label.extra", "Commentaire");
-			o("returned-lend-details-dialog.field.quantity-and-waiting", "%s empreinté(es), %s rendu");
+			o("returned-lend-details-dialog.field.quantity-and-returned", "%s empreinté(es), %s rendu");
+			o("returned-lend-details-dialog.dialog.error.already-fulfill.title", "Déjà rempli");
+			o("returned-lend-details-dialog.dialog.error.already-fulfill.message", "Il semble que tous les éléments ont déjà été retournés.");
 			
 			o("button.action.add", "Ajouter");
 			o("button.action.items", "Materiel");
@@ -135,6 +137,19 @@ public class Language {
 			o("model.constructionsite", "Chantier");
 			o("model.lend", "Prêt");
 			o("model.returnentry", "Retour");
+
+			o("pdf.header.title.good-release", "BON DE SORTIE");
+			o("pdf.header.title.receipt-slip", "BON DE RENTRÉ");
+
+			o("pdf.card.title.item", "Objet");
+			o("pdf.card.title.person", "À");
+			o("pdf.card.title.construction-site", "Chantier");
+			o("pdf.card.title.quantity", "Quantité");
+			o("pdf.card.title.date", "Date");
+			o("pdf.card.title.extra", "Commentaire");
+
+			o("pdf.card.title.negro.date-and-sign", "Date et Signature");
+			o("pdf.card.title.negro.extra", "Remarque");
 			
 			o("", "");
 		}

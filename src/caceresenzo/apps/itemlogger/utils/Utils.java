@@ -6,6 +6,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Arrays;
 
+import com.github.lgooddatepicker.components.DatePicker;
+
 import caceresenzo.apps.itemlogger.configuration.Constants;
 import caceresenzo.frameworks.database.IDatabaseEntry;
 import caceresenzo.frameworks.settings.SettingEntry;
@@ -70,6 +72,14 @@ public class Utils implements Constants {
 		}
 		
 		return String.valueOf(object);
+	}
+	
+	public static final String localDateToPickerFormat(LocalDate localDate) {
+		DatePicker datePicker = new DatePicker();
+		
+		datePicker.setDate(localDate);
+		
+		return datePicker.getText();
 	}
 	
 }

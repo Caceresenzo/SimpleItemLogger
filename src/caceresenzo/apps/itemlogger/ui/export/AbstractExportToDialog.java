@@ -155,14 +155,18 @@ public abstract class AbstractExportToDialog extends JDialog implements Constant
 	
 	/** Initialize the {@link ExportSettingPanel} list with the {@link TableCreator}'s loaded {@link BindableTable bindables}. */
 	private void initializeSettings() {
-		DataManager.get().getTableCreator().getBindables().values().forEach((bindableTable) -> {
+		for (BindableTable bindableTable : DataManager.get().getTableCreator().getBindables().values()) {
+			if (bindableTable.isSubData()) {
+				continue;
+			}
+			
 			Class<?> modelClass = bindableTable.getModelClass();
 			
 			String key = Utils.formatModelClassSettingEntryKey(modelClass);
 			String display = i18n.string("logger.panel.data.title.with.part." + modelClass.getSimpleName().toLowerCase());
 			
 			settingListPanel.add(new ExportSettingPanel(key, display, true));
-		});
+		}
 	}
 	
 	/** Called when the "browse" button has been clicked. */

@@ -23,9 +23,14 @@ public class BindableTable {
 		return annotation.value();
 	}
 	
-	/** @see DatabaseTable#removable() */
+	/** @see DatabaseTable#isRemovable() */
 	public boolean isRowRemovable() {
-		return annotation.removable();
+		return annotation.isRemovable();
+	}
+	
+	/** @see DatabaseTable#isSubData() */
+	public boolean isSubData() {
+		return annotation.isSubData();
 	}
 	
 	/** @return Table's annotation. */

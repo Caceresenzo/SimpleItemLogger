@@ -47,7 +47,7 @@ public class AddNewDialog extends JDialog implements ActionListener {
 	private final Class<?> modelClass;
 	private final transient Callback callback;
 	private final transient List<BindableColumn> bindableColumns;
-	private final transient List<FullfilledEntry> fullfilledEntries;
+	private final transient List<FulfilledEntry> fullfiledEntries;
 	
 	/* Constructor */
 	public AddNewDialog(JFrame parent, Class<?> modelClass, Callback callback) {
@@ -55,12 +55,12 @@ public class AddNewDialog extends JDialog implements ActionListener {
 	}
 	
 	/* Constructor */
-	public AddNewDialog(JFrame parent, Class<?> modelClass, Callback callback, List<FullfilledEntry> fullfilledEntries) {
+	public AddNewDialog(JFrame parent, Class<?> modelClass, Callback callback, List<FulfilledEntry> fullfilledEntries) {
 		super(parent);
 		
 		this.modelClass = modelClass;
 		this.callback = callback;
-		this.fullfilledEntries = fullfilledEntries == null ? new ArrayList<>() : fullfilledEntries;
+		this.fullfiledEntries = fullfilledEntries == null ? new ArrayList<>() : fullfilledEntries;
 		
 		this.bindableColumns = TableAnalizer.get().analizeColumns(modelClass);
 		this.bindableColumns.remove(BindableColumn.findIdColumn(bindableColumns));
@@ -117,9 +117,9 @@ public class AddNewDialog extends JDialog implements ActionListener {
 	/** Fill the main panel with all {@link AbstractFieldPartPanel}. */
 	private void initializePanels() {
 		for (BindableColumn bindableColumn : bindableColumns) {
-			FullfilledEntry fullfilledEntry = FullfilledEntry.find(fullfilledEntries, bindableColumn);
+			FulfilledEntry fulfilledEntry = FulfilledEntry.find(fullfiledEntries, bindableColumn);
 			
-			if (fullfilledEntry == null) {
+			if (fulfilledEntry == null) {
 				fieldListPanel.add(AbstractFieldPartPanel.find(modelClass, bindableColumn, null));
 			}
 		}
@@ -200,9 +200,9 @@ public class AddNewDialog extends JDialog implements ActionListener {
 			}
 		}
 		
-		for (FullfilledEntry fullfilledEntry : fullfilledEntries) {
-			BindableColumn bindableColumn = fullfilledEntry.getBindableColumn();
-			Object value = fullfilledEntry.getValue();
+		for (FulfilledEntry fulfilledEntry : fullfiledEntries) {
+			BindableColumn bindableColumn = fulfilledEntry.getBindableColumn();
+			Object value = fulfilledEntry.getValue();
 			Field field = bindableColumn.getField();
 			
 			field.set(instance, value);
@@ -239,7 +239,7 @@ public class AddNewDialog extends JDialog implements ActionListener {
 	 *            Already full-filled entries {@link List list}.
 	 * @see AddNewDialog#open(JFrame, Class, Callback)
 	 */
-	public static void open(JFrame parent, Class<?> modelClass, Callback callback, List<FullfilledEntry> fullfilledEntries) {
+	public static void open(JFrame parent, Class<?> modelClass, Callback callback, List<FulfilledEntry> fullfilledEntries) {
 		AddNewDialog dialog = new AddNewDialog(parent, modelClass, callback, fullfilledEntries);
 		
 		dialog.setVisible(true);
@@ -264,39 +264,39 @@ public class AddNewDialog extends JDialog implements ActionListener {
 		
 	}
 	
-	public static class FullfilledEntry {
+	public static class FulfilledEntry {
 		
 		/* Variables */
 		private final BindableColumn bindableColumn;
 		private final Object value;
 		
 		/* Constructor */
-		public FullfilledEntry(BindableColumn bindableColumn, Object value) {
+		public FulfilledEntry(BindableColumn bindableColumn, Object value) {
 			this.bindableColumn = bindableColumn;
 			this.value = value;
 		}
 		
-		/** @return {@link FullfilledEntry}'s {@link BindableColumn}. */
+		/** @return {@link FulfilledEntry}'s {@link BindableColumn}. */
 		public BindableColumn getBindableColumn() {
 			return bindableColumn;
 		}
 		
-		/** @return {@link FullfilledEntry}'s filled value. */
+		/** @return {@link FulfilledEntry}'s filled value. */
 		public Object getValue() {
 			return value;
 		}
 		
 		/**
-		 * Find a {@link FullfilledEntry} instance in a {@link List list} if the {@link BindableColumn} matches.
+		 * Find a {@link FulfilledEntry} instance in a {@link List list} if the {@link BindableColumn} matches.
 		 * 
-		 * @param fullfilledEntries
-		 *            {@link List} of {@link FullfilledEntry} to search into.
+		 * @param fulfilledEntries
+		 *            {@link List} of {@link FulfilledEntry} to search into.
 		 * @param bindableColumn
 		 *            {@link BindableColumn} to match.
-		 * @return Matched {@link FullfilledEntry} or <code>null</code> if not found.
+		 * @return Matched {@link FulfilledEntry} or <code>null</code> if not found.
 		 */
-		public static FullfilledEntry find(List<FullfilledEntry> fullfilledEntries, BindableColumn bindableColumn) {
-			for (FullfilledEntry fullfilledEntry : fullfilledEntries) {
+		public static FulfilledEntry find(List<FulfilledEntry> fulfilledEntries, BindableColumn bindableColumn) {
+			for (FulfilledEntry fullfilledEntry : fulfilledEntries) {
 				if (fullfilledEntry.getBindableColumn().equals(bindableColumn)) {
 					return fullfilledEntry;
 				}

@@ -5,7 +5,7 @@ import java.awt.FlowLayout;
 import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.time.LocalDate;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -16,6 +16,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -24,6 +25,9 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.github.lgooddatepicker.components.DatePicker;
 
@@ -43,6 +47,9 @@ import caceresenzo.libs.internationalization.i18n;
 
 public class LendDetailDialog extends JDialog implements ActionListener {
 	
+	/* Logger */
+	private static final Logger LOGGER = LoggerFactory.getLogger(LendDetailDialog.class);
+	
 	/* Constants */
 	public static final Class<? extends IDatabaseEntry> MODEL_CLASS = ReturnEntry.class;
 	
@@ -54,7 +61,7 @@ public class LendDetailDialog extends JDialog implements ActionListener {
 	/* UI */
 	private final JPanel contentPanel = new JPanel();
 	private JPanel detailsPanel;
-	private JTextField itemTextField, personTextField, constructionSiteTextField, quantityAndWaitingTextField, dateTextField, extraTextField;
+	private JTextField itemTextField, personTextField, constructionSiteTextField, quantityAndReturnedTextField, dateTextField, extraTextField;
 	private JTable dataTable;
 	
 	/* Variables */
@@ -173,7 +180,7 @@ public class LendDetailDialog extends JDialog implements ActionListener {
 		constructionSiteTextField.setEditable(false);
 		constructionSiteTextField.setColumns(10);
 		
-		JLabel quantityAndWaitingLabel = new JLabel(i18n.string("returned-lend-details-dialog.label.quantity-and-waiting"));
+		JLabel quantityAndWaitingLabel = new JLabel(i18n.string("returned-lend-details-dialog.label.quantity-and-returned"));
 		quantityAndWaitingLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		
 		JLabel dateLabel = new JLabel(i18n.string("returned-lend-details-dialog.label.date"));
@@ -182,9 +189,9 @@ public class LendDetailDialog extends JDialog implements ActionListener {
 		JLabel extraLabel = new JLabel(i18n.string("returned-lend-details-dialog.label.extra"));
 		extraLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		
-		quantityAndWaitingTextField = new JTextField();
-		quantityAndWaitingTextField.setEditable(false);
-		quantityAndWaitingTextField.setColumns(10);
+		quantityAndReturnedTextField = new JTextField();
+		quantityAndReturnedTextField.setEditable(false);
+		quantityAndReturnedTextField.setColumns(10);
 		
 		dateTextField = new JTextField();
 		dateTextField.setEditable(false);
@@ -192,6 +199,8 @@ public class LendDetailDialog extends JDialog implements ActionListener {
 		
 		extraTextField = new JTextField();
 		extraTextField.setColumns(10);
+		extraTextField.setEditable(false);
+		
 		GroupLayout gl_detailsPanel = new GroupLayout(detailsPanel);
 		gl_detailsPanel.setHorizontalGroup(
 				gl_detailsPanel.createParallelGroup(Alignment.LEADING)
@@ -209,7 +218,7 @@ public class LendDetailDialog extends JDialog implements ActionListener {
 										.addComponent(constructionSiteTextField, GroupLayout.DEFAULT_SIZE, 219, Short.MAX_VALUE)
 										.addComponent(personTextField, GroupLayout.DEFAULT_SIZE, 219, Short.MAX_VALUE)
 										.addComponent(itemTextField, GroupLayout.DEFAULT_SIZE, 219, Short.MAX_VALUE)
-										.addComponent(quantityAndWaitingTextField, GroupLayout.DEFAULT_SIZE, 219, Short.MAX_VALUE)
+										.addComponent(quantityAndReturnedTextField, GroupLayout.DEFAULT_SIZE, 219, Short.MAX_VALUE)
 										.addComponent(dateTextField, GroupLayout.DEFAULT_SIZE, 219, Short.MAX_VALUE)
 										.addGroup(Alignment.TRAILING, gl_detailsPanel.createSequentialGroup()
 												.addPreferredGap(ComponentPlacement.UNRELATED)
@@ -232,7 +241,7 @@ public class LendDetailDialog extends JDialog implements ActionListener {
 								.addPreferredGap(ComponentPlacement.RELATED)
 								.addGroup(gl_detailsPanel.createParallelGroup(Alignment.BASELINE)
 										.addComponent(quantityAndWaitingLabel, GroupLayout.PREFERRED_SIZE, 17, GroupLayout.PREFERRED_SIZE)
-										.addComponent(quantityAndWaitingTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+										.addComponent(quantityAndReturnedTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 								.addPreferredGap(ComponentPlacement.RELATED)
 								.addGroup(gl_detailsPanel.createParallelGroup(Alignment.BASELINE)
 										.addComponent(dateLabel, GroupLayout.PREFERRED_SIZE, 17, GroupLayout.PREFERRED_SIZE)
@@ -287,16 +296,16 @@ public class LendDetailDialog extends JDialog implements ActionListener {
 		
 		dataTable.setModel(new DatabaseEntryTableModel<>(dataTable, ReturnEntry.class, rawReturnEntries));
 		
-		refreshQuantityAndWaitingTextField();
+		refreshQuantityAndReturnedTextField();
 	}
 	
-	/** Refresh the "quantity and waiting" text. */
-	private void refreshQuantityAndWaitingTextField() {
-		quantityAndWaitingTextField.setText(i18n.string("returned-lend-details-dialog.field.quantity-and-waiting", lend.getQuantity(), computeWaitingQuantity()));
+	/** Refresh the "quantity and returned" text. */
+	private void refreshQuantityAndReturnedTextField() {
+		quantityAndReturnedTextField.setText(i18n.string("returned-lend-details-dialog.field.quantity-and-returned", lend.getQuantity(), computeAlreadyReturnedQuantity()));
 	}
 	
-	/** @return Computed waiting-to-return quantity. */
-	private int computeWaitingQuantity() {
+	/** @return Computed already returned quantity. */
+	private int computeAlreadyReturnedQuantity() {
 		int waiting = 0;
 		
 		for (ReturnEntry returnEntry : returnEntries) {
@@ -307,8 +316,49 @@ public class LendDetailDialog extends JDialog implements ActionListener {
 	}
 	
 	@Override
-	public void actionPerformed(ActionEvent actionEvent) {
+	public void actionPerformed(ActionEvent event) {
+		String actionCommand = event.getActionCommand();
 		
+		switch (actionCommand) {
+			case ACTION_COMMAND_ADD: {
+				if (computeAlreadyReturnedQuantity() >= lend.getQuantity()) {
+					JOptionPane.showMessageDialog(this, i18n.string("returned-lend-details-dialog.dialog.error.already-fulfill.message"), i18n.string("returned-lend-details-dialog.dialog.error.already-fulfill.title"), JOptionPane.ERROR_MESSAGE);
+				} else {
+					AddNewDialog.open((JFrame) getParent(), MODEL_CLASS, new AddNewDialog.Callback() {
+						@Override
+						public void onCreatedItem(Class<?> modelClass, Object instance) {
+							rangeQuantity((ReturnEntry) instance);
+							
+							DataManager.get().getDatabaseSynchronizer().insert(modelClass, instance);
+							
+							loadReturnEntries();
+						}
+						
+						public void rangeQuantity(ReturnEntry returnEntry) {
+							int already = computeAlreadyReturnedQuantity();
+							int newQuantity = already + returnEntry.getQuantity();
+							
+							if (newQuantity > lend.getQuantity()) {
+								BindableColumn bindableColumn = BindableColumn.findColumn(TableAnalizer.get().analizeColumns(MODEL_CLASS), ReturnEntry.COLUMN_QUANTITY);
+								Field field = bindableColumn.getField();
+								
+								newQuantity = Math.min(newQuantity, lend.getQuantity());
+								try {
+									field.set(returnEntry, newQuantity);
+								} catch (IllegalArgumentException | IllegalAccessException exception) {
+									LOGGER.warn("Failed to range the quantity for the ReturnEntry model.", exception);
+								}
+							}
+						}
+					}, Arrays.asList(new AddNewDialog.FulfilledEntry(returnEntryLendBindableColumn, lend)));
+				}
+				break;
+			}
+			
+			default: {
+				throw new IllegalStateException("Unknown action command: " + actionCommand);
+			}
+		}
 	}
 	
 	/**

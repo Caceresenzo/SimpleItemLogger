@@ -8,7 +8,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import caceresenzo.apps.itemlogger.export.DataExporter;
-import caceresenzo.apps.itemlogger.export.pdf.PdfDataExporter;
+import caceresenzo.apps.itemlogger.export.implementations.pdf.PdfDataExporter;
 import caceresenzo.apps.itemlogger.ui.export.AbstractExportToDialog;
 import caceresenzo.frameworks.settings.SettingEntry;
 import caceresenzo.libs.internationalization.i18n;

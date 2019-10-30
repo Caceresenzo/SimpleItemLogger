@@ -88,7 +88,7 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 		initilizeActionButtonsRenderer();
 	}
 	
-	/** Check if the {@link BindableTable} has its row "{@link DatabaseTable#removable() removable}" and add the action column (if not already enabled) to add a remove button. */
+	/** Check if the {@link BindableTable} has its row "{@link DatabaseTable#isRemovable() removable}" and add the action column (if not already enabled) to add a remove button. */
 	private void checkActionForRemovableRows() {
 		if (bindableTable.isRowRemovable()) {
 			JButton removeRowButton = new JButton(i18n.string("logger.table.column.actions.button.remove"));
