@@ -2,6 +2,7 @@ package caceresenzo.apps.itemlogger.ui.lend;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -32,6 +33,12 @@ import org.slf4j.LoggerFactory;
 import com.github.lgooddatepicker.components.DatePicker;
 
 import caceresenzo.apps.itemlogger.assets.Assets;
+import caceresenzo.apps.itemlogger.export.GoodReleaseExporter;
+import caceresenzo.apps.itemlogger.export.ReceiptSlipExporter;
+import caceresenzo.apps.itemlogger.export.implementations.pdf.PdfGoodReleaseExporter;
+import caceresenzo.apps.itemlogger.export.implementations.pdf.PdfReceiptSlipExporter;
+import caceresenzo.apps.itemlogger.export.physical.GoodRelease;
+import caceresenzo.apps.itemlogger.export.physical.ReceiptSlip;
 import caceresenzo.apps.itemlogger.managers.DataManager;
 import caceresenzo.apps.itemlogger.models.Lend;
 import caceresenzo.apps.itemlogger.models.ReturnEntry;
@@ -43,9 +50,10 @@ import caceresenzo.frameworks.database.IDatabaseEntry;
 import caceresenzo.frameworks.database.binder.BindableColumn;
 import caceresenzo.frameworks.database.setup.TableAnalizer;
 import caceresenzo.frameworks.database.synchronization.DatabaseSynchronizer;
+import caceresenzo.frameworks.printer.Printer;
 import caceresenzo.libs.internationalization.i18n;
 
-public class LendDetailDialog extends JDialog implements ActionListener {
+public class LendDetailDialog extends JDialog implements ActionListener, DatabaseEntryTableModel.Callback<ReturnEntry> {
 	
 	/* Logger */
 	private static final Logger LOGGER = LoggerFactory.getLogger(LendDetailDialog.class);
@@ -55,14 +63,16 @@ public class LendDetailDialog extends JDialog implements ActionListener {
 	
 	/* Action Commands */
 	public static final String ACTION_COMMAND_ADD = "action_add";
-	public static final String ACTION_COMMAND_EXPORT_TO_PDF = "action_export_to_pdf";
-	public static final String ACTION_COMMAND_EXPORT_TO_PRINTER = "action_export_to_printer";
+	public static final String ACTION_COMMAND_PRINT = "action_export_to_printer";
+	public static final String ACTION_COMMAND_FINISH = "action_finish";
+	public static final String ACTION_COMMAND_TABLE_ACTION_PRINT_RECEIPT_SLIP = "action_table_action_details_return";
 	
 	/* UI */
 	private final JPanel contentPanel = new JPanel();
 	private JPanel detailsPanel;
 	private JTextField itemTextField, personTextField, constructionSiteTextField, quantityAndReturnedTextField, dateTextField, extraTextField;
 	private JTable dataTable;
+	private JButton printButton, addButton;
 	
 	/* Variables */
 	private final Lend lend;
@@ -93,71 +103,63 @@ public class LendDetailDialog extends JDialog implements ActionListener {
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		
 		JScrollPane returnsScrollPane = new JScrollPane();
-		returnsScrollPane.setBorder(new TitledBorder(null, "Returns", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		returnsScrollPane.setBorder(new TitledBorder(null, i18n.string("returned-lend-details-dialog.panel.returned"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		returnsScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		returnsScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		
 		detailsPanel = new JPanel();
-		detailsPanel.setBorder(new TitledBorder(null, "Details", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		detailsPanel.setBorder(new TitledBorder(null, i18n.string("returned-lend-details-dialog.panel.details"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
-		JPanel actionsPanel = new JPanel();
-		actionsPanel.setBorder(new TitledBorder(null, "Actions", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		JPanel actionsContainerPanel = new JPanel();
+		actionsContainerPanel.setBorder(new TitledBorder(null, i18n.string("returned-lend-details-dialog.panel.actions"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
 		GroupLayout gl_contentPanel = new GroupLayout(contentPanel);
 		gl_contentPanel.setHorizontalGroup(
-				gl_contentPanel.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_contentPanel.createSequentialGroup()
+				gl_contentPanel.createParallelGroup(Alignment.TRAILING)
+						.addGroup(Alignment.LEADING, gl_contentPanel.createSequentialGroup()
 								.addContainerGap()
 								.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
 										.addComponent(returnsScrollPane, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 620, Short.MAX_VALUE)
-										.addGroup(gl_contentPanel.createSequentialGroup()
-												.addComponent(detailsPanel, GroupLayout.DEFAULT_SIZE, 397, Short.MAX_VALUE)
-												.addPreferredGap(ComponentPlacement.UNRELATED)
-												.addComponent(actionsPanel, GroupLayout.PREFERRED_SIZE, 213, GroupLayout.PREFERRED_SIZE)))
+										.addComponent(actionsContainerPanel, GroupLayout.DEFAULT_SIZE, 620, Short.MAX_VALUE)
+										.addComponent(detailsPanel, GroupLayout.DEFAULT_SIZE, 620, Short.MAX_VALUE))
 								.addContainerGap()));
 		gl_contentPanel.setVerticalGroup(
 				gl_contentPanel.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_contentPanel.createSequentialGroup()
-								.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING)
-										.addGroup(gl_contentPanel.createSequentialGroup()
-												.addGap(11)
-												.addComponent(detailsPanel, GroupLayout.PREFERRED_SIZE, 178, GroupLayout.PREFERRED_SIZE))
-										.addGroup(gl_contentPanel.createSequentialGroup()
-												.addContainerGap()
-												.addComponent(actionsPanel, GroupLayout.DEFAULT_SIZE, 178, Short.MAX_VALUE)))
-								.addPreferredGap(ComponentPlacement.RELATED)
-								.addComponent(returnsScrollPane, GroupLayout.DEFAULT_SIZE, 317, Short.MAX_VALUE)
-								.addContainerGap()));
-		
-		JButton addButton = new ActionButton("add", Assets.ICON_PLUS_32PX, ACTION_COMMAND_ADD);
-		JButton printButton = new ActionButton("export-printer", Assets.ICON_PRINT_32PX, ACTION_COMMAND_EXPORT_TO_PRINTER);
-		JButton exportToPdfButton = new ActionButton("export-pdf", Assets.ICON_FILE_PDF_32PX, ACTION_COMMAND_EXPORT_TO_PDF);
-		
-		for (JButton jButton : Arrays.asList(addButton, printButton, exportToPdfButton)) {
-			jButton.addActionListener(this);
-			jButton.setHorizontalAlignment(SwingConstants.LEFT);
-		}
-		
-		GroupLayout gl_actionsPanel = new GroupLayout(actionsPanel);
-		gl_actionsPanel.setHorizontalGroup(
-				gl_actionsPanel.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_actionsPanel.createSequentialGroup()
 								.addContainerGap()
-								.addGroup(gl_actionsPanel.createParallelGroup(Alignment.LEADING)
-										.addComponent(addButton, GroupLayout.DEFAULT_SIZE, 181, Short.MAX_VALUE)
-										.addComponent(printButton, GroupLayout.PREFERRED_SIZE, 181, GroupLayout.PREFERRED_SIZE)
-										.addComponent(exportToPdfButton, GroupLayout.PREFERRED_SIZE, 181, GroupLayout.PREFERRED_SIZE))
+								.addComponent(detailsPanel, GroupLayout.PREFERRED_SIZE, 178, GroupLayout.PREFERRED_SIZE)
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addComponent(actionsContainerPanel, GroupLayout.PREFERRED_SIZE, 81, GroupLayout.PREFERRED_SIZE)
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addComponent(returnsScrollPane, GroupLayout.PREFERRED_SIZE, 239, GroupLayout.PREFERRED_SIZE)
 								.addContainerGap()));
-		gl_actionsPanel.setVerticalGroup(
-				gl_actionsPanel.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_actionsPanel.createSequentialGroup()
-								.addComponent(addButton, GroupLayout.PREFERRED_SIZE, 34, GroupLayout.PREFERRED_SIZE)
-								.addPreferredGap(ComponentPlacement.RELATED)
-								.addComponent(printButton, GroupLayout.PREFERRED_SIZE, 34, GroupLayout.PREFERRED_SIZE)
-								.addPreferredGap(ComponentPlacement.RELATED)
-								.addComponent(exportToPdfButton, GroupLayout.PREFERRED_SIZE, 34, GroupLayout.PREFERRED_SIZE)
-								.addContainerGap(41, Short.MAX_VALUE)));
-		actionsPanel.setLayout(gl_actionsPanel);
+		
+		JPanel actionsPanel = new JPanel();
+		actionsPanel.setBorder(null);
+		
+		addButton = new ActionButton("add", Assets.ICON_PLUS_32PX, ACTION_COMMAND_ADD);
+		printButton = new ActionButton("print-good-release", Assets.ICON_PRINT_32PX, ACTION_COMMAND_PRINT);
+		actionsPanel.setLayout(new GridLayout(0, 2, 0, 0));
+		actionsPanel.add(addButton);
+		actionsPanel.add(printButton);
+		GroupLayout gl_actionsContainerPanel = new GroupLayout(actionsContainerPanel);
+		gl_actionsContainerPanel.setHorizontalGroup(
+				gl_actionsContainerPanel.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_actionsContainerPanel.createSequentialGroup()
+								.addContainerGap()
+								.addComponent(actionsPanel, GroupLayout.DEFAULT_SIZE, 600, Short.MAX_VALUE)
+								.addContainerGap()));
+		gl_actionsContainerPanel.setVerticalGroup(
+				gl_actionsContainerPanel.createParallelGroup(Alignment.LEADING)
+						.addGroup(Alignment.TRAILING, gl_actionsContainerPanel.createSequentialGroup()
+								.addContainerGap()
+								.addComponent(actionsPanel, GroupLayout.DEFAULT_SIZE, 43, Short.MAX_VALUE)
+								.addContainerGap()));
+		actionsContainerPanel.setLayout(gl_actionsContainerPanel);
+		
+		for (JButton jButton : Arrays.asList(addButton, printButton)) {
+			jButton.addActionListener(this);
+		}
 		
 		JLabel itemLabel = new JLabel(i18n.string("returned-lend-details-dialog.label.item"));
 		itemLabel.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -263,10 +265,12 @@ public class LendDetailDialog extends JDialog implements ActionListener {
 		buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 		
-		JButton okButton = new JButton("OK");
-		okButton.setActionCommand("OK");
-		buttonPanel.add(okButton);
-		getRootPane().setDefaultButton(okButton);
+		JButton finishButton = new JButton(i18n.string("returned-lend-details-dialog.button.finish"));
+		finishButton.addActionListener(this);
+		finishButton.setActionCommand(ACTION_COMMAND_FINISH);
+		
+		buttonPanel.add(finishButton);
+		getRootPane().setDefaultButton(finishButton);
 		
 		initializeTextFields();
 		loadReturnEntries();
@@ -294,7 +298,10 @@ public class LendDetailDialog extends JDialog implements ActionListener {
 		returnEntries.clear();
 		returnEntries.addAll(rawReturnEntries);
 		
-		dataTable.setModel(new DatabaseEntryTableModel<>(dataTable, ReturnEntry.class, rawReturnEntries));
+		JButton detailButton = new JButton("Impr. Bon de Retour");
+		detailButton.setActionCommand(ACTION_COMMAND_TABLE_ACTION_PRINT_RECEIPT_SLIP);
+		
+		dataTable.setModel(new DatabaseEntryTableModel<>(dataTable, ReturnEntry.class, rawReturnEntries, Arrays.asList(detailButton), this));
 		
 		refreshQuantityAndReturnedTextField();
 	}
@@ -355,9 +362,67 @@ public class LendDetailDialog extends JDialog implements ActionListener {
 				break;
 			}
 			
+			case ACTION_COMMAND_PRINT: {
+				print((file) -> {
+					GoodReleaseExporter goodReleaseExporter = new PdfGoodReleaseExporter();
+					
+					try {
+						goodReleaseExporter.exportToFile(new GoodRelease(lend), file);
+					} catch (Exception exception) {
+						throw new RuntimeException(exception);
+					}
+				});
+				break;
+			}
+			
+			case ACTION_COMMAND_FINISH: {
+				setVisible(false);
+				break;
+			}
+			
 			default: {
 				throw new IllegalStateException("Unknown action command: " + actionCommand);
 			}
+		}
+	}
+	
+	@Override
+	public void onTableActionClick(JTable table, DatabaseEntryTableModel<ReturnEntry> tableClass, List<ReturnEntry> entries, int row, String action) {
+		ReturnEntry returnEntry = entries.get(row);
+		
+		switch (action) {
+			case ACTION_COMMAND_TABLE_ACTION_PRINT_RECEIPT_SLIP: {
+				print((file) -> {
+					ReceiptSlipExporter receiptSlipExporter = new PdfReceiptSlipExporter();
+					
+					try {
+						receiptSlipExporter.exportToFile(new ReceiptSlip(returnEntry), file);
+					} catch (Exception exception) {
+						throw new RuntimeException(exception);
+					}
+				});
+				break;
+			}
+			
+			default: {
+				throw new IllegalStateException("Unknown table row action: " + action);
+			}
+		}
+	}
+	
+	/**
+	 * Do a print and handle any error that append.
+	 * 
+	 * @param printAction
+	 *            Action to print.
+	 */
+	private void print(Printer.PrintAction printAction) {
+		try {
+			new Printer().print(true, printAction);
+		} catch (Exception exception) {
+			LOGGER.error("Failed to print.", exception);
+			
+			JOptionPane.showMessageDialog(this, i18n.string("printer.dialog.failed.message", exception.getMessage()), i18n.string("printer.dialog.failed.title"), JOptionPane.ERROR_MESSAGE);
 		}
 	}
 	

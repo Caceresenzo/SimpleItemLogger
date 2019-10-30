@@ -37,17 +37,15 @@ import caceresenzo.apps.itemlogger.ui.components.ActionButton;
 import caceresenzo.apps.itemlogger.ui.components.DataJTable;
 import caceresenzo.apps.itemlogger.ui.export.implementations.ExportToPdfDialog;
 import caceresenzo.apps.itemlogger.ui.export.implementations.ExportToPrinterDialog;
-import caceresenzo.apps.itemlogger.ui.history.HistoryReturnDialog;
 import caceresenzo.apps.itemlogger.ui.lend.LendDetailDialog;
 import caceresenzo.apps.itemlogger.ui.models.DatabaseEntryTableModel;
 import caceresenzo.frameworks.database.IDatabaseEntry;
-import caceresenzo.frameworks.database.synchronization.DatabaseSynchronizer;
 import caceresenzo.libs.internationalization.i18n;
 
-public class MainLoggerWindow implements ActionListener, DatabaseEntryTableModel.Callback<IDatabaseEntry>, HistoryReturnDialog.Callback {
+public class MainLoggerWindow implements ActionListener, DatabaseEntryTableModel.Callback<IDatabaseEntry> {
 	
 	/* Logger */
-	private static Logger LOGGER = LoggerFactory.getLogger(MainLoggerWindow.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(MainLoggerWindow.class);
 	
 	/* Action Commands */
 	public static final String ACTION_COMMAND_DISPLAY_ITEMS = "action_display_items";
@@ -58,12 +56,11 @@ public class MainLoggerWindow implements ActionListener, DatabaseEntryTableModel
 	public static final String ACTION_COMMAND_ADD = "action_add";
 	public static final String ACTION_COMMAND_EXPORT_TO_PDF = "action_export_to_pdf";
 	public static final String ACTION_COMMAND_EXPORT_TO_PRINTER = "action_export_to_printer";
-	public static final String ACTION_COMMAND_TABLE_ACTION_RETURN_ITEM = "action_table_action_return_item";
 	public static final String ACTION_COMMAND_TABLE_ACTION_DETAILS_ITEM = "action_table_action_details_item";
 	
 	/* UI */
 	private JFrame frame;
-	private JPanel searchPanel, actionContainerPanel, modelActionPanel, dataPanel;
+	private JPanel searchPanel, actionPanel, actionContainerPanel, modelActionPanel, dataPanel;
 	private JScrollPane dataScrollPane;
 	private DataJTable dataTable;
 	private JTextField searchBarTextField;
@@ -71,7 +68,6 @@ public class MainLoggerWindow implements ActionListener, DatabaseEntryTableModel
 	
 	/* Variables */
 	private Class<?> currentDisplayedModelClass;
-	private JPanel actionPanel;
 	
 	/* Constructor */
 	public MainLoggerWindow() {
@@ -265,13 +261,10 @@ public class MainLoggerWindow implements ActionListener, DatabaseEntryTableModel
 					case ACTION_COMMAND_DISPLAY_LEND: {
 						newModelClass = Lend.class;
 						
-						JButton button = new JButton(i18n.string("logger.table.column.actions.button.history-entry.return"));
-						button.setActionCommand(ACTION_COMMAND_TABLE_ACTION_RETURN_ITEM);
-						
 						JButton detailButton = new JButton(i18n.string("logger.table.column.actions.button.lend.details"));
 						detailButton.setActionCommand(ACTION_COMMAND_TABLE_ACTION_DETAILS_ITEM);
 						
-						tableActionButtons = Arrays.asList(button, detailButton);
+						tableActionButtons = Arrays.asList(detailButton);
 						break;
 					}
 					
@@ -303,17 +296,6 @@ public class MainLoggerWindow implements ActionListener, DatabaseEntryTableModel
 	@Override
 	public void onTableActionClick(JTable table, DatabaseEntryTableModel<IDatabaseEntry> tableClass, List<IDatabaseEntry> entries, int row, String action) {
 		switch (action) {
-			case ACTION_COMMAND_TABLE_ACTION_RETURN_ITEM: {
-				if (!Lend.class.equals(currentDisplayedModelClass)) {
-					throw new IllegalArgumentException("Cannot handle the return item action with a different model class than " + Lend.class.getSimpleName() + ".");
-				}
-				
-				Lend historyEntry = (Lend) entries.get(row);
-				
-				HistoryReturnDialog.open(frame, historyEntry, this);
-				break;
-			}
-			
 			case ACTION_COMMAND_TABLE_ACTION_DETAILS_ITEM: {
 				if (!Lend.class.equals(currentDisplayedModelClass)) {
 					throw new IllegalArgumentException("Cannot handle the return item action with a different model class than " + Lend.class.getSimpleName() + ".");
@@ -329,19 +311,6 @@ public class MainLoggerWindow implements ActionListener, DatabaseEntryTableModel
 				throw new IllegalStateException("Unknown table action: " + action);
 			}
 		}
-	}
-	
-	@Override
-	public void onValidatedHistoryItem(Lend originalHistoryEntry, Lend remainingHistoryEntry) {
-		DatabaseSynchronizer databaseSynchronizer = DataManager.get().getDatabaseSynchronizer();
-		
-		databaseSynchronizer.update(Lend.class, originalHistoryEntry);
-		
-		if (remainingHistoryEntry != null) {
-			databaseSynchronizer.insert(Lend.class, remainingHistoryEntry);
-		}
-		
-		((DatabaseEntryTableModel<?>) dataTable.getModel()).synchronize();
 	}
 	
 	/** @return A {@link List list} of {@link JButton button}s that will be used to fill the "Actions" section. */

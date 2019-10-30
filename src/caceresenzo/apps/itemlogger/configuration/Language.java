@@ -113,6 +113,7 @@ public class Language {
 			o("export-dialog.dialog.open-file.message", "Voulez vous ouvrir le fichier ?\nEmplacement : %s");
 
 			o("returned-lend-details-dialog.window.title", "Détail d'un prêt");
+			o("returned-lend-details-dialog.button.finish", "Terminer");
 			o("returned-lend-details-dialog.label.item", "Objet");
 			o("returned-lend-details-dialog.label.person", "À");
 			o("returned-lend-details-dialog.label.construction-site", "Chantier");
@@ -120,6 +121,9 @@ public class Language {
 			o("returned-lend-details-dialog.label.date", "Le");
 			o("returned-lend-details-dialog.label.extra", "Commentaire");
 			o("returned-lend-details-dialog.field.quantity-and-returned", "%s empreinté(es), %s rendu");
+			o("returned-lend-details-dialog.panel.details", "Détails");
+			o("returned-lend-details-dialog.panel.actions", "Actions");
+			o("returned-lend-details-dialog.panel.returned", "Retours");
 			o("returned-lend-details-dialog.dialog.error.already-fulfill.title", "Déjà rempli");
 			o("returned-lend-details-dialog.dialog.error.already-fulfill.message", "Il semble que tous les éléments ont déjà été retournés.");
 			
@@ -131,6 +135,7 @@ public class Language {
 			o("button.action.returns", "Retours");
 			o("button.action.export-printer", "Impression");
 			o("button.action.export-pdf", "Exporter en PDF");
+			o("button.action.print-good-release", "Impr. Bon de Sortie");
 			
 			o("model.item", "Item");
 			o("model.person", "Personne");
@@ -139,17 +144,20 @@ public class Language {
 			o("model.returnentry", "Retour");
 
 			o("pdf.header.title.good-release", "BON DE SORTIE");
-			o("pdf.header.title.receipt-slip", "BON DE RENTRÉ");
+			o("pdf.header.title.receipt-slip", "BON DE RETOUR");
 
 			o("pdf.card.title.item", "Objet");
 			o("pdf.card.title.person", "À");
 			o("pdf.card.title.construction-site", "Chantier");
 			o("pdf.card.title.quantity", "Quantité");
 			o("pdf.card.title.date", "Date");
-			o("pdf.card.title.extra", "Commentaire");
+			o("pdf.card.title.extra", "Commentaire(s)");
 
 			o("pdf.card.title.negro.date-and-sign", "Date et Signature");
-			o("pdf.card.title.negro.extra", "Remarque");
+			o("pdf.card.title.negro.extra", "Remarque(s)");
+
+			o("printer.dialog.failed.title", "Erreur");
+			o("printer.dialog.failed.message", "Une erreur s'est produit lors de la tentative d'impression.\n\nErreur : %s");
 			
 			o("", "");
 		}
