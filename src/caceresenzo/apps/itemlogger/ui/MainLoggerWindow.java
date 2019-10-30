@@ -328,8 +328,8 @@ public class MainLoggerWindow implements ActionListener, DatabaseEntryTableModel
 				new ActionButton("items", Assets.ICON_NEW_PRODUCT_32PX, ACTION_COMMAND_DISPLAY_ITEMS),
 				new ActionButton("persons", Assets.ICON_USER_MEN_32PX, ACTION_COMMAND_DISPLAY_PERSONS),
 				new ActionButton("construction-sites", Assets.ICON_IN_CONSTRUCTION_32PX, ACTION_COMMAND_DISPLAY_CONSTRUCTION_SITES),
-				new ActionButton("lend", Assets.ICON_HISTORY_32PX, ACTION_COMMAND_DISPLAY_LEND),
-				new ActionButton("returns", Assets.ICON_HISTORY_32PX, ACTION_COMMAND_DISPLAY_RETURNS) //
+				new ActionButton("lend", Assets.ICON_HISTORY_32PX, ACTION_COMMAND_DISPLAY_LEND)
+				//, new ActionButton("returns", Assets.ICON_HISTORY_32PX, ACTION_COMMAND_DISPLAY_RETURNS) //
 		));
 	}
 	

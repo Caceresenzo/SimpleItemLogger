@@ -44,7 +44,7 @@ public class Language {
 			o("logger.panel.data.title.with.part.item", "Materiel");
 			o("logger.panel.data.title.with.part.person", "Personnes");
 			o("logger.panel.data.title.with.part.constructionsite", "Chantiers");
-			o("logger.panel.data.title.with.part.historyentry", "Historique");
+			o("logger.panel.data.title.with.part.lend", "Prêts");
 			
 			o("logger.button.search", "Rechercher");
 			o("logger.button.clear-search", "Vider la rech.");
@@ -79,18 +79,6 @@ public class Language {
 			o("create-dialog.combobox.default.select-an-item", "Selectionner un élément");
 			o("create-dialog.error.dialog.title", "Champs manquant");
 			o("create-dialog.error.dialog.message", "Certains champs sont manquants ou n'ont pas été traités correctement.\nSi vous pensez que tout est correct, et que ce n'est pas un bug, contactez le développeur.\n\nDétails:\n    - Champs : \"%s\"\n    - Erreur : %s");
-
-			o("history-return-dialog.window.title", "Édition d'un retour");
-			o("history-return-dialog.panel.return", "Retour");
-			o("history-return-dialog.panel.quantity", "Quantité");
-			o("history-return-dialog.panel.date", "Date");
-			o("history-return-dialog.panel.settings", "Paramètres");
-			o("history-return-dialog.button.validate", "Valider");
-			o("history-return-dialog.button.cancel", "Annuler");
-			o("history-return-dialog.checkbox.add-default-extra-message", "Ajouter un commentaire par défaut.");
-			o("history-return-dialog.devise.extra.message", "Reste a rendre d'un autre");
-			o("history-return-dialog.dialog.warning-already-return.title", "Élément déjà retourné");
-			o("history-return-dialog.dialog.warning-already-return.message", "Cette élément à déjà été retourné, voulez vous quand même enregistrer un retour ?");
 			
 			o("export-dialog.pdf.window.title", "Exporter vers un PDF");
 			o("export-dialog.print.window.title", "Impression");
