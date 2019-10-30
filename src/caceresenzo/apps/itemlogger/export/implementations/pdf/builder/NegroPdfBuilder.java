@@ -1,4 +1,4 @@
-package caceresenzo.apps.itemlogger.builder;
+package caceresenzo.apps.itemlogger.export.implementations.pdf.builder;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;

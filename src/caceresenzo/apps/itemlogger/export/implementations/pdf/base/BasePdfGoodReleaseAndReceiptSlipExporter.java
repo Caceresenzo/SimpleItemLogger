@@ -10,7 +10,7 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 
-import caceresenzo.apps.itemlogger.builder.NegroPdfBuilder;
+import caceresenzo.apps.itemlogger.export.implementations.pdf.builder.NegroPdfBuilder;
 import caceresenzo.libs.internationalization.i18n;
 import caceresenzo.libs.string.StringUtils;
 
@@ -90,7 +90,11 @@ public abstract class BasePdfGoodReleaseAndReceiptSlipExporter<T> extends NegroP
 			}
 			
 			printDateAndSignAndExtraCards(contentStream, minX, maxX);
+			
+			printFooter(contentStream, mediaBox);
+			printCurrentPageNumber(contentStream, mediaBox, 1, 1);
 		}
+		
 		
 		finishDocument(file);
 	}

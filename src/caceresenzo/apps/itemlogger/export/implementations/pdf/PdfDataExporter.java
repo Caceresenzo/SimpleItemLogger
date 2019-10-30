@@ -18,8 +18,8 @@ import org.apache.pdfbox.pdmodel.PDPageTree;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
-import caceresenzo.apps.itemlogger.builder.NegroPdfBuilder;
 import caceresenzo.apps.itemlogger.export.DataExporter;
+import caceresenzo.apps.itemlogger.export.implementations.pdf.builder.NegroPdfBuilder;
 import caceresenzo.apps.itemlogger.managers.DataManager;
 import caceresenzo.apps.itemlogger.utils.Utils;
 import caceresenzo.frameworks.database.binder.BindableColumn;
