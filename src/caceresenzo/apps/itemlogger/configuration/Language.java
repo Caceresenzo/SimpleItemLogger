@@ -84,6 +84,7 @@ public class Language {
 			o("export-dialog.print.window.title", "Impression");
 			o("export-dialog.file-chooser.title", "Selectionner le fichier de destination...");
 			o("export-dialog.panel.settings.title", "Paramètres");
+			o("export-dialog.panel.filter.title", "Filtre");
 			o("export-dialog.panel.file.title", "Fichier");
 			o("export-dialog.panel.print.title", "Imprimante");
 			o("export-dialog.button.browse", "Explorer...");
@@ -93,6 +94,7 @@ public class Language {
 			o("export-dialog.button.cancel", "Annuler");
 			o("export-dialog.button.toggle.enabled", "ACTIVÉ");
 			o("export-dialog.button.toggle.disabled", "DÉSACTIVÉ");
+			o("export-dialog.checkbox.filter.text", "Utiliser Filtrage");
 			o("export-dialog.dialog.error.nothing-enabled.title", "Paramètres invalides");
 			o("export-dialog.dialog.error.nothing-enabled.message", "Veuillez selectionner au moins un ou plusieurs éléments à exporter.");
 			o("export-dialog.dialog.error.export-error.title", "Exportation en erreur");
@@ -133,6 +135,7 @@ public class Language {
 
 			o("pdf.header.title.good-release", "BON DE SORTIE");
 			o("pdf.header.title.receipt-slip", "BON DE RETOUR");
+			o("pdf.header.filtered", "résultat(s) filtré(s)");
 
 			o("pdf.card.title.item", "Objet");
 			o("pdf.card.title.person", "À");

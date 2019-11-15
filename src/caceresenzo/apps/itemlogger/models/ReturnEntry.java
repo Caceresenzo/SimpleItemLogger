@@ -7,7 +7,7 @@ import caceresenzo.frameworks.database.annotations.DatabaseTable;
 import caceresenzo.frameworks.database.annotations.DatabaseTableColumn;
 import caceresenzo.frameworks.database.setup.sql.SqlTableBuilder;
 
-@DatabaseTable(value = "return_entries", isRemovable = true, isSubData = true)
+@DatabaseTable(value = "return_entries", isExportable = false, isSubData = true)
 public class ReturnEntry implements IDatabaseEntry {
 	
 	/* Database Fields */

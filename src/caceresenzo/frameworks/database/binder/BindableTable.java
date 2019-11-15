@@ -37,6 +37,11 @@ public class BindableTable {
 	public boolean hasSubData() {
 		return annotation.hasSubData();
 	}
+
+	/** @see DatabaseTable#isExportable() */
+	public boolean isExportable() {
+		return annotation.isExportable();
+	}
 	
 	/** @return Table's annotation. */
 	public DatabaseTable getAnnotation() {

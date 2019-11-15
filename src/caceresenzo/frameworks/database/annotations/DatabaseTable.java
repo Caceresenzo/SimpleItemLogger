@@ -24,4 +24,7 @@ public @interface DatabaseTable {
 	/** @return Weather or not the table row can only exists if a row in another table is linked to it. */
 	public boolean isSubData() default false;
 	
+	/** @return Weather or not the table can be exported in another format. */
+	public boolean isExportable() default true;
+	
 }

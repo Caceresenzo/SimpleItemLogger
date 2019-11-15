@@ -23,8 +23,8 @@ public class ExportToPrinterDialog extends AbstractExportToDialog implements Con
 	private PrintService printService;
 	
 	/* Constructor */
-	public ExportToPrinterDialog(JFrame parent) {
-		super(parent, AbstractExportToDialog.ExportMode.PRINTER);
+	public ExportToPrinterDialog(JFrame parent, String filterText) {
+		super(parent, filterText, AbstractExportToDialog.ExportMode.PRINTER);
 	}
 	
 	@Override
@@ -33,10 +33,11 @@ public class ExportToPrinterDialog extends AbstractExportToDialog implements Con
 	}
 	
 	@Override
-	protected void handleExport(List<SettingEntry<Boolean>> settingEntries) throws Exception {
+	protected void handleExport(List<SettingEntry<Boolean>> settingEntries, String filterText) throws Exception {
 		File temporaryFile = new File(System.getProperty("java.io.tmpdir"), String.format("%s.%s", UUID.randomUUID().toString(), PDF_EXTENSION));
 		
 		DataExporter dataExporter = new PdfDataExporter();
+		dataExporter.setFilter(filterText);
 		dataExporter.exportToFile(settingEntries, temporaryFile);
 		
 		PDDocument document = PDDocument.load(temporaryFile);
@@ -63,9 +64,11 @@ public class ExportToPrinterDialog extends AbstractExportToDialog implements Con
 	 * 
 	 * @param parent
 	 *            Parent {@link JFrame}.
+	 * @param filterText
+	 *            Initial filtering text.
 	 */
-	public static void open(JFrame parent) {
-		AbstractExportToDialog dialog = new ExportToPrinterDialog(parent);
+	public static void open(JFrame parent, String filterText) {
+		AbstractExportToDialog dialog = new ExportToPrinterDialog(parent, filterText);
 		
 		dialog.setVisible(true);
 	}

@@ -12,20 +12,26 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import javax.swing.RowFilter;
+
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.PDPageTree;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import caceresenzo.apps.itemlogger.export.DataExporter;
 import caceresenzo.apps.itemlogger.export.implementations.pdf.builder.NegroPdfBuilder;
 import caceresenzo.apps.itemlogger.managers.DataManager;
+import caceresenzo.apps.itemlogger.ui.models.QueryRowFilter;
 import caceresenzo.apps.itemlogger.utils.Utils;
 import caceresenzo.frameworks.database.binder.BindableColumn;
 import caceresenzo.frameworks.database.binder.BindableTable;
 import caceresenzo.frameworks.settings.SettingEntry;
 import caceresenzo.libs.internationalization.i18n;
+import caceresenzo.libs.string.StringUtils;
 
 public class PdfDataExporter extends NegroPdfBuilder implements DataExporter {
 	
@@ -36,6 +42,12 @@ public class PdfDataExporter extends NegroPdfBuilder implements DataExporter {
 	
 	/* Settings */
 	public static final boolean SHRINK_INTEGER_COLUMN = true;
+	
+	/* Logger */
+	private static final Logger LOGGER = LoggerFactory.getLogger(PdfDataExporter.class);
+	
+	/* Variables */
+	private String filter;
 	
 	@Override
 	public void exportToFile(List<SettingEntry<Boolean>> settingEntries, File file) throws Exception {
@@ -65,7 +77,42 @@ public class PdfDataExporter extends NegroPdfBuilder implements DataExporter {
 			BindableColumn idBindableColumn = BindableColumn.findIdColumn(bindableColumns);
 			bindableColumns.remove(idBindableColumn);
 			
-			List<?> modelInstances = DataManager.get().getDatabaseSynchronizer().load(bindableTable.getModelClass());
+			Class<?> modelClass = bindableTable.getModelClass();
+			
+			List<?> modelInstances = DataManager.get().getDatabaseSynchronizer().load(modelClass);
+			if (StringUtils.validate(filter)) {
+				QueryRowFilter rowFilter = new QueryRowFilter(filter);
+				
+				modelInstances.removeIf((instance) -> {
+					return !rowFilter.include(new RowFilter.Entry<Object, Object>() {
+						@Override
+						public Object getModel() {
+							throw new UnsupportedOperationException();
+						}
+						
+						@Override
+						public int getValueCount() {
+							return bindableColumns.size();
+						}
+						
+						@Override
+						public Object getValue(int index) {
+							try {
+								return bindableColumns.get(index).getField().get(instance);
+							} catch (IllegalArgumentException | IllegalAccessException exception) {
+								LOGGER.warn("Failed to get field value.", exception);
+							}
+							
+							return null;
+						}
+						
+						@Override
+						public Object getIdentifier() {
+							throw new UnsupportedOperationException();
+						}
+					});
+				});
+			}
 			ListIterator<?> modelInstanceListIterator = modelInstances.listIterator();
 			
 			final float minX = PAGE_MARGIN_HORIZONTAL;
@@ -199,8 +246,14 @@ public class PdfDataExporter extends NegroPdfBuilder implements DataExporter {
 		finishDocument(file);
 	}
 	
+	@Override
+	public void setFilter(String filterText) {
+		this.filter = filterText;
+	}
+	
 	/**
-	 * Print the current {@link BindableTable bindable table} of this page in the header. This function also add today's date, a logo and a line under the text.
+	 * Print the current {@link BindableTable bindable table} of this page in the header.<br>
+	 * This function also add today's date, tell weather or not a filter is active, add a logo and add a line under the text.
 	 * 
 	 * @param contentStream
 	 *            The {@link PDPage page}'s writable steam.
@@ -217,13 +270,18 @@ public class PdfDataExporter extends NegroPdfBuilder implements DataExporter {
 		String tableTranslatedName = i18n.string("logger.panel.data.title.with.part." + bindableTable.getModelClass().getSimpleName().toLowerCase());
 		String todayDate = LocalDate.now().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
 		
+		String subTitle = todayDate;
+		if (StringUtils.validate(filter)) {
+			subTitle += ", " + i18n.string("pdf.header.filtered");
+		}
+		
 		float xStart = PAGE_MARGIN_HORIZONTAL;
 		float xEnd = mediaBox.getWidth() - PAGE_MARGIN_HORIZONTAL;
 		float y = mediaBox.getHeight() - PAGE_MARGIN_VERTICAL - FONT_SIZE;
 		
 		y -= printSimpleText(contentStream, xStart, y, FONT_SIZE * 1.5f, tableTranslatedName);
 		y -= FONT_SIZE * 0.4f;
-		printSimpleText(contentStream, xStart, y, FONT_SIZE, todayDate);
+		printSimpleText(contentStream, xStart, y, FONT_SIZE, subTitle);
 		
 		printLogo(contentStream, mediaBox, y, logo);
 		

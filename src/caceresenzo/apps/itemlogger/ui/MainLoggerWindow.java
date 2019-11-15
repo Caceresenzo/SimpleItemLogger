@@ -277,13 +277,21 @@ public class MainLoggerWindow implements ActionListener, DatabaseEntryTableModel
 				break;
 			}
 			
-			case ACTION_COMMAND_EXPORT_TO_PDF: {
-				ExportToPdfDialog.open(frame);
-				break;
-			}
-			
+			case ACTION_COMMAND_EXPORT_TO_PDF:
 			case ACTION_COMMAND_EXPORT_TO_PRINTER: {
-				ExportToPrinterDialog.open(frame);
+				String filterText = searchBarTextField.getText();
+				
+				switch (actionCommand) {
+					case ACTION_COMMAND_EXPORT_TO_PDF: {
+						ExportToPdfDialog.open(frame, filterText);
+						break;
+					}
+					
+					case ACTION_COMMAND_EXPORT_TO_PRINTER: {
+						ExportToPrinterDialog.open(frame, filterText);
+						break;
+					}
+				}
 				break;
 			}
 			

@@ -1,9 +1,6 @@
 package caceresenzo.apps.itemlogger.ui.models;
 
 import java.lang.reflect.Modifier;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -14,7 +11,6 @@ import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.RowFilter;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
@@ -284,34 +280,8 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 		TableRowSorter<TableModel> sorter = null;
 		
 		if (query != null) {
-			String lowerQuery = query.toLowerCase();
-			String[] splitedQuery = lowerQuery.split(" ");
-			
-			sorter = new TableRowSorter<>(this);
-			sorter.setRowFilter(new RowFilter<Object, Object>() {
-				public boolean include(RowFilter.Entry<?, ?> entry) {
-					for (int index = 0; index < entry.getValueCount(); index++) {
-						Object object = entry.getValue(index);
-						String stringValue = null;
-						
-						if (object instanceof IDatabaseEntry) {
-							stringValue = ((IDatabaseEntry) object).describe();
-						} else if (object instanceof LocalDate) {
-							stringValue = ((LocalDate) object).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
-						} else {
-							stringValue = String.valueOf(object);
-						}
-						
-						for (String word : splitedQuery) {
-							if (stringValue.toLowerCase().contains(word)) {
-								return true;
-							}
-						}
-					}
-					
-					return false;
-				}
-			});
+			sorter = new TableRowSorter<>(this);			
+			sorter.setRowFilter(new QueryRowFilter(query));
 		}
 		
 		table.setRowSorter(sorter);

@@ -21,8 +21,8 @@ public class ExportToPdfDialog extends AbstractExportToDialog {
 	private File targetFile;
 	
 	/* Constructor */
-	public ExportToPdfDialog(JFrame parent) {
-		super(parent, AbstractExportToDialog.ExportMode.PDF);
+	public ExportToPdfDialog(JFrame parent, String filterText) {
+		super(parent, filterText, AbstractExportToDialog.ExportMode.PDF);
 	}
 	
 	@Override
@@ -31,8 +31,9 @@ public class ExportToPdfDialog extends AbstractExportToDialog {
 	}
 	
 	@Override
-	protected void handleExport(List<SettingEntry<Boolean>> settingEntries) throws Exception {
+	protected void handleExport(List<SettingEntry<Boolean>> settingEntries, String filterText) throws Exception {
 		DataExporter dataExporter = new PdfDataExporter();
+		dataExporter.setFilter(filterText);
 		
 		dataExporter.exportToFile(settingEntries, targetFile);
 		
@@ -70,9 +71,11 @@ public class ExportToPdfDialog extends AbstractExportToDialog {
 	 * 
 	 * @param parent
 	 *            Parent {@link JFrame}.
+	 * @param filterText
+	 *            Initial filtering text.
 	 */
-	public static void open(JFrame parent) {
-		AbstractExportToDialog dialog = new ExportToPdfDialog(parent);
+	public static void open(JFrame parent, String filterText) {
+		AbstractExportToDialog dialog = new ExportToPdfDialog(parent, filterText);
 		
 		dialog.setVisible(true);
 	}

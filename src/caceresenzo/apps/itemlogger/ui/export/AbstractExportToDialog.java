@@ -36,8 +36,13 @@ import caceresenzo.frameworks.database.binder.BindableTable;
 import caceresenzo.frameworks.database.setup.TableCreator;
 import caceresenzo.frameworks.settings.SettingEntry;
 import caceresenzo.libs.internationalization.i18n;
+import caceresenzo.libs.string.StringUtils;
 
-public abstract class AbstractExportToDialog extends JDialog implements Constants, ActionListener {
+import javax.swing.JCheckBox;
+import java.awt.event.ItemListener;
+import java.awt.event.ItemEvent;
+
+public abstract class AbstractExportToDialog extends JDialog implements Constants, ActionListener, ItemListener {
 	
 	/* Logger */
 	private static Logger LOGGER = LoggerFactory.getLogger(AbstractExportToDialog.class);
@@ -49,17 +54,17 @@ public abstract class AbstractExportToDialog extends JDialog implements Constant
 	public static final String ACTION_COMMAND_CLOSE = "action_close";
 	
 	/* UI */
-	protected final JPanel contentPanel;
+	protected final JPanel contentPanel = new JPanel();
 	protected JPanel settingListPanel, filePanel, buttonPane;
 	protected JScrollPane settingListScrollPane;
 	protected JTextField exportPathTextField;
 	protected JButton browseButton, doExportButton, cancelButton;
+	private JTextField filterTextField;
+	private JCheckBox filterEnableCheckBox;
 	
 	/* Constructor */
-	public AbstractExportToDialog(JFrame parent, AbstractExportToDialog.ExportMode exportMode) {
+	public AbstractExportToDialog(JFrame parent, String filterText, AbstractExportToDialog.ExportMode exportMode) {
 		super(parent);
-		
-		this.contentPanel = new JPanel();
 		
 		setSize(700, 500);
 		setModal(true);
@@ -82,23 +87,54 @@ public abstract class AbstractExportToDialog extends JDialog implements Constant
 		settingListScrollPane.getVerticalScrollBar().setUnitIncrement(16);
 		settingListScrollPane.setBorder(new TitledBorder(null, i18n.string("export-dialog.panel.settings.title"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
+		JPanel panel = new JPanel();
+		panel.setBorder(new TitledBorder(null, i18n.string("export-dialog.panel.filter.title"), TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		
 		GroupLayout gl_contentPanel = new GroupLayout(contentPanel);
 		gl_contentPanel.setHorizontalGroup(
-				gl_contentPanel.createParallelGroup(Alignment.LEADING)
-						.addGroup(Alignment.TRAILING, gl_contentPanel.createSequentialGroup()
+				gl_contentPanel.createParallelGroup(Alignment.TRAILING)
+						.addGroup(gl_contentPanel.createSequentialGroup()
 								.addContainerGap()
 								.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING)
 										.addComponent(settingListScrollPane, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 654, Short.MAX_VALUE)
-										.addComponent(filePanel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 654, Short.MAX_VALUE))
+										.addComponent(filePanel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 654, Short.MAX_VALUE)
+										.addComponent(panel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 654, Short.MAX_VALUE))
 								.addContainerGap()));
 		gl_contentPanel.setVerticalGroup(
-				gl_contentPanel.createParallelGroup(Alignment.LEADING)
-						.addGroup(Alignment.TRAILING, gl_contentPanel.createSequentialGroup()
+				gl_contentPanel.createParallelGroup(Alignment.TRAILING)
+						.addGroup(gl_contentPanel.createSequentialGroup()
 								.addContainerGap()
-								.addComponent(settingListScrollPane, GroupLayout.DEFAULT_SIZE, 215, Short.MAX_VALUE)
+								.addComponent(settingListScrollPane, GroupLayout.DEFAULT_SIZE, 238, Short.MAX_VALUE)
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addComponent(panel, GroupLayout.PREFERRED_SIZE, 71, GroupLayout.PREFERRED_SIZE)
 								.addPreferredGap(ComponentPlacement.RELATED)
 								.addComponent(filePanel, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE)
 								.addContainerGap()));
+		
+		filterTextField = new JTextField();
+		filterTextField.setColumns(10);
+		
+		filterEnableCheckBox = new JCheckBox(i18n.string("export-dialog.checkbox.filter.text"));
+		filterEnableCheckBox.addItemListener(this);
+		
+		GroupLayout gl_panel = new GroupLayout(panel);
+		gl_panel.setHorizontalGroup(
+				gl_panel.createParallelGroup(Alignment.LEADING)
+						.addGroup(Alignment.TRAILING, gl_panel.createSequentialGroup()
+								.addContainerGap()
+								.addComponent(filterTextField, GroupLayout.DEFAULT_SIZE, 553, Short.MAX_VALUE)
+								.addPreferredGap(ComponentPlacement.UNRELATED)
+								.addComponent(filterEnableCheckBox)
+								.addContainerGap()));
+		gl_panel.setVerticalGroup(
+				gl_panel.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel.createSequentialGroup()
+								.addContainerGap()
+								.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+										.addComponent(filterTextField, GroupLayout.PREFERRED_SIZE, 26, GroupLayout.PREFERRED_SIZE)
+										.addComponent(filterEnableCheckBox))
+								.addContainerGap(25, Short.MAX_VALUE)));
+		panel.setLayout(gl_panel);
 		
 		settingListPanel = new JPanel();
 		settingListScrollPane.setViewportView(settingListPanel);
@@ -151,6 +187,11 @@ public abstract class AbstractExportToDialog extends JDialog implements Constant
 		}
 		
 		initializeSettings();
+		
+		filterTextField.setText(filterText);
+		
+		filterEnableCheckBox.setSelected(StringUtils.validate(filterText));
+		filterTextField.setEnabled(filterEnableCheckBox.isSelected());
 	}
 	
 	/** Initialize the {@link ExportSettingPanel} list with the {@link TableCreator}'s loaded {@link BindableTable bindables}. */
@@ -177,10 +218,12 @@ public abstract class AbstractExportToDialog extends JDialog implements Constant
 	 * 
 	 * @param settingEntries
 	 *            Settings for the export.
+	 * @param filterText
+	 *            Filter text to apply to the exported content.
 	 * @throws Exception
 	 *             If anything goes wrong.
 	 */
-	protected abstract void handleExport(List<SettingEntry<Boolean>> settingEntries) throws Exception;
+	protected abstract void handleExport(List<SettingEntry<Boolean>> settingEntries, String filterText) throws Exception;
 	
 	/**
 	 * Update the path text field and transfer the focus to the do export button.
@@ -226,7 +269,13 @@ public abstract class AbstractExportToDialog extends JDialog implements Constant
 					JOptionPane.showMessageDialog(this, i18n.string("export-dialog.dialog.error.nothing-enabled.message"), i18n.string("export-dialog.dialog.error.nothing-enabled.title"), JOptionPane.ERROR_MESSAGE);
 				} else {
 					try {
-						handleExport(settingEntries);
+						String filterText = filterTextField.getText();
+						
+						if (!filterEnableCheckBox.isEnabled() || !StringUtils.validate(filterText)) {
+							filterText = null;
+						}
+						
+						handleExport(settingEntries, filterText);
 						
 						actionPerformed(new ActionEvent(this, 0, ACTION_COMMAND_CLOSE));
 					} catch (Exception exception) {
@@ -248,6 +297,17 @@ public abstract class AbstractExportToDialog extends JDialog implements Constant
 			default: {
 				throw new IllegalStateException("Unknown action command: " + actionCommand);
 			}
+		}
+	}
+	
+	@Override
+	public void itemStateChanged(ItemEvent event) {
+		Component source = (Component) event.getSource();
+		
+		if (source == filterEnableCheckBox) {
+			filterTextField.setEnabled(filterEnableCheckBox.isSelected());
+		} else {
+			throw new IllegalStateException("Unknown item state changed source: " + source);
 		}
 	}
 	
