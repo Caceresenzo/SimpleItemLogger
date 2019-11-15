@@ -197,7 +197,7 @@ public abstract class AbstractExportToDialog extends JDialog implements Constant
 	/** Initialize the {@link ExportSettingPanel} list with the {@link TableCreator}'s loaded {@link BindableTable bindables}. */
 	private void initializeSettings() {
 		for (BindableTable bindableTable : DataManager.get().getTableCreator().getBindables().values()) {
-			if (bindableTable.isSubData()) {
+			if (!bindableTable.isExportable()) {
 				continue;
 			}
 			

@@ -349,7 +349,7 @@ public class LendDetailDialog extends JDialog implements ActionListener, Databas
 								BindableColumn bindableColumn = BindableColumn.findColumn(TableAnalizer.get().analizeColumns(MODEL_CLASS), ReturnEntry.COLUMN_QUANTITY);
 								Field field = bindableColumn.getField();
 								
-								newQuantity = Math.min(newQuantity, lend.getQuantity());
+								newQuantity = Math.min(newQuantity, lend.getQuantity() - already);
 								try {
 									field.set(returnEntry, newQuantity);
 								} catch (IllegalArgumentException | IllegalAccessException exception) {
