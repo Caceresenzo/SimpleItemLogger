@@ -59,7 +59,7 @@ public class Language {
 			o("logger.table.column.item", "Objet");
 			o("logger.table.column.person", "À");
 			o("logger.table.column.quantity", "Quantité");
-			o("logger.table.column.waiting_quantity", "En Attente");
+			o("logger.table.column.waiting_quantity", "Attente Retour");
 			o("logger.table.column.construction_site", "Chantier");
 			o("logger.table.column.lend", "Prêt");
 			o("logger.table.column.return", "Retour");
@@ -68,7 +68,6 @@ public class Language {
 			o("logger.table.column.actions.button.remove", "SUPPRIMER");
 			o("logger.table.column.actions.button.remove.confirm-dialog.title", "Confirmation de suppression");
 			o("logger.table.column.actions.button.remove.confirm-dialog.message", "Attention : Cette action n'est pas reversible !\nÊtes-vous sur de vouloir supprimer cette ligne ?");
-			o("logger.table.column.actions.button.history-entry.return", "RETOURNER");
 			o("logger.table.column.actions.button.lend.details", "DÉTAILS");
 			
 			o("create-dialog.window.title", "Ajout d'une ligne");
@@ -101,7 +100,7 @@ public class Language {
 			o("export-dialog.dialog.error.export-error.message", "L'exportation a renvoyé une erreur.\nSi vous pensez que ce n'est pas normal, contactez le developpeur.\n\nErreur : %s");
 			o("export-dialog.dialog.open-file.title", "Ouvrir le fichier");
 			o("export-dialog.dialog.open-file.message", "Voulez vous ouvrir le fichier ?\nEmplacement : %s");
-
+			
 			o("returned-lend-details-dialog.window.title", "Détail d'un prêt");
 			o("returned-lend-details-dialog.button.finish", "Terminer");
 			o("returned-lend-details-dialog.label.item", "Objet");
@@ -110,7 +109,7 @@ public class Language {
 			o("returned-lend-details-dialog.label.quantity-and-returned", "Quantité");
 			o("returned-lend-details-dialog.label.date", "Le");
 			o("returned-lend-details-dialog.label.extra", "Commentaire");
-			o("returned-lend-details-dialog.field.quantity-and-returned", "%s empreinté(es), %s rendu");
+			o("returned-lend-details-dialog.field.quantity-and-returned", "%s empreinté(s), %s rendu(s)");
 			o("returned-lend-details-dialog.panel.details", "Détails");
 			o("returned-lend-details-dialog.panel.actions", "Actions");
 			o("returned-lend-details-dialog.panel.returned", "Retours");
@@ -122,7 +121,6 @@ public class Language {
 			o("button.action.persons", "Personnes");
 			o("button.action.construction-sites", "Chantiers");
 			o("button.action.lend", "Prêt");
-			o("button.action.returns", "Retours");
 			o("button.action.export-printer", "Impression");
 			o("button.action.export-pdf", "Exporter en PDF");
 			o("button.action.print-good-release", "Impr. Bon de Sortie");
@@ -132,23 +130,23 @@ public class Language {
 			o("model.constructionsite", "Chantier");
 			o("model.lend", "Prêt");
 			o("model.returnentry", "Retour");
-
+			
 			o("pdf.header.title.good-release", "BON DE SORTIE");
 			o("pdf.header.title.receipt-slip", "BON DE RETOUR");
 			o("pdf.header.filtered", "résultat(s) filtré(s)");
-
+			
 			o("pdf.card.title.item", "Objet");
 			o("pdf.card.title.person", "À");
 			o("pdf.card.title.construction-site", "Chantier");
 			o("pdf.card.title.quantity", "Quantité");
 			o("pdf.card.title.date", "Date");
 			o("pdf.card.title.extra", "Commentaire(s)");
-
+			
 			o("pdf.card.title.negro.date-and-sign", "Date et Signature");
 			o("pdf.card.title.negro.extra", "Remarque(s)");
-
+			
 			o("printer.dialog.failed.title", "Erreur");
-			o("printer.dialog.failed.message", "Une erreur s'est produit lors de la tentative d'impression.\n\nErreur : %s");
+			o("printer.dialog.failed.message", "Une erreur s'est produite lors de la tentative d'impression.\n\nErreur : %s");
 			
 			o("", "");
 		}
