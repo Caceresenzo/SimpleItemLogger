@@ -32,6 +32,11 @@ public class BindableTable {
 	public boolean isSubData() {
 		return annotation.isSubData();
 	}
+
+	/** @see DatabaseTable#hasSubData() */
+	public boolean hasSubData() {
+		return annotation.hasSubData();
+	}
 	
 	/** @return Table's annotation. */
 	public DatabaseTable getAnnotation() {

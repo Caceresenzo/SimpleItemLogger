@@ -18,6 +18,9 @@ public @interface DatabaseTable {
 	/** @return Weather or not the table can has one of its row remove from the database. */
 	public boolean isRemovable() default false;
 	
+	/** @return Weather or not some table exists only if there are linked by one entry of this table. */
+	public boolean hasSubData() default false;
+	
 	/** @return Weather or not the table row can only exists if a row in another table is linked to it. */
 	public boolean isSubData() default false;
 	

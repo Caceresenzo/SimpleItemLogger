@@ -23,6 +23,9 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import caceresenzo.apps.itemlogger.configuration.Config;
 import caceresenzo.apps.itemlogger.managers.DataManager;
 import caceresenzo.apps.itemlogger.ui.models.combobox.DatabaseEntryComboBoxCellEditor;
@@ -43,6 +46,9 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 	
 	/* Serialization */
 	private static final long serialVersionUID = 1082999014657444212L;
+	
+	/* Logger */
+	private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseEntryTableModel.class);
 	
 	/* Action Commands */
 	private static final String ACTION_COMMAND_REMOVE_ROW = "action_remove_row";
@@ -105,10 +111,49 @@ public class DatabaseEntryTableModel<T extends IDatabaseEntry> extends AbstractT
 							int reply = JOptionPane.showConfirmDialog(table, i18n.string("logger.table.column.actions.button.remove.confirm-dialog.message"), i18n.string("logger.table.column.actions.button.remove.confirm-dialog.title"), JOptionPane.YES_NO_OPTION);
 							
 							if (reply == JOptionPane.YES_OPTION) {
-								Object instance = entries.get(row);
-								Class<?> modelClass = instance.getClass();
+								IDatabaseEntry entry = entries.get(row);
+								Class<?> modelClass = entry.getClass();
+								BindableTable instanceBindableTable = TableAnalizer.get().analizeTable(modelClass);
+
+								if (instanceBindableTable.hasSubData()) {
+									List<Object> subDataInstances = new ArrayList<>();
+									
+									for (BindableTable bindableTable : DataManager.get().getTableCreator().getBindables().values()) {
+										if (bindableTable.isSubData()) {
+											BindableColumn subDataBindableColumn = null;
+											
+											for (BindableColumn bindableColumn : bindableTable.getBindableColumns()) {
+												if (bindableColumn.getField().getType().equals(modelClass)) {
+													subDataBindableColumn = bindableColumn;
+													break;
+												}
+											}
+											
+											if (subDataBindableColumn == null) {
+												continue;
+											}
+											
+											try {
+												List<?> instances = synchronizer.load(bindableTable.getModelClass(), true);
+												
+												for (Object instance : instances) {
+													IDatabaseEntry databaseEntry = (IDatabaseEntry) instance;
+													IDatabaseEntry subDataParent = (IDatabaseEntry) subDataBindableColumn.getField().get(databaseEntry);
+													
+													if (subDataParent.getId() == entry.getId()) {
+														subDataInstances.add(databaseEntry);
+													}
+												}
+											} catch (Exception exception) {
+												LOGGER.warn("Failed to find dependency of subdata class.");
+											}
+										}
+									}
+									
+									subDataInstances.forEach((subData) -> synchronizer.delete(subData.getClass(), subData));
+								}
 								
-								synchronizer.delete(modelClass, instance);
+								synchronizer.delete(modelClass, entry);
 								
 								synchronize();
 							}

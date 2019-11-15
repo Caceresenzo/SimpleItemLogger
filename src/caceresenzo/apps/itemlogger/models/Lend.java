@@ -13,7 +13,7 @@ import caceresenzo.frameworks.database.automator.AbstractDatabaseColumnValueAuto
 import caceresenzo.frameworks.database.setup.TableAnalizer;
 import caceresenzo.frameworks.database.setup.sql.SqlTableBuilder;
 
-@DatabaseTable("lends")
+@DatabaseTable(value = "lends", hasSubData = true, isRemovable = true)
 public class Lend implements IDatabaseEntry {
 	
 	/* Database Fields */

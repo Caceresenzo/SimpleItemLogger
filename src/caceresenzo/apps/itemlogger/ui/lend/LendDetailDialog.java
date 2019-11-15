@@ -288,7 +288,7 @@ public class LendDetailDialog extends JDialog implements ActionListener, Databas
 		extraTextField.setText(lend.getExtra());
 	}
 	
-	/** Load the {@link ReturnEntry} and filter once that are not associated with the {@link Lend} instance. */
+	/** Load the {@link ReturnEntry} and filter ones that are not associated with the {@link Lend} instance. */
 	@SuppressWarnings("unchecked")
 	private void loadReturnEntries() {
 		List<ReturnEntry> rawReturnEntries = (List<ReturnEntry>) synchronizer.load(MODEL_CLASS);
